@@ -121,9 +121,9 @@ function renderRekap(source){
   // Chart
   renderRekapChart(sL, mAll, bulan, tahun);
 
-  // Izin Sheet v3
-  ['izinSheet','izinSheetM'].forEach(function(id){
-    var el = document.getElementById(id); if(!el) return;
+  // Izin Sheet v3 — build cards once, render header once
+  (function(){
+    // Kumpulkan semua cards
     var cards=[];
     sL.forEach(function(t){
       var d=new Date(tglDate(t)+'T00:00:00');
@@ -134,39 +134,86 @@ function renderRekap(source){
         if(rec.status==='I') cards.push({nama:m.nama,kegiatan:ket,tgl:tglLabel,catatan:rec.catatan||''});
       });
     });
-    if(!cards.length){ el.innerHTML=''; return; }
+
+    // Clear semua jika kosong
+    if(!cards.length){
+      ['izinSheet','izinSheetM'].forEach(function(id){
+        var el=document.getElementById(id); if(el) el.innerHTML='';
+      });
+      return;
+    }
 
     function iz3Color(cat){
       var c=(cat||'').toLowerCase();
-      if(/kerja|dinas|shift/.test(c))       return {bg:'#dbeafe',col:'#1d4ed8'};
+      if(/kerja|dinas|shift/.test(c))           return {bg:'#dbeafe',col:'#1d4ed8'};
       if(/kuliah|ujian|sekolah|kampus/.test(c)) return {bg:'#ede9fe',col:'#6d28d9'};
-      if(/sakit|demam|rawat/.test(c))       return {bg:'#fee2e2',col:'#b91c1c'};
-      if(/keluarga/.test(c))                return {bg:'#ffedd5',col:'#c2410c'};
+      if(/sakit|demam|rawat/.test(c))           return {bg:'#fee2e2',col:'#b91c1c'};
+      if(/keluarga/.test(c))                    return {bg:'#ffedd5',col:'#c2410c'};
       return {bg:'#ebebeb',col:'#666'};
     }
 
-    var h='<div class="iz3-header">'+
-      '<span class="iz3-title">Keterangan Izin</span>'+
-      '<span class="iz3-total">'+cards.length+' izin</span>'+
-      '</div>'+
-      '<div class="iz3-grid">';
+    // Hitung stat per kategori (sekali saja)
+    var izinStats={sakit:0,kerja:0,kuliah:0,keluarga:0,lain:0};
     cards.forEach(function(c){
-      var rc  = iz3Color(c.catatan);
-      var tag = c.catatan
-        ? '<span class="iz3-tag" style="background:'+rc.bg+';color:'+rc.col+'">'+c.catatan+'</span>'
-        : '';
-      h+='<div class="iz3-card" style="border-left:3px solid '+rc.col+'">'+
-        '<div class="iz3-nama">'+c.nama+'</div>'+
-        '<div class="iz3-kg-row">'+
-          '<span class="iz3-kegiatan">'+c.kegiatan+'</span>'+
-          tag+
-        '</div>'+
-        '<div class="iz3-tgl">'+c.tgl+'</div>'+
-        '</div>';
+      var cat=(c.catatan||'').toLowerCase();
+      if(/sakit|demam|rawat/.test(cat))                izinStats.sakit++;
+      else if(/kerja|dinas|shift/.test(cat))           izinStats.kerja++;
+      else if(/kuliah|ujian|sekolah|kampus/.test(cat)) izinStats.kuliah++;
+      else if(/keluarga/.test(cat))                    izinStats.keluarga++;
+      else izinStats.lain++;
     });
-    h+='</div>';
-    el.innerHTML=h;
-  });
+
+    function iz3StatBadge(label, count, bg, col){
+      if(!count) return '';
+      return '<div style="display:inline-flex;flex-direction:column;align-items:center;background:'+bg+';border-radius:8px;padding:6px 14px;min-width:52px">'+
+        '<span style="font-size:16px;font-weight:700;color:'+col+';line-height:1.2">'+count+'</span>'+
+        '<span style="font-size:9px;font-weight:600;color:'+col+';letter-spacing:.3px;margin-top:1px">'+label+'</span>'+
+        '</div>';
+    }
+
+    // Header rapi — satu kali, dipakai web & print
+    var headerHtml=
+      '<div class="iz3-hd-wrap">'+
+        '<div class="iz3-hd-title-row">'+
+          '<span class="iz3-hd-title">Keterangan Izin</span>'+
+          '<span class="iz3-hd-badge">'+cards.length+' Izin</span>'+
+        '</div>'+
+        '<div class="iz3-hd-stats">'+
+          iz3StatBadge('Sakit',    izinStats.sakit,    '#fee2e2','#b91c1c')+
+          iz3StatBadge('Kerja',    izinStats.kerja,    '#dbeafe','#1d4ed8')+
+          iz3StatBadge('Kuliah',   izinStats.kuliah,   '#ede9fe','#6d28d9')+
+          iz3StatBadge('Keluarga', izinStats.keluarga, '#ffedd5','#c2410c')+
+          iz3StatBadge('Lain-lain',izinStats.lain,     '#ebebeb','#555')+
+        '</div>'+
+      '</div>';
+
+    // Cards grid (sama untuk web & print)
+    var cardsHtml='<div class="iz3-sheet">';
+    for(var i=0; i<cards.length; i+=6){
+      cardsHtml+='<div class="iz3-strip-row">';
+      for(var j=i; j<Math.min(i+6,cards.length); j++){
+        var c=cards[j];
+        var rc=iz3Color(c.catatan);
+        var tag=c.catatan
+          ? ' <span class="iz3-tag" style="background:'+rc.bg+';color:'+rc.col+'">'+c.catatan+'</span>'
+          : '';
+        cardsHtml+=
+          '<div class="iz3-cell">'+
+            '<div class="iz3-cell-nama">'+c.nama+'</div>'+
+            '<div class="iz3-cell-ket">'+c.kegiatan+tag+'</div>'+
+            '<div class="iz3-cell-tgl">'+c.tgl+'</div>'+
+          '</div>';
+      }
+      cardsHtml+='</div>';
+    }
+    cardsHtml+='</div>';
+
+    // Inject ke kedua container agar sync (masing-masing ada di pane berbeda, tidak pernah tampil bersamaan)
+    var izEl  = document.getElementById('izinSheet');
+    var izElM = document.getElementById('izinSheetM');
+    if(izEl)  izEl.innerHTML  = headerHtml+cardsHtml;
+    if(izElM) izElM.innerHTML = headerHtml+cardsHtml;
+  })();
 }
 
 function sc(l, v, c){
@@ -342,18 +389,61 @@ function exportPrint(){
   if(!d.sL.length){ alert('Belum ada data bulan ini!'); return; }
   var theadEl=document.getElementById('theadRekap');
   var tbodyEl=document.getElementById('tbodyRekap');
-  var izinEl=document.getElementById('izinSheet');
-  var tableHtml=theadEl
-    ? '<table><thead>'+theadEl.innerHTML+'</thead><tbody>'+(tbodyEl?tbodyEl.innerHTML:'')+'</tbody></table>'
-    : '';
-  var izinHtml=izinEl&&izinEl.innerHTML ? '<h3 style="margin-top:28px;color:#b07d1a">Keterangan Izin</h3>'+izinEl.innerHTML : '';
+  var izinEl =document.getElementById('izinSheet');
   var bulanLabel=BULAN[d.bulan]||'';
 
+  // Hitung stat kehadiran
   var tot=d.mAll.length*d.sL.length, tH=0, tI=0, tA=0;
   d.mAll.forEach(function(m){ d.sL.forEach(function(t){
     var v=((sesiData[t]||{})[m.nama]||{}).status||'';
     if(v==='H')tH++; else if(v==='I')tI++; else if(v==='A')tA++;
   });});
+
+  // Hitung stat per kategori izin
+  var izinStats={sakit:0,kerja:0,kuliah:0,keluarga:0,lain:0};
+  d.mAll.forEach(function(m){ d.sL.forEach(function(t){
+    var rec=(sesiData[t]||{})[m.nama]||{};
+    if(rec.status!=='I') return;
+    var cat=(rec.catatan||'').toLowerCase();
+    if(/sakit|demam|rawat/.test(cat))                izinStats.sakit++;
+    else if(/kerja|dinas|shift/.test(cat))           izinStats.kerja++;
+    else if(/kuliah|ujian|sekolah|kampus/.test(cat)) izinStats.kuliah++;
+    else if(/keluarga/.test(cat))                    izinStats.keluarga++;
+    else izinStats.lain++;
+  });});
+
+  var izinStatHtml=
+    '<div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:10px 0 14px">'+
+      _izinStatBadge('Sakit',    izinStats.sakit,    '#fee2e2','#b91c1c')+
+      _izinStatBadge('Kerja',    izinStats.kerja,    '#dbeafe','#1d4ed8')+
+      _izinStatBadge('Kuliah',   izinStats.kuliah,   '#ede9fe','#6d28d9')+
+      _izinStatBadge('Keluarga', izinStats.keluarga, '#ffedd5','#c2410c')+
+      _izinStatBadge('Lain-lain',izinStats.lain,     '#ebebeb','#555')+
+    '</div>';
+
+  var tableHtml=theadEl
+    ? '<table><thead>'+theadEl.innerHTML+'</thead><tbody>'+(tbodyEl?tbodyEl.innerHTML:'')+'</tbody></table>'
+    : '';
+
+  // Ambil hanya bagian cards (.iz3-sheet) dari izinEl, header sudah di-render ulang di bawah
+  var izinCardsHtml='';
+  if(izinEl){
+    var sheetEl=izinEl.querySelector('.iz3-sheet');
+    if(sheetEl) izinCardsHtml=sheetEl.outerHTML;
+  }
+
+  var izinHtml=izinCardsHtml
+    ? '<div style="margin-top:28px;page-break-inside:avoid">'+
+        '<div style="background:#fdfaf5;border:1px solid #e4d9c4;border-radius:10px 10px 0 0;border-bottom:none;padding:12px 16px 10px;text-align:center">'+
+          '<div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px">'+
+            '<span style="font-size:13px;font-weight:700;color:#b07d1a;letter-spacing:.3px">Keterangan Izin</span>'+
+            '<span style="font-size:9px;color:#888;background:#fff;border:1px solid #e4d9c4;padding:2px 10px;border-radius:99px">'+tI+' Izin</span>'+
+          '</div>'+
+          izinStatHtml+
+        '</div>'+
+        izinCardsHtml+
+      '</div>'
+    : '';
   var avg=tot?Math.round(tH/tot*100):0;
   var avgClr=avg>=80?'#2e7d52':avg>=60?'#c09000':'#b33030';
   var printDonut=buildDonutSvg(tH,tI,tA,tot-(tH+tI+tA));
@@ -386,20 +476,19 @@ function exportPrint(){
       'tr.gender-sep td{background:#eee;font-weight:600;text-align:left;font-size:9px;letter-spacing:.5px;text-transform:uppercase}'+
       '.badge{display:inline-block;border-radius:3px;padding:1px 5px;font-size:9px;font-weight:700}'+
       '.bh{background:#dcf5e7;color:#1a7a3a}.bi{background:#fff3cd;color:#856404}.ba{background:#fde8e8;color:#a00}'+
-      '.iz3-header{display:flex;align-items:center;justify-content:space-between;padding:10px 0 6px;margin-top:16px}'+
-      '.iz3-title{font-size:11px;font-weight:700;color:#b07d1a}'+
-      '.iz3-total{font-size:9px;color:#888;background:#fffbf0;border:1px solid #e4d9c4;padding:1px 7px;border-radius:99px}'+
-      '.iz3-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;padding:0 0 10px}'+
-      '.iz3-card{background:#fff;border:1px solid #ece6da;border-radius:8px;padding:7px 9px;display:flex;flex-direction:column;gap:2px;break-inside:avoid;page-break-inside:avoid}'+
-      '.iz3-nama{font-size:9.5px;font-weight:700;color:#1a1510;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}'+
-      '.iz3-kg-row{display:flex;align-items:center;gap:4px;overflow:hidden}'+
-      '.iz3-kegiatan{font-size:8.5px;color:#b07d1a;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1;min-width:0}'+
-      '.iz3-tag{font-size:8px;font-weight:600;padding:1px 5px;border-radius:4px;white-space:nowrap;flex-shrink:0}'+
-      '.iz3-tgl{font-size:8px;color:#999}'+
-      '@media print{.iz3-grid{grid-template-columns:repeat(5,1fr)}.iz3-card{break-inside:avoid}}'+
+      '.iz3-sheet{background:#fff;border:1px solid #e8dcc8;border-radius:0 0 8px 8px;overflow:hidden}'+
+      '.iz3-strip-row{display:grid;grid-template-columns:repeat(6,1fr);border-bottom:1px solid #f0ebe0}'+
+      '.iz3-strip-row:last-child{border-bottom:none}'+
+      '.iz3-cell{padding:6px 8px;border-right:1px solid #f0ebe0;min-width:0}'+
+      '.iz3-cell:last-child{border-right:none}'+
+      '.iz3-cell-nama{font-size:9.5px;font-weight:700;color:#1a1510;line-height:1.2}'+
+      '.iz3-cell-ket{font-size:8.5px;color:#b07d1a;font-weight:600;margin-top:1px;display:flex;align-items:center;gap:3px;flex-wrap:wrap}'+
+      '.iz3-cell-tgl{font-size:8px;color:#999;margin-top:2px}'+
+      '.iz3-tag{display:inline-block;font-size:8px;font-weight:600;padding:1px 5px;border-radius:4px;white-space:nowrap}'+
+      '@media print{.iz3-strip-row{grid-template-columns:repeat(6,1fr)}.iz3-cell{break-inside:avoid}}'+
     '</style></head><body>'+
     '<h2>Rekap Absensi Muda-Mudi Margosari</h2>'+
-    '<p>'+bulanLabel+' '+d.tahun+'</p>'+
+    '<p style="color:#b07d1a;font-weight:600;font-size:12px;margin:0 0 16px;letter-spacing:.2px">'+bulanLabel+' '+d.tahun+'</p>'+
     statHtml+tableHtml+izinHtml+
     '</body></html>'
   );
@@ -416,5 +505,12 @@ function _printRsItem(v, l, c){
   return '<div style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 10px;border-radius:8px">'+
     '<div style="font-size:26px;font-weight:300;line-height:1;letter-spacing:-.5px;color:'+c+'">'+v+'</div>'+
     '<div style="font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:#b0a078;font-weight:500;margin-top:3px">'+l+'</div>'+
+  '</div>';
+}
+
+function _izinStatBadge(label, count, bg, col){
+  return '<div style="display:inline-flex;flex-direction:column;align-items:center;background:'+bg+';border-radius:8px;padding:6px 14px;min-width:52px">'+
+    '<span style="font-size:16px;font-weight:700;color:'+col+';line-height:1.2">'+count+'</span>'+
+    '<span style="font-size:9px;font-weight:600;color:'+col+';letter-spacing:.3px;margin-top:1px">'+label+'</span>'+
   '</div>';
 }

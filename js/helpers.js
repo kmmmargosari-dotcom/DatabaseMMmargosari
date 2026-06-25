@@ -26,12 +26,12 @@ function escHtml(s){
     .replace(/"/g,'&quot;');
 }
 
-function showToast(msg){
-  var t = document.getElementById('toast');
+function showToast(msg, dur){
+  var t = document.getElementById('app-toast');
   if(!t) return;
   t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(function(){ t.classList.remove('show'); }, 2200);
+  t.style.display = 'block';
+  setTimeout(function(){ t.style.display = 'none'; }, dur||2200);
 }
 
 function _printWithIframe(html){
