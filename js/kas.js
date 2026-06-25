@@ -614,6 +614,7 @@ function saveRiwayatSaldoAwal(){
   var val=parseFloat(inp?inp.value:0)||0;
   kasSaldoAwal=val;
   localStorage.setItem('kas_saldo_awal',val);
+  fbSaveSaldoAwal(val);
   var dispEl=document.getElementById('riwayatSaldoAwalDisplay');
   if(dispEl) dispEl.textContent=fmtRp(kasSaldoAwal);
   var row=document.getElementById('riwayatSaldoAwalEdit');

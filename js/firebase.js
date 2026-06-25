@@ -81,6 +81,14 @@ function fbStartListeners(){
     sesiData = {};
     sesiKet  = {};
     snap.forEach(function(d){
+      if(d.id === '__pinned__'){
+        var p = d.data().pinned;
+        if(p && typeof p === 'object'){
+          _dbPinned = p;
+          try { localStorage.setItem('db_pinned', JSON.stringify(p)); } catch(e){}
+        }
+        return;
+      }
       var dat = d.data();
       sesiData[d.id] = dat.absensi || {};
       sesiKet[d.id]  = dat.kegiatan || '';
@@ -95,6 +103,14 @@ function fbStartListeners(){
   _fbUnsubKas = window._fsSnap(window._fsCol(fsDb(),'kas'), function(snap){
     kasTransaksi = [];
     snap.forEach(function(d){
+      if(d.id === '__config__'){
+        var cfg = d.data();
+        if(typeof cfg.saldo_awal === 'number'){
+          kasSaldoAwal = cfg.saldo_awal;
+          localStorage.setItem('kas_saldo_awal', cfg.saldo_awal);
+        }
+        return;
+      }
       var dat = d.data();
       kasTransaksi.push({
         id: d.id,
@@ -148,4 +164,16 @@ function fbInit(){
     setSyncStatus('off');
     fbStartListeners();
   });
+}
+
+// Simpan saldo awal ke Firestore
+function fbSaveSaldoAwal(val){
+  if(!_fbReady) return;
+  _syncWrite(window._fsSet(window._fsDoc(fsDb(),'kas','__config__'), { saldo_awal: val }));
+}
+
+// Simpan state pin sesi ke Firestore
+function fbSavePinned(pinned){
+  if(!_fbReady) return;
+  _syncWrite(window._fsSet(window._fsDoc(fsDb(),'sesi','__pinned__'), { pinned: pinned }));
 }
