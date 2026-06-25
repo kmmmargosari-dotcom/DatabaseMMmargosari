@@ -10,6 +10,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAQdX4r2BrStdRIaRE7MsgGqEMjlnnW3ac",
@@ -21,15 +22,21 @@
       measurementId: "G-63JZN3F1E4"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db  = getFirestore(app);
-    window._db = db;
+    const app  = initializeApp(firebaseConfig);
+    const db   = getFirestore(app);
+    const auth = getAuth(app);
+
+    window._db  = db;
+    window._auth = auth;
     window._fsCol  = collection;
     window._fsDoc  = doc;
     window._fsSet  = setDoc;
     window._fsDel  = deleteDoc;
     window._fsSnap = onSnapshot;
     window._fsGetDocs = getDocs;
+    window._fbSignIn  = signInWithEmailAndPassword;
+    window._fbSignOut = signOut;
+    window._fbAuthStateChanged = onAuthStateChanged;
     window._firebaseReady = true;
     document.dispatchEvent(new Event('firebase-ready'));
   </script>
