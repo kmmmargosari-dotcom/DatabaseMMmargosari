@@ -1,0 +1,220 @@
+/* ══════════════════════════════════
+   NEW DASHBOARD MODULE
+══════════════════════════════════ */
+
+/* PC wrap */
+.ndash-wrap{padding:20px;display:flex;flex-direction:column;gap:16px;max-width:1100px;margin:0 auto;width:100%}
+
+/* Dashboard Header */
+.ndash-header{background:var(--bg);border:1px solid var(--border);border-radius:var(--rl);padding:20px 24px;box-shadow:var(--shadow);text-align:center}
+.ndash-header-title{font-size:20px;font-weight:500;color:var(--text);line-height:1.4;letter-spacing:-.3px}
+.ndash-header-date{font-size:12px;color:var(--text3);margin-top:6px;letter-spacing:.2px}
+
+/* Stat cards */
+.ndash-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.nstat-card{display:flex;align-items:center;gap:12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--rl);padding:16px;box-shadow:var(--shadow)}
+.nstat-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nstat-info{flex:1;min-width:0}
+.nstat-val{font-size:26px;font-weight:600;color:var(--text);line-height:1.1;letter-spacing:-.5px}
+.nstat-lbl{font-size:11px;color:var(--text2);margin-top:2px;font-weight:500}
+.nstat-sub{font-size:10px;color:var(--text3);margin-top:1px;text-transform:uppercase;letter-spacing:.3px}
+
+/* Middle row: chart + recent */
+.ndash-mid{display:grid;grid-template-columns:1fr 320px;gap:16px}
+.ndash-chart-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--rl);box-shadow:var(--shadow);overflow:hidden}
+.ndash-recent-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--rl);box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column}
+
+/* Section header */
+.ndash-sec-hd{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);font-size:13px;font-weight:500;color:var(--text);flex-shrink:0}
+.ndash-legend{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text2)}
+.nleg-dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}
+.ndash-see-all{font-size:11px;color:var(--gold-dk);background:none;border:none;cursor:pointer;padding:0;font-family:inherit;text-decoration:underline}
+.ndash-see-all:hover{color:var(--brown)}
+
+/* Chart */
+.ndash-chart-wrap{padding:12px 16px 8px}
+
+/* Recent items */
+.ndash-recent-item{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border)}
+.ndash-recent-item:last-child{border-bottom:none}
+.ndash-recent-icon{width:34px;height:34px;border-radius:9px;background:var(--gold-xlt);color:var(--gold-dk);display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--gold-lt)}
+.ndash-recent-info{flex:1;min-width:0}
+.ndash-recent-name{font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ndash-recent-date{font-size:10px;color:var(--text3);margin-top:2px}
+.ndash-recent-stats{display:flex;flex-direction:column;gap:2px;align-items:flex-end;flex-shrink:0}
+.ndash-rs-h{font-size:10px;color:var(--green);font-weight:500}
+.ndash-rs-i{font-size:10px;color:var(--amber);font-weight:500}
+.ndash-rs-a{font-size:10px;color:var(--red);font-weight:500}
+.ndash-empty{padding:24px;text-align:center;color:var(--text3);font-size:12px}
+
+/* Quick access */
+.ndash-quick-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--rl);box-shadow:var(--shadow);overflow:hidden}
+.ndash-quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px}
+.nquick-btn{display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:var(--rl);cursor:pointer;transition:all .15s}
+.nquick-btn:active{transform:scale(.97)}
+.nquick-primary{background:var(--gold);color:#fff}
+.nquick-primary:hover{background:var(--gold-dk)}
+.nquick-secondary{background:var(--bg2);border:1px solid var(--border)}
+.nquick-secondary:hover{background:var(--bg3)}
+.nquick-text{flex:1;min-width:0}
+.nquick-title{font-size:14px;font-weight:600}
+.nquick-primary .nquick-title{color:#fff}
+.nquick-primary .nquick-sub{color:rgba(255,255,255,.75)}
+.nquick-secondary .nquick-title{color:var(--text)}
+.nquick-secondary .nquick-sub{color:var(--text2)}
+.nquick-sub{font-size:11px;margin-top:2px}
+.nquick-arrow{color:rgba(255,255,255,.8);transform:rotate(180deg)}
+.nquick-arrow-sec{color:var(--text3);transform:rotate(180deg)}
+
+/* Mobile dashboard */
+.ndash-mob-wrap{padding:12px;display:flex;flex-direction:column;gap:12px;padding-bottom:20px}
+.ndash-mob-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ndash-mob-stats .nstat-card{padding:12px 10px}
+.ndash-mob-stats .nstat-icon{width:38px;height:38px;border-radius:10px}
+.ndash-mob-stats .nstat-val{font-size:20px}
+.ndash-mob-stats .nstat-lbl{font-size:10px}
+.ndash-mob-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--rl);box-shadow:var(--shadow);overflow:hidden}
+.ndash-mob-legend{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text2);padding:8px 14px 4px}
+.ndash-mob-quick{display:flex;flex-direction:column;gap:8px;padding:10px}
+
+/* Chart responsive */
+@media(max-width:1024px){.ndash-mid{grid-template-columns:1fr 260px}}
+@media(max-width:900px){
+  .ndash-stats{grid-template-columns:repeat(2,1fr)}
+  .ndash-mid{grid-template-columns:1fr}
+}
+
+/* ══════════════════════════════════
+   KAS / KEUANGAN MODULE
+══════════════════════════════════ */
+
+/* Stat cards */
+.kas-stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:16px 20px 0}
+.kas-stat-card{display:flex;align-items:center;gap:12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--rl);padding:16px;box-shadow:var(--shadow);transition:box-shadow .15s}
+.kas-stat-card:hover{box-shadow:var(--shadow-md)}
+.kas-stat-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.kas-stat-info{flex:1;min-width:0}
+.kas-stat-lbl{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.kas-stat-val{font-size:20px;font-weight:700;color:var(--text);line-height:1.1;letter-spacing:-.5px}
+.kas-stat-sub{font-size:10px;margin-top:3px;font-weight:500}
+
+/* Cash Flow Card */
+.kas-cf-donut-row{display:flex;gap:16px;padding:12px 20px;flex-wrap:wrap}
+.kas-cf-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--rl);box-shadow:var(--shadow);overflow:hidden;flex:1;min-width:260px}
+.kas-cf-hd{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border);background:var(--bg)}
+.kas-cf-hd-styled{flex-direction:row;align-items:flex-start;justify-content:space-between;padding:18px 20px;background:linear-gradient(135deg,#1a1510 0%,#2d2218 100%);border-bottom:none}
+.kas-cf-hd-left{display:flex;align-items:center;gap:14px}
+.kas-cf-hd-icon{width:46px;height:46px;background:rgba(200,164,74,.15);border:1.5px solid rgba(200,164,74,.35);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#c8a44a;flex-shrink:0}
+.kas-cf-hd-sub{font-size:10.5px;color:#c8a44a;letter-spacing:.5px;font-weight:600;text-transform:uppercase;margin-bottom:3px}
+.kas-cf-hd-title{font-size:16px;font-weight:700;color:#fff;letter-spacing:.1px}
+.kas-cf-hd-right{text-align:right;flex-shrink:0}
+.kas-cf-hd-period-lbl{font-size:10px;color:rgba(255,255,255,.5);letter-spacing:.3px;text-transform:uppercase;margin-bottom:2px}
+.kas-cf-hd-period-val{font-size:15px;font-weight:700;color:#fff;margin-bottom:8px}
+.kas-cf-hd-styled .kas-cf-filters select{font-size:11px;padding:5px 8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:var(--r)}
+.kas-cf-hd-styled .kas-cf-filters select option{background:#2d2218;color:#fff}
+.kas-cf-title{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text2);flex:1}
+.kas-cf-filters{display:flex;align-items:center;gap:8px}
+.kas-cf-filters select{font-size:12px;padding:6px 10px;border-radius:var(--r);width:auto;min-width:90px}
+.kas-cf-row{display:flex;align-items:center;padding:13px 18px;border-bottom:1px solid var(--border);gap:12px}
+.kas-cf-row:last-of-type{border-bottom:none}
+.kas-cf-row-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.kas-cf-row-label{flex:1;font-size:13px;color:var(--text2)}
+.kas-cf-row-val{font-size:13px;font-weight:600}
+.kas-cf-saldo-akhir{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:var(--gold-xlt);border-top:2px solid var(--gold-lt)}
+.kas-cf-saldo-akhir-lbl{font-size:14px;font-weight:700;color:var(--brown)}
+.kas-cf-saldo-akhir-val{font-size:22px;font-weight:700;color:var(--brown);letter-spacing:-.5px}
+
+/* Transaction Table Card */
+.kas-tbl-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--rl);box-shadow:var(--shadow);overflow:hidden;margin:12px 20px 20px}
+.kas-tbl-hd{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border)}
+.kas-tbl-title{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text2)}
+.kas-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.kas-table th{background:var(--bg2);color:var(--text2);font-size:10.5px;font-weight:600;padding:9px 14px;text-align:left;border-bottom:1px solid var(--border);letter-spacing:.2px;text-transform:uppercase;white-space:nowrap}
+.kas-table th.r,.kas-table td.r{text-align:right}
+.kas-table td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+.kas-table tr:last-child td{border-bottom:none}
+.kas-table tbody tr:hover td{background:var(--bg2)}
+.kas-table .kas-row-saldo-awal td{background:var(--bg2);color:var(--text2);font-style:italic}
+.kas-table .kas-total-row td{background:var(--gold-xlt)!important;font-weight:700;color:var(--brown);border-top:2px solid var(--gold-lt)}
+.kas-tbl-saldo-awal-row td{background:var(--gold-xlt)!important;border-bottom:2px solid var(--gold-lt)!important}
+.kas-masuk{color:var(--green);font-weight:600}
+.kas-keluar{color:var(--red);font-weight:600}
+
+/* Topbar action buttons */
+.kas-topbar-actions{display:flex;gap:6px;margin-left:auto}
+.kas-action-btn{display:flex;align-items:center;gap:5px;padding:6px 12px;font-size:12px;border-radius:var(--r);border:1px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer;font-family:inherit;font-weight:500;transition:all .15s;white-space:nowrap}
+.kas-action-btn:hover{background:var(--bg2)}
+.kas-action-btn.primary{background:var(--gold);color:#fff;border-color:var(--gold-dk)}
+.kas-action-btn.primary:hover{background:var(--gold-dk)}
+
+/* Popup sizing */
+.kas-popup{width:min(420px,94vw)!important}
+
+/* Riwayat table */
+.kas-riwayat-table{width:100%;border-collapse:collapse;font-size:12px}
+.kas-riwayat-table th{background:var(--bg2);color:var(--text2);font-size:10px;padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:2;letter-spacing:.3px;text-transform:uppercase;font-weight:600}
+.kas-riwayat-table td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+.kas-riwayat-table tbody tr:hover td{background:var(--bg2)}
+
+/* Saldo awal edit button */
+.kas-sa-edit-btn{font-size:11px;padding:3px 8px;background:var(--gold-lt);border:1px solid var(--gold);color:var(--brown);border-radius:5px;cursor:pointer;font-family:inherit}
+.kas-sa-edit-btn:hover{background:var(--gold-xlt)}
+
+/* Mobile Kas */
+.kas-mob-actions{display:flex;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--bg);flex-shrink:0}
+.kas-mob-action-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 6px;border-radius:var(--r);border:1px solid var(--border);background:var(--bg);font-size:10px;font-weight:500;color:var(--text2);cursor:pointer;font-family:inherit;transition:all .15s}
+.kas-mob-action-btn:hover{background:var(--bg2)}
+.kas-mob-icon{font-size:17px;line-height:1}
+.kas-mob-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 14px 0}
+.kas-mob-stat-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--rl);padding:12px 14px;box-shadow:var(--shadow)}
+.kas-mob-stat-lbl{font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.kas-mob-stat-val{font-size:17px;font-weight:700;color:var(--text);letter-spacing:-.3px}
+.kas-mob-stat-sub{font-size:10px;margin-top:2px;font-weight:500}
+.kas-mob-cf{background:var(--bg);border:1px solid var(--border);border-radius:var(--rl);box-shadow:var(--shadow);overflow:hidden;flex-shrink:0}
+.kas-mob-trx-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;box-shadow:var(--shadow)}
+.kas-mob-trx-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--border)}
+.kas-mob-trx-item:last-child{border-bottom:none}
+.kas-mob-trx-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.kas-mob-trx-info{flex:1;min-width:0}
+.kas-mob-trx-date{font-size:10px;color:var(--text3)}
+.kas-mob-trx-ket{font-size:12px;font-weight:500;color:var(--text);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kas-mob-trx-right{text-align:right;flex-shrink:0}
+.kas-mob-trx-nominal{font-size:12px;font-weight:600}
+.kas-mob-trx-saldo{font-size:10px;color:var(--text3);margin-top:1px}
+.kas-mob-trx-saldo-awal{background:var(--bg2)}
+.kas-mob-total-row{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-top:2px solid var(--gold-lt);background:var(--gold-xlt)}
+.kas-mob-total-lbl{font-size:11px;font-weight:700;color:var(--brown)}
+.kas-mob-total-val{font-size:13px;font-weight:700}
+.kas-mob-donut-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--rl);box-shadow:var(--shadow);padding:14px 16px;flex-shrink:0}
+.kas-mob-donut-inner{display:flex;align-items:center;justify-content:flex-start;gap:16px;min-height:112px}
+.kas-mob-donut-inner>div:first-child{flex:1;min-width:0}
+
+/* Kas page header */
+.kas-dash-header{background:var(--bg);border-bottom:1px solid var(--border);padding:18px 24px;display:flex;align-items:center;gap:16px;flex-shrink:0;box-shadow:var(--shadow)}
+.kas-dash-hd-left{display:flex;align-items:center;gap:14px}
+.kas-dash-hd-icon{width:44px;height:44px;background:var(--gold-lt);border:1.5px solid var(--gold);border-radius:11px;display:flex;align-items:center;justify-content:center;color:var(--gold-dk);flex-shrink:0}
+.kas-dash-hd-sub{font-size:10px;color:var(--gold-dk);letter-spacing:.6px;font-weight:700;text-transform:uppercase;margin-bottom:2px}
+.kas-dash-hd-title{font-size:16px;font-weight:700;color:var(--text);letter-spacing:-.2px}
+.kas-dash-hd-center{flex:1;text-align:center}
+
+/* Donut legend */
+.kas-donut-legend{display:flex;flex-direction:column;gap:6px}
+.kas-donut-leg-item{display:flex;align-items:center;gap:8px;font-size:11px}
+.kas-donut-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.kas-donut-leg-lbl{flex:1;color:var(--text2)}
+.kas-donut-leg-val{font-weight:600;font-size:11px}
+
+/* Donut card box (PC) */
+.kas-donut-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--rl);box-shadow:var(--shadow);padding:16px 18px;display:flex;flex-direction:column;gap:12px;min-width:160px}
+.kas-donut-ttl{font-size:10.5px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--text2)}
+
+/* Kas Line Chart */
+.kas-line-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--rl);box-shadow:var(--shadow);overflow:hidden;margin:0 20px 16px}
+.kas-mob-line-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--rl);box-shadow:var(--shadow);overflow:hidden;margin:12px 14px 0;flex-shrink:0}
+.kas-line-hd{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);gap:10px}
+.kas-line-title{font-size:10.5px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--text2);flex:1;min-width:0}
+.kas-line-yr{font-size:12px;font-weight:600;color:var(--brown)}
+.kas-line-legend{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.kas-line-leg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)}
+.kas-line-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.kas-line-body{padding:14px 16px 10px;overflow-x:auto}
