@@ -5,14 +5,10 @@
 var _dbPinned = {};
 try { _dbPinned = JSON.parse(localStorage.getItem('db_pinned')||'{}'); } catch(e){}
 
-var _pinSaveTimer = null;
 function togglePin(t){
   if(_dbPinned[t]) delete _dbPinned[t]; else _dbPinned[t]=1;
   try { localStorage.setItem('db_pinned', JSON.stringify(_dbPinned)); } catch(e){}
   renderDb(); renderDbMob();
-  // Debounce Firestore save 800ms — UI langsung, server belakangan
-  if(_pinSaveTimer) clearTimeout(_pinSaveTimer);
-  _pinSaveTimer = setTimeout(function(){ fbSavePinned(_dbPinned); }, 800);
 }
 
 function dbHtml(suffix){

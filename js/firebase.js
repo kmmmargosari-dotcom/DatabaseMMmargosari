@@ -80,22 +80,12 @@ function fbStartListeners(){
   _fbUnsubSesi = window._fsSnap(window._fsCol(fsDb(),'sesi'), function(snap){
     sesiData = {};
     sesiKet  = {};
-    var pinnedFound = false;
     snap.forEach(function(d){
-      if(d.id === '__pinned__'){
-        pinnedFound = true;
-        var p = d.data().pinned;
-        if(p && typeof p === 'object'){
-          _dbPinned = p;
-          try { localStorage.setItem('db_pinned', JSON.stringify(p)); } catch(e){}
-        }
-        return;
-      }
+      if(d.id === '__pinned__') return;
       var dat = d.data();
       sesiData[d.id] = dat.absensi || {};
       sesiKet[d.id]  = dat.kegiatan || '';
     });
-    // Kalau __pinned__ tidak ada di Firestore, tetap pakai state lokal
     try { renderRekap('pc'); } catch(e){}
     try { renderRekap('mob'); } catch(e){}
     try { renderDb(); renderDbMob(); } catch(e){}
