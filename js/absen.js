@@ -165,7 +165,7 @@ function openStatusMenu(btn, nama, ctx){
   var left= r.right - mw;
   if(left < 6) left = 6;
   var top = r.bottom + 4;
-  if(top + 200 > window.innerHeight) top = r.top - 4 - menu.offsetHeight;
+  if(top + menu.offsetHeight > window.innerHeight) top = r.top - 4 - menu.offsetHeight;
   menu.style.left = left+'px';
   menu.style.top  = top+'px';
   void menu.offsetWidth;

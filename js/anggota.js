@@ -463,7 +463,7 @@ function doExpAng(type){
   if(!sel.length){ alert('Pilih minimal satu anggota.'); return; }
   var fBln = (document.getElementById('expang-bulan')||{}).value||'';
   var fThn = (document.getElementById('expang-tahun')||{}).value||'';
-  var bulanLabel = fBln ? (Object.values(BULAN)[parseInt(fBln)-1]||fBln) : 'Semua Bulan';
+  var bulanLabel = fBln ? (BULAN[parseInt(fBln)]||fBln) : 'Semua Bulan';
   var filterDesc = (fThn||'Semua Tahun')+' · '+bulanLabel;
 
   if(type==='print'){

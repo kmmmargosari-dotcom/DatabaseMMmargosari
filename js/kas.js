@@ -420,8 +420,8 @@ function submitKasTambah(){
   if(!tanggal){ showToast('Isi tanggal transaksi'); return; }
   if(isNaN(nominal)||nominal<=0){ showToast('Nominal harus lebih dari 0'); return; }
   var id     = editId||('kas-'+Date.now()+'-'+Math.random().toString(36).slice(2,7));
-  var record = {id:id,jenis:jenis,nominal:nominal,tanggal:tanggal,keterangan:ket,createdAt:editId?undefined:Date.now()};
-  if(!record.createdAt) record.createdAt=Date.now();
+  var originalCreatedAt = editId ? (kasTransaksi.find(function(k){return k.id===editId})||{}).createdAt : null;
+  var record = {id:id,jenis:jenis,nominal:nominal,tanggal:tanggal,keterangan:ket,createdAt:originalCreatedAt||Date.now()};
   var idx = kasTransaksi.findIndex(function(k){ return k.id===id; });
   if(idx>=0) kasTransaksi[idx]=record; else kasTransaksi.push(record);
   fbSaveKas(id,{jenis:record.jenis,nominal:record.nominal,tanggal:record.tanggal,keterangan:record.keterangan,createdAt:record.createdAt});
@@ -566,7 +566,7 @@ function kasExport(type){
     wsData.push(['TOTAL','',totalMasuk,totalKeluar,saldoAkhir]);
     var ws=XLSX.utils.aoa_to_sheet(wsData);
     XLSX.utils.book_append_sheet(wb,ws,'Kas '+periodeLabel);
-    XLSX.writeFile(wb,'Laporan_Kas_'+periodeLabel.replace(/\s/,'_')+'.xlsx');
+    XLSX.writeFile(wb,'Laporan_Kas_'+periodeLabel.replace(/\s+/g,'_')+'.xlsx');
   } else if(type==='csv'){
     var lines=['Tanggal,Keterangan,Masuk,Keluar,Saldo'];
     lines.push('"Saldo Awal","","","",'+saldoAwal);
@@ -577,7 +577,7 @@ function kasExport(type){
     lines.push('"TOTAL","",'+totalMasuk+','+totalKeluar+','+saldoAkhir);
     var a=document.createElement('a');
     a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(lines.join('\n'));
-    a.download='Laporan_Kas_'+periodeLabel.replace(/\s/,'_')+'.csv';
+    a.download='Laporan_Kas_'+periodeLabel.replace(/\s+/g,'_')+'.csv';
     a.click();
   }
 }
@@ -614,7 +614,6 @@ function saveRiwayatSaldoAwal(){
   var val=parseFloat(inp?inp.value:0)||0;
   kasSaldoAwal=val;
   localStorage.setItem('kas_saldo_awal',val);
-  fbSaveSaldoAwal(val);
   var dispEl=document.getElementById('riwayatSaldoAwalDisplay');
   if(dispEl) dispEl.textContent=fmtRp(kasSaldoAwal);
   var row=document.getElementById('riwayatSaldoAwalEdit');

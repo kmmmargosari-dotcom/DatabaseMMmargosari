@@ -26,12 +26,13 @@ function escHtml(s){
     .replace(/"/g,'&quot;');
 }
 
-function showToast(msg, dur){
-  var t = document.getElementById('app-toast');
+function showToast(msg, duration){
+  var t = document.getElementById('toast');
   if(!t) return;
   t.textContent = msg;
-  t.style.display = 'block';
-  setTimeout(function(){ t.style.display = 'none'; }, dur||2200);
+  t.classList.add('show');
+  if(window._toastTimer) clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(function(){ t.classList.remove('show'); }, duration||2200);
 }
 
 function _printWithIframe(html){

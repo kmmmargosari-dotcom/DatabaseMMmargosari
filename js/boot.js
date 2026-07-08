@@ -38,7 +38,7 @@ window.addEventListener('DOMContentLoaded', function(){
       var waited = 0;
       var timer = setInterval(function(){
         waited += 100;
-        var fsReady = (_fbUnsubSesi !== null) || waited >= 2500;
+        var fsReady = (_fbUnsubSesi !== null) || waited >= 8000;
         if(fsReady){
           clearInterval(timer);
           // Periksa session Firebase Auth
@@ -57,7 +57,7 @@ window.addEventListener('DOMContentLoaded', function(){
         var waited = 0;
         var timer = setInterval(function(){
           waited += 100;
-          var fsReady = (_fbUnsubSesi !== null) || waited >= 2500;
+          var fsReady = (_fbUnsubSesi !== null) || waited >= 8000;
           if(fsReady){
             clearInterval(timer);
             window._fbAuthStateChanged(window._auth, function(fbUser){

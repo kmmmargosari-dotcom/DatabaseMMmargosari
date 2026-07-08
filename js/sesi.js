@@ -119,6 +119,9 @@ function hapusSesi(tgl){
   delete sesiKet[tgl];
   fbDelSesi(tgl);
   renderDb(); renderDbMob();
+  try { renderRekap('pc'); } catch(e){}
+  try { renderRekap('mob'); } catch(e){}
+  try { renderDashboard(); } catch(e){}
 }
 
 function editSesi(tgl){
