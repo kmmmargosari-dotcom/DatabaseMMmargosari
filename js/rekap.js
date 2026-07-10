@@ -190,7 +190,13 @@ function renderRekapChart(sL, mAll, bulan, tahun){
     });
     return { label: sesiKet[t] ? sesiKet[t].substring(0,6) : t.slice(5), h: h, iz: iz, al: al };
   });
-  if(!perSesi.length) return;
+  if(!perSesi.length){
+    ['rekapChart','rekapChartM'].forEach(function(id){
+      var el = document.getElementById(id);
+      if(el) el.innerHTML = '';
+    });
+    return;
+  }
   var svg = buildBarSvg(perSesi, mAll.length);
   ['rekapChart','rekapChartM'].forEach(function(id,i){
     var el = document.getElementById(id);
@@ -276,15 +282,26 @@ function buildBarSvg(perSesi, totalMembers){
 }
 
 function toggleExp(){
-  var menus=['expMenu','expMenuM'];
-  var anyOpen=menus.some(function(id){ var el=document.getElementById(id); return el&&el.classList.contains('open'); });
-  menus.forEach(function(id){ var el=document.getElementById(id); if(el){ if(anyOpen)el.classList.remove('open'); else el.classList.add('open'); }});
-  if(!anyOpen){
-    function outsideClick(e){
-      menus.forEach(function(id){ var el=document.getElementById(id); if(el) el.classList.remove('open'); });
-      document.removeEventListener('click',outsideClick);
-    }
-    setTimeout(function(){ document.addEventListener('click',outsideClick); }, 0);
+  var isMb = mob();
+  var menuId = isMb ? 'expMenuM' : 'expMenu';
+  var otherId = isMb ? 'expMenu' : 'expMenuM';
+  var el = document.getElementById(menuId);
+  var other = document.getElementById(otherId);
+  if(other) other.classList.remove('open');
+  if(!el) return;
+  var opening = !el.classList.contains('open');
+  el.classList.toggle('open', opening);
+  if(opening){
+    if(window._expOutsideClick) document.removeEventListener('click', window._expOutsideClick);
+    window._expOutsideClick = function _expHandler(e){
+      el.classList.remove('open');
+      document.removeEventListener('click', window._expOutsideClick);
+      window._expOutsideClick = null;
+    };
+    setTimeout(function(){ document.addEventListener('click', window._expOutsideClick); }, 0);
+  } else if(window._expOutsideClick){
+    document.removeEventListener('click', window._expOutsideClick);
+    window._expOutsideClick = null;
   }
 }
 

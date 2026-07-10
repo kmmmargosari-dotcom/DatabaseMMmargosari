@@ -31,58 +31,56 @@ window.addEventListener('DOMContentLoaded', function(){
     }, 420);
   }
 
-  function waitForFirebase(){
-    if(window._firebaseReady){
-      fbInit();
-      // Tunggu Firestore selesai load lalu cek auth state
-      var waited = 0;
-      var timer = setInterval(function(){
-        waited += 100;
-        var fsReady = (_fbUnsubSesi !== null) || waited >= 8000;
-        if(fsReady){
-          clearInterval(timer);
-          // Periksa session Firebase Auth
-          window._fbAuthStateChanged(window._auth, function(fbUser){
-            if(fbUser){
-              showApp(fbUser);
-            } else {
-              showLogin();
-            }
-          });
-        }
-      }, 100);
-    } else {
-      document.addEventListener('firebase-ready', function(){
-        fbInit();
-        var waited = 0;
-        var timer = setInterval(function(){
-          waited += 100;
-          var fsReady = (_fbUnsubSesi !== null) || waited >= 8000;
-          if(fsReady){
-            clearInterval(timer);
-            window._fbAuthStateChanged(window._auth, function(fbUser){
-              if(fbUser){
-                showApp(fbUser);
-              } else {
-                showLogin();
-              }
-            });
+  function startAppWithFirebase(){
+    fbInit();
+    var waited = 0;
+    var timer = setInterval(function(){
+      waited += 100;
+      var fsReady = (_fbUnsubSesi !== null) || waited >= 8000;
+      if(fsReady){
+        clearInterval(timer);
+        window._fbAuthStateChanged(window._auth, function(fbUser){
+          if(fbUser){
+            showApp(fbUser);
+          } else if(localStorage.getItem('_members')){
+            var savedU = localStorage.getItem('saved_user') || 'admin';
+            currentUser = { username: savedU, nama: 'Administrator' };
+            masukApp();
+          } else {
+            showLogin();
           }
-        }, 100);
-      }, {once:true});
-      // Fallback jika Firebase timeout
-      setTimeout(function(){
-        if(!_fbReady){
-          console.warn('Firebase timeout, tampilkan login.');
-          setSyncStatus('off');
+        });
+      }
+    }, 100);
+    // Fallback jika Firebase timeout
+    setTimeout(function(){
+      if(!_fbReady){
+        console.warn('Firebase timeout.');
+        setSyncStatus('off');
+        var savedU = localStorage.getItem('saved_user');
+        if(savedU && localStorage.getItem('_members')){
+          restoreData();
+          currentUser = { username: savedU, nama: 'Administrator' };
+          masukApp();
+        } else {
           showLogin();
         }
-      }, 5000);
+      }
+    }, 5000);
+  }
+
+  function waitForFirebase(){
+    if(window._firebaseReady){
+      startAppWithFirebase();
+    } else {
+      document.addEventListener('firebase-ready', function(){
+        startAppWithFirebase();
+      }, {once:true});
     }
   }
 
-  window.addEventListener('online',  function(){ setSyncStatus('ok');  });
-  window.addEventListener('offline', function(){ setSyncStatus('off'); });
+  window.addEventListener('online',  function(){ setPendingCount(getPendingCount()); });
+  window.addEventListener('offline', function(){ setPendingCount(getPendingCount()); });
 
   setTimeout(waitForFirebase, 800);
 });

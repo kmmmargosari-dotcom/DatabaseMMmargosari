@@ -46,6 +46,7 @@ function seedKasData(){
       fbSaveKas(trx.id,{jenis:trx.jenis,nominal:trx.nominal,tanggal:trx.tanggal,keterangan:trx.keterangan,createdAt:trx.createdAt});
     }
   });
+  logActivity('kas', 'Seed data awal Apr-Jun 2026');
   renderKas();
   showToast('✅ Data kas April–Juni 2026 dimuat');
 }
@@ -148,8 +149,6 @@ function renderKas(){
 
   var titleEl = document.getElementById('kasTblTitle');
   if(titleEl) titleEl.textContent = 'TRANSAKSI PERIODE '+BULAN_ID[bulanNum].toUpperCase()+' '+tahun;
-  setText('kasTblSaldoAwalVal', fmtRp(saldoAwal));
-
   var tbody = document.getElementById('kasTblBody');
   if(tbody){
     var html='';
@@ -425,6 +424,8 @@ function submitKasTambah(){
   var idx = kasTransaksi.findIndex(function(k){ return k.id===id; });
   if(idx>=0) kasTransaksi[idx]=record; else kasTransaksi.push(record);
   fbSaveKas(id,{jenis:record.jenis,nominal:record.nominal,tanggal:record.tanggal,keterangan:record.keterangan,createdAt:record.createdAt});
+  var jn = jenis==='pemasukan'?'Pemasukan':'Pengeluaran';
+  logActivity('kas', (editId?'Edit ':'+ ')+jn+' Rp'+Math.round(nominal).toLocaleString('id-ID')+(ket?' ('+ket+')':''));
   closeKasTambah();
   closeKasRiwayat();
   renderKas();
@@ -439,8 +440,11 @@ function kasEditTrx(id){
 
 function kasDelTrx(id){
   if(!confirm('Hapus transaksi ini?')) return;
+  var trx = kasTransaksi.find(function(k){return k.id===id;});
+  var info = trx ? (trx.jenis==='pemasukan'?'Pemasukan':'Pengeluaran')+' Rp'+Math.round(trx.nominal||0).toLocaleString('id-ID')+(trx.keterangan?' ('+trx.keterangan+')':'') : '';
   kasTransaksi=kasTransaksi.filter(function(k){return k.id!==id;});
   fbDelKas(id);
+  logActivity('kas', 'Hapus '+info);
   renderKas();
   renderKasRiwayat();
   showToast('Transaksi dihapus');
@@ -618,6 +622,7 @@ function saveRiwayatSaldoAwal(){
   if(dispEl) dispEl.textContent=fmtRp(kasSaldoAwal);
   var row=document.getElementById('riwayatSaldoAwalEdit');
   if(row) row.style.display='none';
+  logActivity('kas', 'Ubah saldo awal → '+fmtRp(val));
   renderKas();
   showToast('Saldo awal disimpan: '+fmtRp(val));
 }

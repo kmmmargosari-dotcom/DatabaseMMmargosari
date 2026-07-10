@@ -115,6 +115,7 @@ function renderDbMob(){
 function hapusSesi(tgl){
   var label = sesiLabel(tgl);
   if(!confirm('Hapus sesi '+label+'?\nSemua data kehadiran akan terhapus permanen.')) return;
+  logActivity('sesi', 'Hapus '+label);
   delete sesiData[tgl];
   delete sesiKet[tgl];
   fbDelSesi(tgl);

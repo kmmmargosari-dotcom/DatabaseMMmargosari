@@ -14,16 +14,12 @@ function anggotaHtml(listId, searchId){
     if(!arr.length) return '';
     var s = '<div class="sec-title">'+label+' ('+arr.length+')</div>';
     arr.forEach(function(m){
-      var idx = members.indexOf(m);
       var avc = m.gender==='P'?'av-p':'av-l';
-      s += '<div class="mem-item">'+
+      s += '<div class="mem-item" onclick="openMemberDetail(\''+m.nama.replace(/'/g,"\\'")+'\')" style="cursor:pointer">'+
         '<div class="avatar '+avc+'" style="width:34px;height:34px;font-size:11px">'+initials(m.nama)+'</div>'+
         '<div class="mem-info"><div class="mem-name">'+m.nama+'</div>'+
         '<div class="mem-gender">'+glabel(m.gender)+'</div></div>'+
-        '<div style="display:flex;gap:6px;align-items:center">'+
-          '<button class="mem-detail-btn" onclick="openMemberDetail(\''+m.nama+'\')">📊 Detail</button>'+
-          '<button class="btn-danger" onclick="hapusAnggota('+idx+',\''+listId+'\',\''+searchId+'\')" style="padding:4px 8px;font-size:11px">✕</button>'+
-        '</div>'+
+        '<span style="color:var(--text3);font-size:16px">›</span>'+
       '</div>';
     });
     return s;
@@ -68,6 +64,7 @@ function hapusAnggota(i, lid, sid){
   var m = members[i];
   if(!m) return;
   if(confirm('Hapus '+m.nama+' dari daftar anggota aktif?\n\nData absensi pada sesi yang sudah ada tetap tersimpan.')){
+    logActivity('anggota', 'Hapus '+m.nama);
     members.splice(i,1);
     fbSaveAnggota();
     var el = document.getElementById(lid);
@@ -100,6 +97,7 @@ function submitAddAnggota(){
     if(a.gender===b.gender) return a.nama.localeCompare(b.nama);
     return a.gender==='P' ? -1 : 1;
   });
+  logActivity('anggota', 'Tambah '+nm+' ('+(gd==='P'?'Perempuan':'Laki-laki')+')');
   fbSaveAnggota();
   closeAddAnggotaPopup();
   renderAnggota(); renderAnggotaMob();
@@ -113,6 +111,18 @@ var _mdetNama       = '';
 var _mdetRows       = [];
 var _mdetSortAsc    = true;
 var _mdetActiveStatus = {H:true,I:true,A:true,X:true};
+
+function hapusAnggotaFromDetail(){
+  if(!_mdetNama) return;
+  var idx = members.findIndex(function(m){ return m.nama === _mdetNama; });
+  if(idx < 0) return;
+  if(!confirm('Hapus '+_mdetNama+' dari daftar anggota aktif?\n\nData absensi pada sesi yang sudah ada tetap tersimpan.')) return;
+  logActivity('anggota', 'Hapus '+_mdetNama);
+  members.splice(idx, 1);
+  fbSaveAnggota();
+  closeMemberDetail();
+  renderAnggota(); renderAnggotaMob();
+}
 
 function getMemberSessions(nama){
   var allKeys = Object.keys(sesiData).sort();

@@ -43,7 +43,8 @@ function doLogin(){
     })
     .catch(function(e){
       var msg = 'Username atau password salah.';
-      if(e.code === 'auth/network-request-failed') msg = 'Tidak ada koneksi internet.';
+      if(e.code === 'auth/network-request-failed') msg = 'Tidak ada koneksi internet. Coba lagi nanti.';
+      else if(e.code === 'auth/invalid-credential') msg = 'Username atau password salah.';
       err.textContent = msg;
       document.getElementById('loginPass').value = '';
       if(btn){ btn.classList.add('shake'); setTimeout(function(){ btn.classList.remove('shake'); }, 400); }
@@ -53,7 +54,10 @@ function doLogin(){
     });
 }
 
+var _appStarted = false;
 function masukApp(){
+  if(_appStarted) return;
+  _appStarted = true;
   document.getElementById('pg-login').style.display = 'none';
   document.getElementById('pg-app').style.display   = '';
   applyRole();
@@ -67,6 +71,8 @@ function doLogout(){
   window._fbSignOut(window._auth).then(function(){
     currentUser = null;
     localStorage.removeItem('saved_user');
+    localStorage.removeItem('_members');
+    localStorage.removeItem('_activityLogs');
     document.getElementById('pg-app').style.display   = 'none';
     document.getElementById('pg-login').style.display = '';
     document.getElementById('loginUser').value = '';

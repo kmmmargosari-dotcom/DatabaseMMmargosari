@@ -220,6 +220,7 @@ function saveIzinPopup(){
   if(!sesiData[absenTgl][_izinNama]) sesiData[absenTgl][_izinNama]={};
   sesiData[absenTgl][_izinNama].status  = 'I';
   sesiData[absenTgl][_izinNama].catatan = val;
+  logActivity('absen', 'Izin '+_izinNama+(val?' ('+val+')':'')+(absenKet?' ['+absenKet+']':''));
   fbSaveSesi(absenTgl);
   var ctx = _izinCtx;
   closeIzinPopup();
@@ -242,6 +243,8 @@ function setStatus(nama, s, ctx){
   if(!sesiData[absenTgl][nama]) sesiData[absenTgl][nama]={};
   sesiData[absenTgl][nama].status = s;
   if(s!=='I') delete sesiData[absenTgl][nama].catatan;
+  var sl = s==='H'?'Hadir':s==='I'?'Izin':'Alfa';
+  logActivity('absen', nama+' → '+sl+(absenKet?' ('+absenKet+')':''));
   fbSaveSesi(absenTgl);
   openPanel=null; redraw(ctx);
   setTimeout(function(){
@@ -268,6 +271,7 @@ function clearStatus(nama, ctx){
     delete sesiData[absenTgl][nama].status;
     delete sesiData[absenTgl][nama].catatan;
   }
+  logActivity('absen', 'Hapus status '+nama+(absenKet?' ('+absenKet+')':''));
   fbSaveSesi(absenTgl);
   openPanel=null; redraw(ctx);
 }

@@ -6,41 +6,50 @@ var _fbReady        = false;
 var _fbUnsubSesi    = null;
 var _fbUnsubAnggota = null;
 var _fbUnsubKas     = null;
+var _fbUnsubLog     = null;
 
 function fsDb(){ return window._db; }
 
 // ── SYNC STATUS BADGE ──
 var _syncTimer = null;
 function setSyncStatus(state){
-  var badges = [
-    document.getElementById('pc-sync-badge'),
-    document.getElementById('mob-sync-badge')
-  ];
-  var cfg = {
-    ok:   { cls:'sync-ok',   text:'🟢 Online' },
-    off:  { cls:'sync-off',  text:'🔴 Offline' },
-    save: { cls:'sync-save', text:'🔄 Syncing...' }
-  };
-  var c = cfg[state] || cfg.ok;
-  badges.forEach(function(el){
-    if(!el) return;
-    el.className = 'sync-badge ' + c.cls;
-    el.textContent = c.text;
-  });
+  if(state === 'ok'){
+    document.querySelectorAll('.sync-badge').forEach(function(el){
+      el.className = 'sync-badge sync-ok';
+      el.textContent = '🟢 Online';
+    });
+  } else if(state === 'off'){
+    setPendingCount(getPendingCount());
+  } else if(state === 'save'){
+    document.querySelectorAll('.sync-badge').forEach(function(el){
+      el.className = 'sync-badge sync-save';
+      el.textContent = '🔄 Syncing...';
+    });
+  }
 }
 
 function _syncWrite(promise){
-  setSyncStatus('save');
+  setPendingCount(getPendingCount() + 1);
   if(_syncTimer) clearTimeout(_syncTimer);
   return promise.then(function(){
-    setSyncStatus(navigator.onLine ? 'ok' : 'off');
+    setPendingCount(Math.max(0, getPendingCount() - 1));
+    updateSyncFromOnline();
   }).catch(function(e){
     console.error('Firebase write error', e);
-    setSyncStatus('off');
-    _syncTimer = setTimeout(function(){
-      if(navigator.onLine) setSyncStatus('ok');
-    }, 4000);
+    updateSyncFromOnline();
   });
+}
+
+function updateSyncFromOnline(){
+  setPendingCount(getPendingCount());
+  _syncTimer = setTimeout(function(){
+    if(navigator.onLine && getPendingCount() === 0){
+      document.querySelectorAll('.sync-badge').forEach(function(el){
+        el.className = 'sync-badge sync-ok';
+        el.textContent = '🟢 Online';
+      });
+    }
+  }, 4000);
 }
 
 // Simpan satu sesi ke Firestore
@@ -74,6 +83,17 @@ function fbDelKas(id){
   _syncWrite(window._fsDel(window._fsDoc(fsDb(),'kas',id)));
 }
 
+// Simpan activity log ke Firestore
+function fbSaveLog(entry){
+  if(!_fbReady) return;
+  _syncWrite(window._fsSet(window._fsDoc(fsDb(),'log',entry.id), {
+    waktu: entry.waktu,
+    user: entry.user,
+    aksi: entry.aksi,
+    detail: entry.detail
+  }));
+}
+
 // Mulai listen realtime Firestore
 function fbStartListeners(){
   // --- Sesi ---
@@ -85,6 +105,7 @@ function fbStartListeners(){
       sesiData[d.id] = dat.absensi || {};
       sesiKet[d.id]  = dat.kegiatan || '';
     });
+    backupData();
     try { renderRekap('pc'); } catch(e){}
     try { renderRekap('mob'); } catch(e){}
     try { renderDb(); renderDbMob(); } catch(e){}
@@ -105,6 +126,7 @@ function fbStartListeners(){
         createdAt: dat.createdAt||0
       });
     });
+    backupData();
     if(kasTransaksi.length === 0) seedKasData();
     try { renderKas(); } catch(e){ console.error('renderKas',e); }
   }, function(e){ console.error('fbSnap kas',e); });
@@ -115,10 +137,37 @@ function fbStartListeners(){
       var dat = snap.data();
       if(dat.members && dat.members.length){ members = dat.members; }
     }
+    backupData();
     try { renderAnggota(); } catch(e){}
     try { renderAnggotaMob(); } catch(e){}
     try { renderDashboard(); } catch(e){}
   }, function(e){ console.error('fbSnap anggota',e); });
+
+  // --- Activity Log (hanya ambil dari user lain) ---
+  _fbUnsubLog = window._fsSnap(window._fsCol(fsDb(),'log'), function(snap){
+    var myName = (currentUser&&currentUser.username)||'';
+    snap.docChanges().forEach(function(change){
+      if(change.type==='added'){
+        var dat = change.doc.data();
+        if(dat.user !== myName){
+          var exists = _activityLogs.some(function(e){ return e.id===change.doc.id; });
+          if(!exists){
+            _activityLogs.unshift({
+              id: change.doc.id,
+              waktu: dat.waktu||0,
+              user: dat.user||'',
+              aksi: dat.aksi||'',
+              detail: dat.detail||''
+            });
+            if(_activityLogs.length > 500) _activityLogs.length = 500;
+          }
+        }
+      }
+    });
+    _activityLogs.sort(function(a,b){ return b.waktu - a.waktu; });
+    if(_activityLogs.length > 500) _activityLogs.length = 500;
+    backupData();
+  }, function(e){ console.error('fbSnap log',e); });
 }
 
 // Inisialisasi Firebase
@@ -141,11 +190,14 @@ function fbInit(){
       sesiData[d.id] = dat.absensi || {};
       sesiKet[d.id]  = dat.kegiatan || '';
     });
+    backupData();
     fbStartListeners();
     setSyncStatus('ok');
   }).catch(function(e){
     console.error('fbInit load error', e);
-    setSyncStatus('off');
+    // Coba restore dari localStorage
+    restoreData();
     fbStartListeners();
+    setPendingCount(0);
   });
 }

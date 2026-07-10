@@ -39,6 +39,11 @@ input::placeholder{color:var(--text3)}
 .bh{background:var(--green-lt);color:var(--green)}
 .bi{background:var(--amber-lt);color:var(--amber)}
 .ba{background:var(--red-lt);color:var(--red)}
+.log-badge{font-size:11px;padding:2px 8px;border-radius:99px;font-weight:500;display:inline-block;white-space:nowrap}
+.log-absen{background:#e8f0f8;color:#2a5a8a}
+.log-kas{background:#f5eedd;color:#8a6e10}
+.log-anggota{background:#f0e8f5;color:#7a3a8a}
+.log-sesi{background:#f5ead5;color:#b07d1a}
 
 /* ── SEGMENT ── */
 .seg{display:flex;background:var(--bg2);border-radius:var(--r);padding:3px;gap:2px}
@@ -77,6 +82,7 @@ tr.gender-sep-p td{background:#f5eef8;color:#7a3a8a}
 .sync-ok  {background:#e6f4ed;color:#1f6045;border-color:#b8dfc9}
 .sync-off {background:#fde8e8;color:#8b3530;border-color:#e8c0be}
 .sync-save{background:#fff3cd;color:#8a5e10;border-color:#f0d88a}
+.sync-pending{background:#fff3cd;color:#8a5e10;border-color:#f0d88a}
 .pc-sync-wrap{padding:6px 12px 2px}
 #pc-sync-badge{margin:6px 12px;border-radius:20px}
 .user-info{display:flex;align-items:center;gap:8px;padding:12px 14px;border-top:1px solid var(--border);background:var(--bg)}

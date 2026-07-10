@@ -9,7 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { initializeFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDocs, persistentLocalCache, persistentMultipleTabManager } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -23,7 +23,9 @@
     };
 
     const app  = initializeApp(firebaseConfig);
-    const db   = getFirestore(app);
+    const db   = initializeFirestore(app, {
+      localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()})
+    });
     const auth = getAuth(app);
 
     window._db  = db;
@@ -48,7 +50,7 @@
   <link rel="stylesheet" href="css/components.css"/>
   <link rel="stylesheet" href="css/modules.css"/>
   
-  <link rel="icon" type="image/png" href="logo.jpg">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🕌</text></svg>">
 </head>
 <body>
 
@@ -146,6 +148,9 @@
         </button>
       </nav>
       <div id="pc-sync-badge" class="sync-badge sync-ok">🟢 Online</div>
+      <button onclick="openActivityLog()" style="margin:0 12px 4px;padding:5px 10px;font-size:11px;border:1px solid var(--border);background:var(--bg);border-radius:var(--r);cursor:pointer;display:flex;align-items:center;gap:5px;color:var(--text2);font-family:inherit" title="Activity Log">
+        🕐 Activity Log
+      </button>
       <div class="user-info">
         <div class="u-av js-uinit"></div>
         <div style="flex:1;min-width:0">
@@ -292,7 +297,7 @@
         </div>
 
         <!-- STATE 2: Attendance List -->
-        <div id="pc-absen-body" style="display:none;flex:1;overflow:hidden;flex-direction:column;display:none">
+        <div id="pc-absen-body" style="display:none;flex:1;overflow:hidden;flex-direction:column">
           <div style="padding:10px 16px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);flex-shrink:0;background:var(--bg);display:flex;align-items:center;gap:8px">
             <span id="pc-absen-date" style="flex:1"></span>
           </div>
@@ -538,6 +543,7 @@
       <span class="mob-topbar-brand">Muda-Mudi</span>
       <div class="mob-topbar-icons">
         <div id="mob-sync-badge" class="sync-badge sync-ok">🟢 Tersinkron</div>
+        <button class="tb-icon" onclick="openActivityLog()" title="Activity Log">🕐</button>
         <button class="tb-icon" onclick="doLogout()" title="Keluar"><svg class="ico"><use href="#ico-logout"/></svg></button>
       </div>
     </div>
@@ -958,6 +964,7 @@
     <button onclick="exportMemberExcel()">📊 Excel</button>
     <button onclick="exportMemberCSV()">📄 CSV</button>
     <button onclick="exportMemberPrint()">🖨 Print</button>
+    <button class="btn-danger" onclick="hapusAnggotaFromDetail()" style="margin-left:auto">🗑 Hapus</button>
     <button class="mdet-close-btn" onclick="closeMemberDetail()">Tutup</button>
   </div>
 </div>
@@ -1109,7 +1116,7 @@
       <span style="font-size:12px;color:var(--text2)" id="riwayatSaldoAwalDisplay">Rp0</span>
       <button onclick="toggleRiwayatSaldoEdit()" class="kas-sa-edit-btn">✏️ Ubah</button>
     </div>
-    <div id="riwayatSaldoAwalEdit" style="display:none;margin-top:8px;display:none;align-items:center;gap:8px;flex-wrap:wrap">
+    <div id="riwayatSaldoAwalEdit" style="display:none;margin-top:8px;align-items:center;gap:8px;flex-wrap:wrap">
       <span style="font-size:11.5px;color:var(--text2);white-space:nowrap">Saldo Awal Baru:</span>
       <input type="number" id="riwayatSaldoInput" placeholder="0" min="0" style="flex:1;min-width:100px;max-width:160px;font-size:12px;padding:5px 8px;text-align:right"/>
       <button onclick="saveRiwayatSaldoAwal()" class="btn-p" style="padding:5px 12px;font-size:12px;white-space:nowrap;background:var(--brown);border-color:var(--brown)">Simpan</button>
@@ -1213,6 +1220,52 @@
 <script src="js/anggota.js"></script>
 <script src="js/kas.js"></script>
 <script src="js/boot.js"></script>
+
+<!-- ACTIVITY LOG POPUP -->
+<div id="log-overlay" class="izin-overlay" onclick="closeActivityLog()"></div>
+<div id="log-popup" class="izin-popup" style="width:min(680px,96vw);max-height:88vh;overflow:hidden;display:none;flex-direction:column">
+  <div class="izin-popup-header" style="flex-shrink:0">
+    <div class="izin-popup-icon" style="background:var(--amber-lt);color:var(--amber)">🕐</div>
+    <div style="flex:1">
+      <div class="izin-popup-title" style="color:var(--amber)">Activity Log</div>
+      <div class="izin-popup-name">Riwayat aktivitas pengguna</div>
+    </div>
+    <button onclick="closeActivityLog()" style="background:none;border:none;font-size:16px;cursor:pointer;color:var(--text3);padding:4px 6px;margin-left:auto">✕</button>
+  </div>
+  <div style="padding:8px 14px;border-bottom:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;flex-shrink:0;align-items:center">
+    <input type="text" id="logSearch" placeholder="🔍 Cari aktivitas..." style="flex:1;min-width:120px;font-size:12px;padding:7px 10px" oninput="renderActivityLogFor('')"/>
+    <select id="logFilter" onchange="renderActivityLogFor('')" style="font-size:12px;padding:6px 8px;width:auto;min-width:100px">
+      <option value="">Semua</option>
+      <option value="absen">Absensi</option>
+      <option value="kas">Kas</option>
+      <option value="anggota">Anggota</option>
+      <option value="sesi">Sesi</option>
+    </select>
+    <select id="logSort" onchange="renderActivityLogFor('')" style="font-size:12px;padding:6px 8px;width:auto;min-width:110px">
+      <option value="desc">Terbaru Dulu</option>
+      <option value="asc">Terlama Dulu</option>
+    </select>
+  </div>
+  <div style="overflow-y:auto;flex:1">
+    <table class="kas-riwayat-table">
+      <thead>
+        <tr>
+          <th>Waktu</th>
+          <th>User</th>
+          <th>Aksi</th>
+          <th>Detail</th>
+        </tr>
+      </thead>
+      <tbody id="logTbody"></tbody>
+    </table>
+    <div id="logEmpty" class="empty" style="display:none">Belum ada aktivitas.</div>
+  </div>
+  <div class="izin-popup-footer">
+    <button onclick="closeActivityLog()">Tutup</button>
+    <button class="btn-p" style="background:var(--brown);border-color:var(--brown)" onclick="logExport()">📊 Export</button>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div id="app-toast" style="display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1510;color:#fff;padding:10px 20px;border-radius:99px;font-size:13px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.25);white-space:nowrap;animation:fadeUp .2s ease">...</div>
 </body>

@@ -27,12 +27,12 @@ function escHtml(s){
 }
 
 function showToast(msg, duration){
-  var t = document.getElementById('toast');
+  var t = document.getElementById('app-toast');
   if(!t) return;
   t.textContent = msg;
-  t.classList.add('show');
+  t.style.display = 'block';
   if(window._toastTimer) clearTimeout(window._toastTimer);
-  window._toastTimer = setTimeout(function(){ t.classList.remove('show'); }, duration||2200);
+  window._toastTimer = setTimeout(function(){ t.style.display = 'none'; }, duration||2200);
 }
 
 function _printWithIframe(html){
