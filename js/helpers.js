@@ -40,13 +40,13 @@ function _printWithIframe(html){
   if(old) old.remove();
   var f = document.createElement('iframe');
   f.id = '_print_frame';
-  f.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;border:none';
+  f.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:794px;height:1123px;border:none';
   document.body.appendChild(f);
   f.contentDocument.open();
   f.contentDocument.write(html);
   f.contentDocument.close();
   f.contentWindow.focus();
-  setTimeout(function(){ f.contentWindow.print(); }, 600);
+  setTimeout(function(){ f.contentWindow.print(); }, 900);
 }
 
 function fmtRp(n){
@@ -100,4 +100,21 @@ function skeletonHtml(count){
 function showSkeleton(elId, count){
   var el = document.getElementById(elId);
   if(el) el.innerHTML = skeletonHtml(count||5);
+}
+
+// Buat path SVG garis halus (Catmull-Rom -> Bezier) dari array titik [x,y]
+function smoothLinePath(pts){
+  if(!pts || pts.length < 2) return '';
+  if(pts.length === 2){
+    return 'M '+pts[0][0]+' '+pts[0][1]+' L '+pts[1][0]+' '+pts[1][1];
+  }
+  var d = 'M '+pts[0][0].toFixed(2)+' '+pts[0][1].toFixed(2)+' ';
+  for(var i=0;i<pts.length-1;i++){
+    var p0=pts[Math.max(0,i-1)], p1=pts[i], p2=pts[i+1], p3=pts[Math.min(pts.length-1,i+2)];
+    var c1x=p1[0]+(p2[0]-p0[0])/6, c1y=p1[1]+(p2[1]-p0[1])/6;
+    var c2x=p2[0]-(p3[0]-p1[0])/6, c2y=p2[1]-(p3[1]-p1[1])/6;
+    d+='C '+c1x.toFixed(2)+' '+c1y.toFixed(2)+', '+c2x.toFixed(2)+' '+c2y.toFixed(2)+', '+
+       p2[0].toFixed(2)+' '+p2[1].toFixed(2)+' ';
+  }
+  return d;
 }

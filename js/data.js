@@ -40,7 +40,12 @@ var openPanel   = null;
 
 // Kas data
 var kasTransaksi  = [];
+// Starting point Kas ditetapkan SEKALI SAJA: April 2026 = Rp 1.045.700
 var kasSaldoAwal  = parseFloat(localStorage.getItem('kas_saldo_awal')) || 0;
+if(kasSaldoAwal === 0 && localStorage.getItem('kas_saldo_awal') === null){
+  kasSaldoAwal = 1045700;
+  try{ localStorage.setItem('kas_saldo_awal','1045700'); }catch(e){}
+}
 
 // ── Activity Log ──
 var _activityLogs = [];

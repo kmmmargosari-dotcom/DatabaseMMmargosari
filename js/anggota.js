@@ -8,23 +8,29 @@ function anggotaHtml(listId, searchId){
   var list   = members.filter(function(m){
     return m.nama.toLowerCase().includes(search.toLowerCase());
   });
+  if(!members.length) return '<div class="empty">Tidak ada anggota.</div>';
+  if(!list.length)    return '<div class="empty">Tidak ada anggota yang cocok.</div>';
   var P = list.filter(function(m){ return m.gender==='P'; });
   var L = list.filter(function(m){ return m.gender==='L'; });
-  function grp(label, arr){
-    if(!arr.length) return '';
-    var s = '<div class="sec-title">'+label+' ('+arr.length+')</div>';
-    arr.forEach(function(m){
-      var avc = m.gender==='P'?'av-p':'av-l';
-      s += '<div class="mem-item" onclick="openMemberDetail(\''+m.nama.replace(/'/g,"\\'")+'\')" style="cursor:pointer">'+
+  function card(label, arr, avc){
+    var body = arr.map(function(m){
+      return '<div class="mem-item" onclick="openMemberDetail(\''+m.nama.replace(/'/g,"\\'")+'\')" style="cursor:pointer">'+
         '<div class="avatar '+avc+'" style="width:34px;height:34px;font-size:11px">'+initials(m.nama)+'</div>'+
         '<div class="mem-info"><div class="mem-name">'+m.nama+'</div>'+
         '<div class="mem-gender">'+glabel(m.gender)+'</div></div>'+
         '<span style="color:var(--text3);font-size:16px">›</span>'+
       '</div>';
-    });
-    return s;
+    }).join('');
+    if(!body) body = '<div class="empty">Tidak ada anggota.</div>';
+    return '<div class="nd-card ang-card">'+
+      '<div class="ang-card-hd"><span>'+label+'</span><span class="ang-count">'+arr.length+'</span></div>'+
+      '<div class="ang-card-list">'+body+'</div>'+
+    '</div>';
   }
-  return (grp('Perempuan',P)+grp('Laki-laki',L))||'<div class="empty">Tidak ada anggota.</div>';
+  return '<div class="ang-cards">'+
+    card('Perempuan', P, 'av-p')+
+    card('Laki-laki', L, 'av-l')+
+  '</div>';
 }
 
 function renderAnggota(){
@@ -387,8 +393,12 @@ function exportMemberPrint(){
   var sortInfo=_mdetSortAsc?'A→Z':'Z→A';
   var filterDesc=fYear+' · '+fBulan+' · '+activeS+' · Urutan: '+sortInfo;
   var tableRows=rows.map(function(r,i){
-    var st=r.status==='H'?'<span style="color:#1a6040;font-weight:600">Hadir</span>':r.status==='I'?'<span style="color:#8a5e10">Izin</span>':r.status==='A'?'<span style="color:#8b3530">Alfa</span>':'<span style="color:#aaa">Belum</span>';
-    return '<tr><td>'+(i+1)+'</td><td>'+r.tgl+'</td><td>'+r.kegiatan+'</td><td>'+st+'</td><td>'+(r.catatan||'—')+'</td></tr>';
+    var stBadge='';
+    if(r.status==='H') stBadge='<span class="badge bh">Hadir</span>';
+    else if(r.status==='I') stBadge='<span class="badge bi">Izin</span>';
+    else if(r.status==='A') stBadge='<span class="badge ba">Alfa</span>';
+    else stBadge='<span style="color:#7c8a6c">Belum</span>';
+    return '<tr><td>'+(i+1)+'</td><td>'+r.tgl+'</td><td>'+r.kegiatan+'</td><td>'+stBadge+'</td><td>'+(r.catatan||'—')+'</td></tr>';
   }).join('');
   var circ=2*Math.PI*28;
   function pArc(val,offset,color){
@@ -398,24 +408,34 @@ function exportMemberPrint(){
   }
   var belum=tot-h-iz-al;
   var oH=0,oI=oH+(h/tot||0)*circ,oA=oI+(iz/tot||0)*circ,oX=oA+(al/tot||0)*circ;
-  var pColor=pct>=80?'#1a6040':pct>=60?'#8a5e10':'#8b3530';
-  var donutSvg=tot?'<svg width="120" height="120" viewBox="0 0 120 120"><circle cx="60" cy="60" r="28" fill="none" stroke="#e0d8cc" stroke-width="14"/>'+pArc(h,oH,'#1a6040')+pArc(iz,oI,'#c9a040')+pArc(al,oA,'#b03030')+pArc(belum,oX,'#e0d8cc')+'<text x="60" y="65" text-anchor="middle" font-size="14" font-weight="700" fill="'+pColor+'">'+pct+'%</text></svg>':'';
+  var pColor=pct>=80?'#2e7d55':pct>=60?'#b07b1f':'#a83a33';
+  var donutSvg=tot?'<svg width="120" height="120" viewBox="0 0 120 120"><circle cx="60" cy="60" r="28" fill="none" stroke="#d9dbc9" stroke-width="14"/>'+pArc(h,oH,'#2e7d55')+pArc(iz,oI,'#b07b1f')+pArc(al,oA,'#a83a33')+pArc(belum,oX,'#d9dbc9')+'<text x="60" y="65" text-anchor="middle" font-size="14" font-weight="700" fill="'+pColor+'">'+pct+'%</text></svg>':'';
   var legendHtml=tot?'<div style="display:flex;flex-direction:column;gap:5px;font-size:12px;justify-content:center">'+
-    '<div><span style="display:inline-block;width:10px;height:10px;background:#1a6040;border-radius:2px;margin-right:6px"></span>Hadir: <b>'+h+'</b> ('+Math.round(h/tot*100)+'%)</div>'+
-    '<div><span style="display:inline-block;width:10px;height:10px;background:#c9a040;border-radius:2px;margin-right:6px"></span>Izin: <b>'+iz+'</b> ('+Math.round(iz/tot*100)+'%)</div>'+
-    '<div><span style="display:inline-block;width:10px;height:10px;background:#b03030;border-radius:2px;margin-right:6px"></span>Alfa: <b>'+al+'</b> ('+Math.round(al/tot*100)+'%)</div>'+
-    (belum?'<div><span style="display:inline-block;width:10px;height:10px;background:#e0d8cc;border-radius:2px;margin-right:6px"></span>Belum: <b>'+belum+'</b> ('+Math.round(belum/tot*100)+'%)</div>':'')+
+    '<div><span style="display:inline-block;width:10px;height:10px;background:#2e7d55;border-radius:2px;margin-right:6px"></span>Hadir: <b>'+h+'</b> ('+Math.round(h/tot*100)+'%)</div>'+
+    '<div><span style="display:inline-block;width:10px;height:10px;background:#b07b1f;border-radius:2px;margin-right:6px"></span>Izin: <b>'+iz+'</b> ('+Math.round(iz/tot*100)+'%)</div>'+
+    '<div><span style="display:inline-block;width:10px;height:10px;background:#a83a33;border-radius:2px;margin-right:6px"></span>Alfa: <b>'+al+'</b> ('+Math.round(al/tot*100)+'%)</div>'+
+    (belum?'<div><span style="display:inline-block;width:10px;height:10px;background:#d9dbc9;border-radius:2px;margin-right:6px"></span>Belum: <b>'+belum+'</b> ('+Math.round(belum/tot*100)+'%)</div>':'')+
     '</div>':'';
   _printWithIframe('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Detail '+_mdetNama+'</title>'+
-    '<style>body{font-family:Arial,sans-serif;font-size:12px;padding:24px;color:#222}'+
-    'h2{font-size:16px;margin:0 0 4px}p{margin:0 0 4px;color:#666;font-size:11px}.filter-info{font-size:10px;color:#999;margin-bottom:14px;padding:6px 10px;background:#f9f6f0;border-radius:4px}'+
-    '.summary{display:flex;align-items:center;gap:24px;background:#f5eedf;padding:14px 18px;border-radius:8px;margin-bottom:20px}'+
+    '<link rel="preconnect" href="https://fonts.googleapis.com">'+
+    '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'+
+    '<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">'+
+    '<style>*{box-sizing:border-box}'+
+    'body{font-family:"Hanken Grotesk",system-ui,sans-serif;font-size:12px;padding:24px;color:#28322a;background:#f7f3e8;-webkit-print-color-adjust:exact;print-color-adjust:exact}'+
+    'h2{font-family:"Young Serif",Georgia,serif;font-weight:400;font-size:18px;margin:0 0 2px;color:#28322a}'+
+    'p{margin:0 0 4px;color:#5f6d52;font-size:11px}'+
+    '.print-hd{border-bottom:2px solid #3f8a53;padding-bottom:10px;margin-bottom:12px}'+
+    '.filter-info{font-size:10px;color:#7c8a6c;margin-bottom:14px;padding:6px 10px;background:#eef5ea;border:1px solid #d9dbc9;border-radius:8px}'+
+    '.summary{display:flex;align-items:center;gap:24px;background:#fff;border:1px solid #d9dbc9;border-radius:12px;box-shadow:0 1px 3px rgba(40,58,44,.10);padding:14px 18px;margin-bottom:20px}'+
     '.stats{display:flex;gap:20px;flex-wrap:wrap;align-items:center}'+
-    '.stat{text-align:center}.stat-val{font-size:18px;font-weight:700}.stat-lbl{font-size:10px;color:#888;text-transform:uppercase}'+
-    'table{width:100%;border-collapse:collapse;font-size:11px}'+
-    'th,td{border:1px solid #ddd;padding:6px 9px;text-align:left}th{background:#f5f5f5;font-weight:600}'+
-    '@media print{body{padding:8px}}</style></head><body>'+
-    '<h2>Detail Kehadiran: '+_mdetNama+'</h2><p>'+gender+'</p>'+
+    '.stat{text-align:center}.stat-val{font-size:18px;font-weight:700;color:#28322a}.stat-lbl{font-size:10px;color:#7c8a6c;text-transform:uppercase;letter-spacing:.4px}'+
+    'table{width:100%;border-collapse:collapse;font-size:11px;border:1px solid #d9dbc9;border-radius:12px;overflow:hidden}'+
+    'th,td{border:1px solid #e6e1cb;padding:6px 9px;text-align:left;color:#28322a}th{background:#efe9d8;color:#525f48;font-weight:600;font-size:9px;letter-spacing:.3px;text-transform:uppercase}'+
+    '.badge{display:inline-block;border-radius:99px;padding:1px 7px;font-size:9px;font-weight:700}'+
+    '.bh{background:#e2f0e7;color:#2e7d55}.bi{background:#f5ead0;color:#b07b1f}.ba{background:#f6e2df;color:#a83a33}'+
+    '@media print{body{background:#fff;padding:8px}.summary{box-shadow:none}}'+
+    '</style></head><body>'+
+    '<div class="print-hd"><h2>Detail Kehadiran: '+_mdetNama+'</h2><p>'+gender+'</p></div>'+
     '<div class="filter-info">Filter: '+filterDesc+' &nbsp;·&nbsp; '+tot+' sesi ditampilkan</div>'+
     '<div class="summary">'+donutSvg+'<div>'+legendHtml+'</div>'+
     '<div class="stats" style="margin-left:auto">'+

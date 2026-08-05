@@ -232,7 +232,7 @@ function renderKasDonut(totalMasuk, totalKeluar){
   var targets=[{svg:'kasDonutSvg',leg:'kasDonutLegend'},{svg:'kasDonutSvgM',leg:'kasDonutLegendM'}];
   var total=totalMasuk+totalKeluar;
   var selisih=totalMasuk-totalKeluar;
-  var cColor=selisih>=0?'#1f6045':'#c0392b';
+  var cColor=selisih>=0?'#2e7d55':'#a83a33';
   targets.forEach(function(t){
     var svgEl=document.getElementById(t.svg);
     var legEl=document.getElementById(t.leg);
@@ -246,13 +246,13 @@ function renderKasDonut(totalMasuk, totalKeluar){
     if(total>0){
       var pM=totalMasuk/total,pK=totalKeluar/total;
       if(totalMasuk>0){
-        svgHtml+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#1f6045" stroke-width="'+stroke+'"'+
+        svgHtml+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#2e7d55" stroke-width="'+stroke+'"'+
           ' stroke-dasharray="'+(circ*pM)+' '+(circ*(1-pM))+'"'+
           ' stroke-dashoffset="'+(circ*0.25)+'"'+
           ' style="transition:stroke-dasharray .35s"/>';
       }
       if(totalKeluar>0){
-        svgHtml+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#c0392b" stroke-width="'+stroke+'"'+
+        svgHtml+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#a83a33" stroke-width="'+stroke+'"'+
           ' stroke-dasharray="'+(circ*pK)+' '+(circ*(1-pK))+'"'+
           ' stroke-dashoffset="'+(circ*(0.25-pM))+'"'+
           ' style="transition:stroke-dasharray .35s"/>';
@@ -268,8 +268,8 @@ function renderKasDonut(totalMasuk, totalKeluar){
         legEl.innerHTML='<div style="color:var(--text3);font-size:11px;padding:4px 0">Belum ada transaksi</div>';
       } else {
         legEl.innerHTML='<div class="kas-donut-legend">'+
-          '<div class="kas-donut-leg-item"><span class="kas-donut-dot" style="background:#1f6045"></span><span class="kas-donut-leg-lbl">Masuk</span><span class="kas-donut-leg-val" style="color:#1f6045">'+fmtRp(totalMasuk)+'</span></div>'+
-          '<div class="kas-donut-leg-item"><span class="kas-donut-dot" style="background:#c0392b"></span><span class="kas-donut-leg-lbl">Keluar</span><span class="kas-donut-leg-val" style="color:#c0392b">'+fmtRp(totalKeluar)+'</span></div>'+
+          '<div class="kas-donut-leg-item"><span class="kas-donut-dot" style="background:#2e7d55"></span><span class="kas-donut-leg-lbl">Masuk</span><span class="kas-donut-leg-val" style="color:#2e7d55">'+fmtRp(totalMasuk)+'</span></div>'+
+          '<div class="kas-donut-leg-item"><span class="kas-donut-dot" style="background:#a83a33"></span><span class="kas-donut-leg-lbl">Keluar</span><span class="kas-donut-leg-val" style="color:#a83a33">'+fmtRp(totalKeluar)+'</span></div>'+
           '</div>';
       }
     }
@@ -326,26 +326,25 @@ function renderKasLineChart(tahun){
       svg+='<line x1="'+xv+'" y1="'+padT+'" x2="'+xv+'" y2="'+(padT+cH)+'" stroke="var(--border)" stroke-width="0.5" opacity="0.5"/>';
     }
 
-    // area fills
+    // area fills (smooth top edge)
     function area(data,color){
-      var pts=padL+','+(padT+cH)+' ';
-      data.forEach(function(v,i){ pts+=xP(i).toFixed(1)+','+yP(v).toFixed(1)+' '; });
-      pts+=(W-padR)+','+(padT+cH);
-      return '<polygon points="'+pts+'" fill="'+color+'" opacity="0.07"/>';
+      var pts=[];
+      data.forEach(function(v,i){ pts.push([xP(i), yP(v)]); });
+      var d=smoothLinePath(pts);
+      d+='L '+(W-padR).toFixed(2)+' '+(padT+cH).toFixed(2)+' L '+padL+' '+(padT+cH).toFixed(2)+' Z';
+      return '<path d="'+d+'" fill="'+color+'" opacity="0.08"/>';
     }
-    svg+=area(masuk,'#1f6045');
-    svg+=area(keluar,'#c0392b');
+    svg+=area(masuk,'#2e7d55');
+    svg+=area(keluar,'#a83a33');
 
-    // lines
+    // lines (smooth curve)
     function line(data,color){
-      var d='';
-      data.forEach(function(v,i){
-        d+=(i===0?'M ':'L ')+xP(i).toFixed(1)+' '+yP(v).toFixed(1)+' ';
-      });
-      return '<path d="'+d+'" fill="none" stroke="'+color+'" stroke-width="'+(isMob?1.8:2.2)+'" stroke-linejoin="round" stroke-linecap="round"/>';
+      var pts=[];
+      data.forEach(function(v,i){ pts.push([xP(i), yP(v)]); });
+      return '<path d="'+smoothLinePath(pts)+'" fill="none" stroke="'+color+'" stroke-width="'+(isMob?1.8:2.2)+'" stroke-linejoin="round" stroke-linecap="round"/>';
     }
-    svg+=line(masuk,'#1f6045');
-    svg+=line(keluar,'#c0392b');
+    svg+=line(masuk,'#2e7d55');
+    svg+=line(keluar,'#a83a33');
 
     // dots + value labels for non-zero
     function dots(data,color){
@@ -360,8 +359,8 @@ function renderKasLineChart(tahun){
       });
       return s;
     }
-    svg+=dots(masuk,'#1f6045');
-    svg+=dots(keluar,'#c0392b');
+    svg+=dots(masuk,'#2e7d55');
+    svg+=dots(keluar,'#a83a33');
 
     // x-axis month labels
     BULAN.forEach(function(lbl,i){
@@ -450,13 +449,7 @@ function kasDelTrx(id){
   showToast('Transaksi dihapus');
 }
 
-// ── Saldo Awal ──
-function toggleSaldoAwalEdit(){
-  openKasRiwayat();
-  setTimeout(function(){ toggleRiwayatSaldoEdit(); },150);
-}
-
-function saveKasSaldoAwal(){ saveRiwayatSaldoAwal(); }
+// ── Saldo Awal (starting point April 2026: terkunci, read-only) ──
 
 // ── Export ──
 function openKasExport(){ showPopup('kas-export-overlay','kas-export-popup'); }
@@ -493,62 +486,67 @@ function kasExport(type){
       var dashM=pctMasuk*circ,gapM=circ-dashM,dashK=pctKeluar*circ,gapK=circ-dashK,rotateK=-90+pctMasuk*360;
       donutSvg='<svg width="140" height="140" viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">'+
         '<circle cx="'+donutCx+'" cy="'+donutCy+'" r="'+donutR+'" fill="none" stroke="#e8e0d0" stroke-width="'+donutW+'"/>'+
-        '<circle cx="'+donutCx+'" cy="'+donutCy+'" r="'+donutR+'" fill="none" stroke="#1f6045" stroke-width="'+donutW+'" stroke-dasharray="'+dashM+' '+gapM+'" transform="rotate(-90 '+donutCx+' '+donutCy+')" stroke-linecap="round"/>'+
-        (totalKeluar>0?'<circle cx="'+donutCx+'" cy="'+donutCy+'" r="'+donutR+'" fill="none" stroke="#c0392b" stroke-width="'+donutW+'" stroke-dasharray="'+dashK+' '+gapK+'" transform="rotate('+rotateK+' '+donutCx+' '+donutCy+')" stroke-linecap="round"/>':'')+
-        '<text x="'+donutCx+'" y="'+(donutCy-5)+'" text-anchor="middle" font-size="13" font-weight="700" fill="#3b2a00">'+Math.round(pctMasuk*100)+'%</text>'+
+        '<circle cx="'+donutCx+'" cy="'+donutCy+'" r="'+donutR+'" fill="none" stroke="#2e7d55" stroke-width="'+donutW+'" stroke-dasharray="'+dashM+' '+gapM+'" transform="rotate(-90 '+donutCx+' '+donutCy+')" stroke-linecap="round"/>'+
+        (totalKeluar>0?'<circle cx="'+donutCx+'" cy="'+donutCy+'" r="'+donutR+'" fill="none" stroke="#a83a33" stroke-width="'+donutW+'" stroke-dasharray="'+dashK+' '+gapK+'" transform="rotate('+rotateK+' '+donutCx+' '+donutCy+')" stroke-linecap="round"/>':'')+
+        '<text x="'+donutCx+'" y="'+(donutCy-5)+'" text-anchor="middle" font-size="13" font-weight="700" fill="#28322a">'+Math.round(pctMasuk*100)+'%</text>'+
         '<text x="'+donutCx+'" y="'+(donutCy+10)+'" text-anchor="middle" font-size="9" fill="#888">Masuk</text>'+
         '</svg>';
     } else {
       donutSvg='<svg width="140" height="140" viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg"><circle cx="70" cy="70" r="54" fill="none" stroke="#e8e0d0" stroke-width="14"/><text x="70" y="75" text-anchor="middle" font-size="11" fill="#aaa">Kosong</text></svg>';
     }
     var rows='',rowNo=1;
-    rows+='<tr class="saldo-awal-row"><td colspan="2" style="font-style:italic;color:#888;font-size:10.5px">Saldo Awal Periode</td><td></td><td></td><td class="num bold" style="color:#7a5800">'+fmtRp(saldoAwal)+'</td></tr>';
+    rows+='<tr class="saldo-awal-row"><td colspan="2" style="font-style:italic;color:#7c8a6c;font-size:10.5px">Saldo Awal Periode</td><td></td><td></td><td class="num bold" style="color:#b07b1f">'+fmtRp(saldoAwal)+'</td></tr>';
     periodItems.forEach(function(item){
       var trx=item.trx;
       var masuk =trx.jenis==='pemasukan'   ?fmtRp(trx.nominal):'-';
       var keluar=trx.jenis==='pengeluaran' ?fmtRp(trx.nominal):'-';
-      var shade=rowNo%2===0?'background:#fafaf8':'';
+      var shade=rowNo%2===0?'background:#f7f4ea':'';
       rows+='<tr style="'+shade+'"><td style="white-space:nowrap;font-size:10.5px">'+fmtTglShort(trx.tanggal)+'</td><td style="font-size:10.5px">'+escHtml(trx.keterangan||'')+'</td><td class="num green" style="font-size:10.5px">'+masuk+'</td><td class="num red" style="font-size:10.5px">'+keluar+'</td><td class="num bold" style="font-size:10.5px">'+fmtRp(item.saldo)+'</td></tr>';
       rowNo++;
     });
     var printedAt=new Date().toLocaleString('id-ID',{dateStyle:'long',timeStyle:'short'});
-    var html='<!DOCTYPE html><html><head><meta charset="UTF-8">'+
+var html='<!DOCTYPE html><html><head><meta charset="UTF-8">'+
       '<title>Laporan Keuangan Muda-Mudi Margosari — '+periodeLabel+'</title>'+
-      '<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:"Segoe UI",Arial,sans-serif;font-size:11px;color:#222;background:#fff;padding:24px 28px}'+
-      '.print-header{display:flex;align-items:center;justify-content:space-between;padding-bottom:14px;margin-bottom:16px;border-bottom:3px solid #c8a44a}'+
-      '.ph-left{display:flex;align-items:center;gap:14px}.ph-icon{width:46px;height:46px;background:#f5eedd;border:1.5px solid #c8a44a;border-radius:11px;display:flex;align-items:center;justify-content:center}'+
-      '.ph-sub{font-size:9.5px;color:#c8a44a;letter-spacing:.6px;font-weight:700;text-transform:uppercase;margin-bottom:3px}.ph-title{font-size:18px;font-weight:800;color:#3b2a00}'+
-      '.ph-right{text-align:right}.ph-period-lbl{font-size:9px;color:#aaa;letter-spacing:.3px;text-transform:uppercase;margin-bottom:3px}.ph-period-val{font-size:15px;font-weight:700;color:#3b2a00}'+
-      '.ph-badge{display:inline-block;margin-top:4px;background:#f5eedd;border:1px solid #c8a44a;color:#7a5800;font-size:9px;font-weight:700;padding:2px 10px;border-radius:20px;letter-spacing:.3px}'+
-      '.cf-donut-row{display:flex;gap:12px;margin-bottom:14px;align-items:stretch}.cf-box{flex:1;border:1px solid #e8e0d0;border-radius:8px;overflow:hidden}'+
-      '.cf-box-title{font-size:9.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#7a5800;padding:9px 12px;border-bottom:1px solid #f0ece4;background:#f9f6ee}'+
-      '.cf-row{display:flex;align-items:center;padding:8px 12px;border-bottom:1px solid #f5f0e8;gap:10px;font-size:10.5px}.cf-row:last-child{border-bottom:none}'+
-      '.cf-icon{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}.cf-lbl{flex:1;color:#555}.cf-val{font-weight:600}'+
-      '.cf-saldo-akhir{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#f9f2dd;border-top:2px solid #c8a44a}.cf-sa-lbl{font-size:11px;font-weight:700;color:#7a5800}.cf-sa-val{font-size:14px;font-weight:700;color:#7a5800}'+
-      '.donut-box{width:180px;flex-shrink:0;border:1px solid #e8e0d0;border-radius:8px;display:flex;flex-direction:column;align-items:center;padding:12px;gap:8px}'+
-      '.donut-box-title{font-size:9.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#7a5800;align-self:flex-start;margin-bottom:4px}.donut-legend{width:100%;font-size:10px}'+
-      '.donut-leg-row{display:flex;align-items:center;gap:6px;margin-bottom:5px}.donut-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0}.donut-leg-lbl{flex:1;color:#555}.donut-leg-val{font-weight:700;font-size:10px}'+
-      '.section-title{font-size:9.5px;font-weight:700;color:#3b2a00;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;display:flex;align-items:center;gap:8px}.section-title::after{content:"";flex:1;height:1px;background:#e8e0d0}'+
-      'table{width:100%;border-collapse:collapse}thead tr{background:#f0ece4}th{padding:6px 9px;font-size:9.5px;font-weight:700;color:#5a4200;letter-spacing:.3px;text-align:left;border-bottom:2px solid #c8a44a}'+
-      'td{padding:5px 9px;border-bottom:1px solid #f0ece4;vertical-align:top}.num{text-align:right}.bold{font-weight:700}.green{color:#1f6045}.red{color:#c0392b}'+
-      '.saldo-awal-row td{background:#f9f6ee}.total-row td{background:#f0ece4;font-weight:700;border-top:2px solid #c8a44a}'+
-      '.footer{margin-top:14px;padding-top:10px;border-top:1px solid #e8e0d0;display:flex;justify-content:space-between;align-items:flex-end}.footer-left{font-size:9px;color:#999}'+
-      '.sign-box{text-align:center;font-size:9.5px}.sign-line{width:130px;border-top:1px solid #555;margin:28px auto 4px}'+
-      '@media print{body{padding:12px 16px}.no-print{display:none!important}}'+
+      '<link rel="preconnect" href="https://fonts.googleapis.com">'+
+      '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'+
+      '<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">'+
+      '<style>*{box-sizing:border-box;margin:0;padding:0}'+
+      'body{font-family:"Hanken Grotesk",system-ui,sans-serif;font-size:11px;color:#28322a;background:#f7f3e8;padding:24px 28px;-webkit-print-color-adjust:exact;print-color-adjust:exact}'+
+      '.print-header{display:flex;align-items:center;justify-content:space-between;padding-bottom:14px;margin-bottom:18px;border-bottom:2px solid #3f8a53}'+
+      '.ph-left{display:flex;align-items:center;gap:14px}.ph-icon{width:46px;height:46px;background:#e2efdd;border:1.5px solid #3f8a53;border-radius:12px;display:flex;align-items:center;justify-content:center}'+
+      '.ph-sub{font-size:9.5px;color:#3f8a53;letter-spacing:.6px;font-weight:700;text-transform:uppercase;margin-bottom:3px}.ph-title{font-family:"Young Serif",Georgia,serif;font-weight:400;font-size:19px;color:#28322a}'+
+      '.ph-right{text-align:right}.ph-period-lbl{font-size:9px;color:#7c8a6c;letter-spacing:.3px;text-transform:uppercase;margin-bottom:3px}.ph-period-val{font-size:15px;font-weight:700;color:#28322a}'+
+      '.ph-badge{display:inline-block;margin-top:4px;background:#e2efdd;border:1px solid #3f8a53;color:#31663d;font-size:9px;font-weight:700;padding:2px 10px;border-radius:20px;letter-spacing:.3px}'+
+      '.cf-donut-row{display:flex;gap:12px;margin-bottom:16px;align-items:stretch}.cf-box,.donut-box{background:#fff;box-shadow:0 1px 3px rgba(40,58,44,.10)}'+
+      '.cf-box{flex:1;border:1px solid #d9dbc9;border-radius:12px;overflow:hidden}'+
+      '.cf-box-title{font-size:9.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#525f48;padding:10px 12px;border-bottom:1px solid #e6e1cb;background:#efe9d8}'+
+      '.cf-row{display:flex;align-items:center;padding:9px 12px;border-bottom:1px solid #e6e1cb;gap:10px;font-size:10.5px}.cf-row:last-child{border-bottom:none}'+
+      '.cf-icon{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}.cf-lbl{flex:1;color:#5f6d52}.cf-val{font-weight:600}'+
+      '.cf-saldo-akhir{display:flex;align-items:center;justify-content:space-between;padding:11px 12px;background:#eef5e9;border-top:2px solid #3f8a53}.cf-sa-lbl{font-size:11px;font-weight:700;color:#31663d}.cf-sa-val{font-size:15px;font-weight:700;color:#31663d}'+
+      '.donut-box{width:184px;flex-shrink:0;border:1px solid #d9dbc9;border-radius:12px;display:flex;flex-direction:column;align-items:center;padding:12px;gap:8px}'+
+      '.donut-box-title{font-size:9.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#525f48;align-self:flex-start;margin-bottom:4px}.donut-legend{width:100%;font-size:10px}'+
+      '.donut-leg-row{display:flex;align-items:center;gap:6px;margin-bottom:5px}.donut-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0}.donut-leg-lbl{flex:1;color:#5f6d52}.donut-leg-val{font-weight:700;font-size:10px}'+
+      '.section-title{font-size:10px;font-weight:700;color:#28322a;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;display:flex;align-items:center;gap:8px}.section-title::after{content:"";flex:1;height:1px;background:#d9dbc9}'+
+      'table{width:100%;border-collapse:collapse;border:1px solid #d9dbc9;border-radius:12px;overflow:hidden}thead tr{background:#efe9d8}th{padding:7px 9px;font-size:9px;font-weight:700;color:#525f48;letter-spacing:.3px;text-align:left;text-transform:uppercase;border-bottom:2px solid #3f8a53}'+
+      'td{padding:6px 9px;border-bottom:1px solid #e6e1cb;vertical-align:top}.num{text-align:right}.bold{font-weight:700}.green{color:#2e7d55}.red{color:#a83a33}'+
+      '.saldo-awal-row td{background:#eef5e9}.total-row td{background:#efe9d8;font-weight:700;border-top:2px solid #3f8a53}'+
+      '.footer{margin-top:16px;padding-top:10px;border-top:2px solid #3f8a53;display:flex;justify-content:space-between;align-items:flex-end}.footer-left{font-size:9px;color:#7c8a6c}'+
+      '.sign-box{text-align:center;font-size:9.5px}.sign-line{width:130px;border-top:1px solid #525f48;margin:28px auto 4px}'+
+      '@media print{body{background:#fff;padding:12px 16px}.no-print{display:none!important}.cf-box,.donut-box{box-shadow:none}}'+
       '</style></head><body>'+
-      '<div class="print-header"><div class="ph-left"><div class="ph-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c8a44a" stroke-width="1.8"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg></div>'+
+      '<div class="print-header"><div class="ph-left"><div class="ph-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3f8a53" stroke-width="1.8"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg></div>'+
       '<div><div class="ph-sub">Laporan Keuangan</div><div class="ph-title">Muda-Mudi Margosari</div></div></div>'+
       '<div class="ph-right"><div class="ph-period-lbl">Periode Aktif</div><div class="ph-period-val">'+periodeLabel+'</div><div class="ph-badge">Kas &amp; Keuangan</div></div></div>'+
-      '<div class="cf-donut-row"><div class="cf-box"><div class="cf-box-title">📋 Cash Flow Periode</div>'+
-      '<div class="cf-row"><div class="cf-icon" style="background:#f5f0e0">💼</div><span class="cf-lbl">Saldo Awal</span><span class="cf-val" style="color:#7a5800">'+fmtRp(saldoAwal)+'</span></div>'+
-      '<div class="cf-row"><div class="cf-icon" style="background:#eef8f2">↑</div><span class="cf-lbl">Total Pemasukan</span><span class="cf-val" style="color:#1f6045">'+fmtRp(totalMasuk)+'</span></div>'+
-      '<div class="cf-row"><div class="cf-icon" style="background:#fef2f2">↓</div><span class="cf-lbl">Total Pengeluaran</span><span class="cf-val" style="color:#c0392b">'+fmtRp(totalKeluar)+'</span></div>'+
-      '<div class="cf-row"><div class="cf-icon" style="background:#fffbee">~</div><span class="cf-lbl">Selisih</span><span class="cf-val" style="color:'+(selisih>=0?'#1f6045':'#c0392b')+'">'+fmtRp(selisih)+'</span></div>'+
+      '<div class="cf-donut-row"><div class="cf-box"><div class="cf-box-title">Cash Flow Periode</div>'+
+      '<div class="cf-row"><div class="cf-icon" style="background:#e2f0e7">Sal</div><span class="cf-lbl">Saldo Awal</span><span class="cf-val" style="color:#b07b1f">'+fmtRp(saldoAwal)+'</span></div>'+
+      '<div class="cf-row"><div class="cf-icon" style="background:#e2f0e7">↑</div><span class="cf-lbl">Total Pemasukan</span><span class="cf-val" style="color:#2e7d55">'+fmtRp(totalMasuk)+'</span></div>'+
+      '<div class="cf-row"><div class="cf-icon" style="background:#f6e2df">↓</div><span class="cf-lbl">Total Pengeluaran</span><span class="cf-val" style="color:#a83a33">'+fmtRp(totalKeluar)+'</span></div>'+
+      '<div class="cf-row"><div class="cf-icon" style="background:#f5ead0">~</div><span class="cf-lbl">Selisih</span><span class="cf-val" style="color:'+(selisih>=0?'#2e7d55':'#a83a33')+'">'+fmtRp(selisih)+'</span></div>'+
       '<div class="cf-saldo-akhir"><span class="cf-sa-lbl">Saldo Akhir</span><span class="cf-sa-val">'+fmtRp(saldoAkhir)+'</span></div></div>'+
       '<div class="donut-box"><div class="donut-box-title">Komposisi</div>'+donutSvg+
       '<div class="donut-legend">'+
-      (totalMasuk>0?'<div class="donut-leg-row"><div class="donut-dot" style="background:#1f6045"></div><span class="donut-leg-lbl">Pemasukan</span><span class="donut-leg-val" style="color:#1f6045">'+fmtRp(totalMasuk)+'</span></div>':'')+
-      (totalKeluar>0?'<div class="donut-leg-row"><div class="donut-dot" style="background:#c0392b"></div><span class="donut-leg-lbl">Pengeluaran</span><span class="donut-leg-val" style="color:#c0392b">'+fmtRp(totalKeluar)+'</span></div>':'')+
+      (totalMasuk>0?'<div class="donut-leg-row"><div class="donut-dot" style="background:#2e7d55"></div><span class="donut-leg-lbl">Pemasukan</span><span class="donut-leg-val" style="color:#2e7d55">'+fmtRp(totalMasuk)+'</span></div>':'')+
+      (totalKeluar>0?'<div class="donut-leg-row"><div class="donut-dot" style="background:#a83a33"></div><span class="donut-leg-lbl">Pengeluaran</span><span class="donut-leg-val" style="color:#a83a33">'+fmtRp(totalKeluar)+'</span></div>':'')+
       '</div></div></div>'+
       '<div class="section-title">Detail Transaksi</div>'+
       '<table><thead><tr><th>Tanggal</th><th>Keterangan</th><th style="text-align:right">Masuk (Rp)</th><th style="text-align:right">Keluar (Rp)</th><th style="text-align:right">Saldo (Rp)</th></tr></thead>'+
@@ -602,29 +600,6 @@ function closeKasRiwayat(){
   var popup  =document.getElementById('kas-riwayat-popup');
   if(overlay) overlay.classList.remove('show');
   if(popup){ popup.classList.remove('show'); popup.style.display='none'; }
-}
-
-function toggleRiwayatSaldoEdit(){
-  var row=document.getElementById('riwayatSaldoAwalEdit');
-  var inp=document.getElementById('riwayatSaldoInput');
-  if(!row) return;
-  var isOpen=row.style.display==='flex';
-  if(isOpen){ row.style.display='none'; }
-  else { row.style.display='flex'; if(inp){ inp.value=kasSaldoAwal||''; setTimeout(function(){inp.focus();},50); } }
-}
-
-function saveRiwayatSaldoAwal(){
-  var inp=document.getElementById('riwayatSaldoInput');
-  var val=parseFloat(inp?inp.value:0)||0;
-  kasSaldoAwal=val;
-  localStorage.setItem('kas_saldo_awal',val);
-  var dispEl=document.getElementById('riwayatSaldoAwalDisplay');
-  if(dispEl) dispEl.textContent=fmtRp(kasSaldoAwal);
-  var row=document.getElementById('riwayatSaldoAwalEdit');
-  if(row) row.style.display='none';
-  logActivity('kas', 'Ubah saldo awal → '+fmtRp(val));
-  renderKas();
-  showToast('Saldo awal disimpan: '+fmtRp(val));
 }
 
 function renderKasRiwayat(){

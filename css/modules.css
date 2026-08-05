@@ -218,3 +218,55 @@
 .kas-line-leg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)}
 .kas-line-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .kas-line-body{padding:14px 16px 10px;overflow-x:auto}
+
+/* ----------------------------------
+   UNIFORM CARDS (Dashboard & Kas sebagai standar)
+   Diterapkan ke semua menu: Rekap, Sesi, Data, Absensi
+------------------------------------- */
+.nd-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--rl);box-shadow:var(--shadow);overflow:hidden}
+
+/* Semua konten menu non-dashboard duduk di atas band bg2 agar card menonjol */
+.pane-body{background:var(--bg2)}
+
+/* RECAP Bulanan */
+#rekapStats{background:var(--bg);border:1px solid var(--border);border-radius:var(--rl);box-shadow:var(--shadow);overflow:hidden;margin:16px 20px 0}
+#rekapStatsM{background:var(--bg);border:1px solid var(--border);border-radius:var(--rl);box-shadow:var(--shadow);overflow:hidden;margin:12px 12px 0}
+#rekapStats .rs-panel,#rekapStatsM .rs-panel{border:none;background:transparent}
+.rekap-tbl{background:var(--bg);border:1px solid var(--border);border-radius:var(--rl);box-shadow:var(--shadow);overflow:auto;margin:16px 20px}
+#izinSheet{background:var(--bg);border:1px solid var(--border);border-radius:var(--rl);box-shadow:var(--shadow);overflow:hidden;margin:16px 20px 20px}
+#izinSheetM{background:var(--bg);border:1px solid var(--border);border-radius:var(--rl);box-shadow:var(--shadow);overflow:hidden;margin:12px}
+#izinSheet .iz3-header{margin-top:0;padding:12px 16px 8px}
+#rekapStats:empty,#rekapStatsM:empty,#izinSheet:empty,#izinSheetM:empty,.rekap-chart-card:empty{display:none}
+.rekap-chart-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--rl);box-shadow:var(--shadow);overflow:hidden;margin:16px 20px 20px}
+.rekap-chart-hd{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--border)}
+.rekap-chart-title{font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--text2)}
+.rekap-chart-body{padding:14px 16px 10px;overflow-x:auto}
+.rc-legend{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text2);flex-wrap:wrap}
+.rc-legend .rc-dot{width:8px;height:8px;border-radius:2px;display:inline-block;flex-shrink:0;margin-left:8px}
+.rc-legend .rc-dot:first-child{margin-left:0}
+
+/* SESI / Database */
+.db-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--rl);box-shadow:var(--shadow);overflow:hidden;margin:16px 20px}
+.db-card .db-section-hd:first-child{border-top:none;margin-top:0}
+
+/* ANGGOTA / Data - 2 card berdampingan */
+.ang-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;padding:16px 20px;align-items:start}
+.ang-card{overflow:hidden}
+.ang-card-hd{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg2);font-weight:600;font-size:13px;color:var(--text)}
+.ang-count{background:var(--gold-lt);color:var(--gold-dk);border-radius:99px;padding:1px 10px;font-size:11px;font-weight:600}
+.ang-card-list{max-height:64vh;overflow-y:auto}
+.ang-card-list .mem-item:last-child{border-bottom:none}
+
+/* ABSENSI PC: daftar dalam satu card */
+.pc-2col{background:var(--bg);border:1px solid var(--border);border-radius:var(--rl);box-shadow:var(--shadow);overflow:auto;margin:10px 16px}
+
+/* MOBILE */
+@media(max-width:768px){
+  #rekapStatsM{margin:12px}
+  .rekap-tbl{margin:12px}
+  #izinSheetM{margin:12px}
+  .rekap-chart-card{margin:12px}
+  .db-card{margin:12px}
+  .ang-cards{grid-template-columns:1fr;gap:12px;padding:12px}
+  .ang-card-list{max-height:none}
+}

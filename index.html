@@ -44,7 +44,7 @@
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Hanken+Grotesk:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="css/base.css"/>
   <link rel="stylesheet" href="css/layout.css"/>
   <link rel="stylesheet" href="css/components.css"/>
@@ -181,7 +181,7 @@
             <!-- Stat Cards -->
             <div class="ndash-stats">
               <div class="nstat-card">
-                <div class="nstat-icon" style="background:#eef2fa;color:#2a5a8a">
+                <div class="nstat-icon" style="background:var(--gold-xlt);color:var(--gold-dk)">
                   <svg class="ico" style="width:22px;height:22px"><use href="#ico-users"/></svg>
                 </div>
                 <div class="nstat-info">
@@ -191,7 +191,7 @@
                 </div>
               </div>
               <div class="nstat-card">
-                <div class="nstat-icon" style="background:#eef8f2;color:#1f6045">
+                <div class="nstat-icon" style="background:var(--green-lt);color:var(--green)">
                   <svg class="ico" style="width:22px;height:22px"><use href="#ico-clipboard"/></svg>
                 </div>
                 <div class="nstat-info">
@@ -228,9 +228,9 @@
                 <div class="ndash-sec-hd">
                   <span>Grafik Kehadiran (Bulan Ini)</span>
                   <span class="ndash-legend">
-                    <span class="nleg-dot" style="background:#22c55e"></span>Hadir
-                    <span class="nleg-dot" style="background:#f97316;margin-left:10px"></span>Izin
-                    <span class="nleg-dot" style="background:#ef4444;margin-left:10px"></span>Alpa
+                    <span class="nleg-dot" style="background:#2e7d55"></span>Hadir
+                    <span class="nleg-dot" style="background:#b07b1f;margin-left:10px"></span>Izin
+                    <span class="nleg-dot" style="background:#a83a33;margin-left:10px"></span>Alpa
                   </span>
                 </div>
                 <div id="dash-chart-pc" class="ndash-chart-wrap"></div>
@@ -342,7 +342,7 @@
         </div>
         <div class="pane-body">
           <div id="rekapStats"></div>
-          <div class="scroll-x"><table><thead id="theadRekap"></thead><tbody id="tbodyRekap"></tbody></table></div>
+          <div class="scroll-x rekap-tbl"><table><thead id="theadRekap"></thead><tbody id="tbodyRekap"></tbody></table></div>
           <div id="izinSheet"></div>
         </div>
       </div>
@@ -372,7 +372,9 @@
             <option value="asc">Terlama Dulu</option>
           </select>
         </div>
-        <div class="pane-body" id="dbList"><div class="empty">Belum ada sesi.</div></div>
+        <div class="pane-body" id="dbPane">
+          <div class="nd-card db-card"><div id="dbList"><div class="empty">Belum ada sesi.</div></div></div>
+        </div>
       </div>
 
       <!-- KAS -->
@@ -482,8 +484,8 @@
               <span class="kas-line-title">Tren Pemasukan &amp; Pengeluaran</span>
               <span class="kas-line-yr" id="kasLineYear">—</span>
               <div class="kas-line-legend">
-                <span class="kas-line-leg"><span class="kas-line-dot" style="background:#1f6045"></span>Pemasukan</span>
-                <span class="kas-line-leg"><span class="kas-line-dot" style="background:#c0392b"></span>Pengeluaran</span>
+                <span class="kas-line-leg"><span class="kas-line-dot" style="background:#2e7d55"></span>Pemasukan</span>
+                <span class="kas-line-leg"><span class="kas-line-dot" style="background:#a83a33"></span>Pengeluaran</span>
               </div>
             </div>
             <div class="kas-line-body"><div id="kasLineChart"></div></div>
@@ -559,7 +561,7 @@
         <!-- Stat Cards 2x2 -->
         <div class="ndash-mob-stats">
           <div class="nstat-card">
-            <div class="nstat-icon" style="background:#eef2fa;color:#2a5a8a">
+            <div class="nstat-icon" style="background:var(--gold-xlt);color:var(--gold-dk)">
               <svg class="ico" style="width:20px;height:20px"><use href="#ico-users"/></svg>
             </div>
             <div class="nstat-info">
@@ -569,7 +571,7 @@
             </div>
           </div>
           <div class="nstat-card">
-            <div class="nstat-icon" style="background:#eef8f2;color:#1f6045">
+            <div class="nstat-icon" style="background:var(--green-lt);color:var(--green)">
               <svg class="ico" style="width:20px;height:20px"><use href="#ico-clipboard"/></svg>
             </div>
             <div class="nstat-info">
@@ -606,9 +608,9 @@
             <span>Grafik Kehadiran (Bulan Ini)</span>
           </div>
           <div class="ndash-mob-legend">
-            <span class="nleg-dot" style="background:#22c55e"></span>Hadir
-            <span class="nleg-dot" style="background:#f97316;margin-left:8px"></span>Izin
-            <span class="nleg-dot" style="background:#ef4444;margin-left:8px"></span>Alpa
+            <span class="nleg-dot" style="background:#2e7d55"></span>Hadir
+            <span class="nleg-dot" style="background:#b07b1f;margin-left:8px"></span>Izin
+            <span class="nleg-dot" style="background:#a83a33;margin-left:8px"></span>Alpa
           </div>
           <div id="dash-chart-mob" class="ndash-chart-wrap"></div>
         </div>
@@ -720,7 +722,7 @@
       </div>
       <div class="mob-scroll">
         <div id="rekapStatsM"></div>
-        <div class="scroll-x"><table><thead id="theadRekapM"></thead><tbody id="tbodyRekapM"></tbody></table></div>
+        <div class="scroll-x rekap-tbl"><table><thead id="theadRekapM"></thead><tbody id="tbodyRekapM"></tbody></table></div>
         <div id="izinSheetM"></div>
       </div>
     </div>
@@ -753,7 +755,9 @@
           <option value="asc">Terlama Dulu</option>
         </select>
       </div>
-      <div id="dbListM" class="mob-scroll"><div class="empty">Belum ada sesi.</div></div>
+      <div class="mob-scroll" style="background:var(--bg2)">
+        <div class="nd-card db-card"><div id="dbListM"><div class="empty">Belum ada sesi.</div></div></div>
+      </div>
     </div>
 
     <!-- ANGGOTA -->
@@ -859,8 +863,8 @@
           <span class="kas-line-title" style="font-size:10px">Tren Tahunan</span>
           <span class="kas-line-yr" id="kasLineYearM" style="font-size:11px">—</span>
           <div class="kas-line-legend">
-            <span class="kas-line-leg" style="font-size:10px"><span class="kas-line-dot" style="background:#1f6045;width:7px;height:7px"></span>Masuk</span>
-            <span class="kas-line-leg" style="font-size:10px"><span class="kas-line-dot" style="background:#c0392b;width:7px;height:7px"></span>Keluar</span>
+            <span class="kas-line-leg" style="font-size:10px"><span class="kas-line-dot" style="background:#2e7d55;width:7px;height:7px"></span>Masuk</span>
+            <span class="kas-line-leg" style="font-size:10px"><span class="kas-line-dot" style="background:#a83a33;width:7px;height:7px"></span>Keluar</span>
           </div>
         </div>
         <div class="kas-line-body" style="padding:10px 14px 8px"><div id="kasLineChartM"></div></div>
@@ -1108,19 +1112,12 @@
     </div>
     <button onclick="closeKasRiwayat()" style="background:none;border:none;font-size:16px;cursor:pointer;color:var(--text3);padding:4px 6px;margin-left:auto">✕</button>
   </div>
-  <!-- Saldo Awal Setting Row -->
+  <!-- Saldo Awal Starting Point (kunci, read-only) -->
   <div id="kasRiwayatSaldoAwalSection" style="padding:10px 14px;border-bottom:1px solid var(--border);background:var(--gold-xlt);flex-shrink:0">
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
       <svg class="ico" style="width:14px;height:14px;color:var(--brown)"><use href="#ico-wallet"/></svg>
-      <span style="font-size:12px;color:var(--brown);font-weight:600">Pengaturan Saldo Awal:</span>
+      <span style="font-size:12px;color:var(--brown);font-weight:600">Saldo Awal Starting Point (April 2026):</span>
       <span style="font-size:12px;color:var(--text2)" id="riwayatSaldoAwalDisplay">Rp0</span>
-      <button onclick="toggleRiwayatSaldoEdit()" class="kas-sa-edit-btn">✏️ Ubah</button>
-    </div>
-    <div id="riwayatSaldoAwalEdit" style="display:none;margin-top:8px;align-items:center;gap:8px;flex-wrap:wrap">
-      <span style="font-size:11.5px;color:var(--text2);white-space:nowrap">Saldo Awal Baru:</span>
-      <input type="number" id="riwayatSaldoInput" placeholder="0" min="0" style="flex:1;min-width:100px;max-width:160px;font-size:12px;padding:5px 8px;text-align:right"/>
-      <button onclick="saveRiwayatSaldoAwal()" class="btn-p" style="padding:5px 12px;font-size:12px;white-space:nowrap;background:var(--brown);border-color:var(--brown)">Simpan</button>
-      <button onclick="toggleRiwayatSaldoEdit()" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:15px;padding:2px 6px;line-height:1">✕</button>
     </div>
   </div>
   <!-- Filter bar -->
@@ -1267,6 +1264,6 @@
 </div>
 
 <!-- TOAST -->
-<div id="app-toast" style="display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1510;color:#fff;padding:10px 20px;border-radius:99px;font-size:13px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.25);white-space:nowrap;animation:fadeUp .2s ease">...</div>
+<div id="app-toast" style="display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1f2a24;color:#fff;padding:10px 20px;border-radius:99px;font-size:13px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.25);white-space:nowrap;animation:fadeUp .2s ease">...</div>
 </body>
 </html>

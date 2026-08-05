@@ -92,7 +92,7 @@ function renderDashboard(){
 function buildDashChart(sesiStats){
   if(!sesiStats||!sesiStats.length){
     return '<div style="overflow-x:auto"><svg viewBox="0 0 500 190" xmlns="http://www.w3.org/2000/svg" style="width:100%;min-width:300px;height:auto;display:block">'+
-      '<text x="250" y="100" text-anchor="middle" font-size="12" fill="#b0a078">Belum ada sesi bulan ini</text></svg></div>';
+      '<text x="250" y="100" text-anchor="middle" font-size="12" fill="#8b987c">Belum ada sesi bulan ini</text></svg></div>';
   }
   var H_arr = sesiStats.map(function(s){ return s.H; });
   var I_arr = sesiStats.map(function(s){ return s.I; });
@@ -111,8 +111,8 @@ function buildDashChart(sesiStats){
 
   function polyline(vals,color){
     if(vals.length<2) return dots(vals,color);
-    var pts = vals.map(function(v,i){ return tx(i).toFixed(1)+','+ty(v).toFixed(1); }).join(' ');
-    return '<polyline points="'+pts+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
+    var pts = vals.map(function(v,i){ return [tx(i), ty(Math.min(v,maxV))]; });
+    return '<path d="'+smoothLinePath(pts)+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
   }
   function dots(vals,color){
     return vals.map(function(v,i){
@@ -123,19 +123,19 @@ function buildDashChart(sesiStats){
   var grid = '';
   [0,10,20,30,40,50].forEach(function(val){
     var yy = ty(val);
-    grid += '<line x1="'+pL+'" y1="'+yy.toFixed(1)+'" x2="'+(W-pR)+'" y2="'+yy.toFixed(1)+'" stroke="#e4d9c4" stroke-width="0.7"/>';
-    grid += '<text x="'+(pL-4)+'" y="'+(yy+3).toFixed(1)+'" text-anchor="end" font-size="8" fill="#b0a078">'+val+'</text>';
+    grid += '<line x1="'+pL+'" y1="'+yy.toFixed(1)+'" x2="'+(W-pR)+'" y2="'+yy.toFixed(1)+'" stroke="#d9dbc9" stroke-width="0.7"/>';
+    grid += '<text x="'+(pL-4)+'" y="'+(yy+3).toFixed(1)+'" text-anchor="end" font-size="8" fill="#8b987c">'+val+'</text>';
   });
 
   var xlbls = sesiStats.map(function(s,i){
     var x = tx(i).toFixed(1);
-    return '<text x="'+x+'" y="'+(H_-6)+'" text-anchor="middle" font-size="8" fill="#b0a078">'+s.label+'</text>';
+    return '<text x="'+x+'" y="'+(H_-6)+'" text-anchor="middle" font-size="8" fill="#8b987c">'+s.label+'</text>';
   }).join('');
 
   return '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch">'+
     '<svg viewBox="0 0 '+W+' '+H_+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">'+
     grid+xlbls+
-    polyline(H_arr,'#22c55e')+polyline(I_arr,'#f97316')+polyline(A_arr,'#ef4444')+
-    dots(H_arr,'#22c55e')+dots(I_arr,'#f97316')+dots(A_arr,'#ef4444')+
+    polyline(H_arr,'#2e7d55')+polyline(I_arr,'#b07b1f')+polyline(A_arr,'#a83a33')+
+    dots(H_arr,'#2e7d55')+dots(I_arr,'#b07b1f')+dots(A_arr,'#a83a33')+
     '</svg></div>';
 }
