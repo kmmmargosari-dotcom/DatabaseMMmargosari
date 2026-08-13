@@ -40,6 +40,12 @@
   width:min(520px,95vw);max-height:85vh;overflow:hidden;flex-direction:column}
 .mdet-modal.show{display:flex;animation:mdetIn .2s cubic-bezier(.34,1.3,.64,1) both}
 @keyframes mdetIn{from{opacity:0;transform:translate(-50%,-50%) scale(.9)} to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+
+/* App Popup (pengganti alert/confirm/prompt) harus selalu tampil PALING ATAS,
+   termasuk di atas modal Detail Anggota, supaya tidak ketutup saat dipanggil
+   dari dalam modal lain (mis. tombol Edit/Hapus di Detail Anggota). */
+#app-popup-overlay{z-index:960}
+#app-popup{z-index:961}
 .mdet-header{display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--border);flex-shrink:0}
 .mdet-name{font-size:15px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mdet-gender{font-size:11px;color:var(--text2);margin-top:2px}

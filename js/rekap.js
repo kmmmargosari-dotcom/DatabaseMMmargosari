@@ -102,7 +102,7 @@ function renderRekap(source){
         });
         var pct=sL.length?Math.round(h/sL.length*100):0;
         var pc=pct>=80?'var(--green)':pct>=60?'var(--amber)':'var(--red)';
-        bd+='<tr><td>'+noCount+'</td><td class="tl">'+m.nama+'</td>'+cells+
+        bd+='<tr><td>'+noCount+'</td><td class="tl">'+escHtml(m.nama)+'</td>'+cells+
           '<td style="color:var(--green);font-weight:500">'+h+'</td>'+
           '<td style="color:var(--amber)">'+iz+'</td><td style="color:var(--red)">'+al+'</td>'+
           '<td style="color:'+pc+';font-weight:500">'+pct+'%</td></tr>';
@@ -153,15 +153,15 @@ function renderRekap(source){
     cards.forEach(function(c){
       var rc  = iz3Color(c.catatan);
       var tag = c.catatan
-        ? '<span class="iz3-tag" style="background:'+rc.bg+';color:'+rc.col+'">'+c.catatan+'</span>'
+        ? '<span class="iz3-tag" style="background:'+rc.bg+';color:'+rc.col+'">'+escHtml(c.catatan)+'</span>'
         : '';
       h+='<div class="iz3-card" style="border-left:3px solid '+rc.col+'">'+
-        '<div class="iz3-nama">'+c.nama+'</div>'+
+        '<div class="iz3-nama">'+escHtml(c.nama)+'</div>'+
         '<div class="iz3-kg-row">'+
-          '<span class="iz3-kegiatan">'+c.kegiatan+'</span>'+
+          '<span class="iz3-kegiatan">'+escHtml(c.kegiatan)+'</span>'+
           tag+
         '</div>'+
-        '<div class="iz3-tgl">'+c.tgl+'</div>'+
+        '<div class="iz3-tgl">'+escHtml(c.tgl)+'</div>'+
         '</div>';
     });
     h+='</div>';
@@ -182,17 +182,7 @@ function rsItem(v, l, c){
 }
 
 function renderRekapChart(sL, mAll, bulan, tahun){
-  var perSesi = sL.map(function(t){
-    var h = 0, iz = 0, al = 0;
-    mAll.forEach(function(m){
-      var v = ((sesiData[t]||{})[m.nama]||{}).status||'';
-      if(v==='H') h++; else if(v==='I') iz++; else if(v==='A') al++;
-    });
-    var dt = tglDate(t).split('-');
-    var day = parseInt(dt[2],10) || 0;
-    var ket = sesiKet[t]||'';
-    return { day:day, ket:ket, label: ket ? ket.substring(0,8) : String(day), h:h, iz:iz, al:al };
-  });
+  var perSesi = buildPerSesi(sL, mAll);
   if(!perSesi.length){
     ['rekapChart','rekapChartM'].forEach(function(id){
       var el = document.getElementById(id);
@@ -210,9 +200,39 @@ function renderRekapChart(sL, mAll, bulan, tahun){
       var ref = document.getElementById(i===0?'rekapStats':'rekapStatsM');
       if(ref && ref.parentNode) ref.parentNode.insertBefore(el, ref.nextSibling);
     }
-    el.innerHTML = '<div class="rekap-chart-hd"><span class="rekap-chart-title">Grafik Kehadiran per Pertemuan</span>'+
-      '<span class="rc-legend"><span class="rc-dot" style="background:#2e7d55"></span>Hadir<span class="rc-dot" style="background:#b07b1f"></span>Izin<span class="rc-dot" style="background:#a83a33"></span>Alfa</span></div>'+
-      '<div class="rekap-chart-body">'+svg+'</div>';
+    el.innerHTML = '<div class="rekap-chart-hd"><span class="rekap-chart-title">Grafik Kehadiran per Pertemuan</span></div>'+
+      '<div class="rekap-chart-body">'+svg+'</div>'+
+      chartLegendHtml();
+  });
+}
+
+// Baris keterangan grafik (arah sumbu + warna) — satu baris rapi di BAWAH grafik,
+// dipakai bareng oleh tampilan layar (renderRekapChart) & cetak (exportPrint).
+function chartLegendHtml(){
+  return '<div class="rc-legend-row">'+
+    '<span class="rc-axis">↑ Jumlah</span>'+
+    '<span class="rc-axis">→ Tanggal Kegiatan</span>'+
+    '<span class="rc-legend">'+
+      '<span class="rc-dot" style="background:#2e7d55"></span>Hadir'+
+      '<span class="rc-dot" style="background:#b07b1f"></span>Izin'+
+      '<span class="rc-dot" style="background:#a83a33"></span>Alfa'+
+    '</span>'+
+  '</div>';
+}
+
+// Hitung data per-sesi (jumlah Hadir/Izin/Alfa tiap pertemuan) untuk grafik.
+// Dipakai bareng oleh tampilan layar (renderRekapChart) & cetak (exportPrint).
+function buildPerSesi(sL, mAll){
+  return sL.map(function(t){
+    var h = 0, iz = 0, al = 0;
+    mAll.forEach(function(m){
+      var v = ((sesiData[t]||{})[m.nama]||{}).status||'';
+      if(v==='H') h++; else if(v==='I') iz++; else if(v==='A') al++;
+    });
+    var dt = tglDate(t).split('-');
+    var day = parseInt(dt[2],10) || 0;
+    var ket = sesiKet[t]||'';
+    return { day:day, ket:ket, label: ket ? ket.substring(0,8) : String(day), h:h, iz:iz, al:al };
   });
 }
 
@@ -253,20 +273,24 @@ function buildBarSvg(perSesi, totalMembers){
   var n=perSesi.length;
   var barW=16, gap=3, groupGap=26;
   var groupW=barW*3+gap*2+groupGap;
-  var padL=32, padR=12, padT=18, padB=34;
+  var padL=30, padR=12, padT=16, padB=30;
   var W=padL+n*groupW+padR;
-  var H=158;
+  var H=padT+90+padB;
   var chartH=H-padT-padB;
-  var maxVal=Math.max(1, totalMembers);
-  perSesi.forEach(function(s){ maxVal=Math.max(maxVal, s.h, s.iz, s.al); });
+  var rawMax=Math.max(1, totalMembers);
+  perSesi.forEach(function(s){ rawMax=Math.max(rawMax, s.h, s.iz, s.al); });
 
-  var yLines='', bars='', labels='', lg='';
-  [0,0.25,0.5,0.75,1].forEach(function(f){
-    var y=padT+chartH*(1-f);
-    var val=Math.round(f*maxVal);
+  // Sumbu jumlah (atas) hanya pakai kelipatan 5 (0, 5, 10, 15, ...)
+  var step=5;
+  var maxVal=Math.ceil(rawMax/step)*step || step;
+  while(maxVal/step > 6){ step+=5; maxVal=Math.ceil(rawMax/step)*step; }
+
+  var yLines='', bars='', labels='';
+  for(var v=0; v<=maxVal; v+=step){
+    var y=padT+chartH*(1-v/maxVal);
     yLines+='<line x1="'+padL+'" y1="'+y.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+y.toFixed(1)+'" stroke="#e4d9c4" stroke-width="0.8" stroke-dasharray="2 3"/>';
-    yLines+='<text x="'+(padL-5)+'" y="'+(y+3.5).toFixed(1)+'" text-anchor="end" font-size="8" fill="#7c8a6c">'+val+'</text>';
-  });
+    yLines+='<text x="'+(padL-5)+'" y="'+(y+3.5).toFixed(1)+'" text-anchor="end" font-size="8" fill="#7c8a6c">'+v+'</text>';
+  }
   perSesi.forEach(function(s,i){
     var gx=padL+i*groupW;
     var cx=gx+groupW/2;
@@ -282,16 +306,13 @@ function buildBarSvg(perSesi, totalMembers){
       bars+='<rect x="'+bx.toFixed(1)+'" y="'+by.toFixed(1)+'" width="'+barW+'" height="'+bh.toFixed(1)+'" fill="'+cols[ki]+'" rx="3"/>';
       bars+='<text x="'+(bx+barW/2).toFixed(1)+'" y="'+(by-4).toFixed(1)+'" text-anchor="middle" font-size="8" fill="'+cols[ki]+'" font-weight="600">'+v+'</text>';
     });
-    labels+='<text x="'+cx.toFixed(1)+'" y="'+(H-10)+'" text-anchor="middle" font-size="9" fill="#525f48">'+
+    labels+='<text x="'+cx.toFixed(1)+'" y="'+(H-9)+'" text-anchor="middle" font-size="9" fill="#525f48">'+
       '<title>'+(s.ket?escHtml(s.ket):('Sesi '+(i+1)))+' · '+s.day+'</title>'+(s.day? s.day : 'P'+ (i+1))+'</text>';
   });
-  lg='<g font-family="sans-serif" font-size="8.5" fill="#5f6d52">'+
-    '<rect x="'+padL+'" y="5" width="9" height="9" rx="2" fill="#2e7d55"/><text x="'+(padL+12)+'" y="13">Hadir</text>'+
-    '<rect x="'+(padL+52)+'" y="5" width="9" height="9" rx="2" fill="#b07b1f"/><text x="'+(padL+64)+'" y="13">Izin</text>'+
-    '<rect x="'+(padL+96)+'" y="5" width="9" height="9" rx="2" fill="#a83a33"/><text x="'+(padL+108)+'" y="13">Alfa</text>'+
-    '</g>';
-  return '<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" style="display:block;min-width:100%" role="img">'+
-    lg+yLines+bars+labels+'</svg>';
+  // Ukuran fiks (bukan diregangkan ke lebar container) & mulai dari kiri,
+  // supaya rapi walau datanya sedikit (mis. cuma 3 pertemuan).
+  return '<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" style="display:block">'+
+    yLines+bars+labels+'</svg>';
 }
 
 function toggleExp(){
@@ -365,7 +386,7 @@ function buildIzinRows(sL, mAll){
 
 function exportExcel(){
   var d=getExportData();
-  if(!d.sL.length){ alert('Belum ada data bulan ini!'); return; }
+  if(!d.sL.length){ appAlert('Belum ada data bulan ini!'); return; }
   var wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(buildRekapRows(d.sL,d.mAll,d.bulan,d.tahun)),'Rekap');
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(buildIzinRows(d.sL,d.mAll)),'Keterangan Izin');
@@ -374,7 +395,7 @@ function exportExcel(){
 
 function exportCSV(){
   var d=getExportData();
-  if(!d.sL.length){ alert('Belum ada data bulan ini!'); return; }
+  if(!d.sL.length){ appAlert('Belum ada data bulan ini!'); return; }
   function toCSV(rows){
     return rows.map(function(r){
       return r.map(function(c){ return '"'+String(c).replace(/"/g,'""')+'"'; }).join(',');
@@ -391,7 +412,7 @@ function exportCSV(){
 
 function exportPrint(){
   var d=getExportData();
-  if(!d.sL.length){ alert('Belum ada data bulan ini!'); return; }
+  if(!d.sL.length){ appAlert('Belum ada data bulan ini!'); return; }
   var theadEl=document.getElementById('theadRekap');
   var tbodyEl=document.getElementById('tbodyRekap');
   var izinEl=document.getElementById('izinSheet');
@@ -409,6 +430,14 @@ function exportPrint(){
   var avg=tot?Math.round(tH/tot*100):0;
   var avgClr=avg>=80?'#2e7d55':avg>=60?'#b07b1f':'#a83a33';
   var printDonut=buildDonutSvg(tH,tI,tA,tot-(tH+tI+tA));
+  var perSesi=buildPerSesi(d.sL, d.mAll);
+  var chartHtml=perSesi.length
+    ? '<div class="tbl-card chart-card">'+
+        '<div class="chart-card-hd">Grafik Kehadiran per Pertemuan</div>'+
+        buildBarSvg(perSesi, d.mAll.length)+
+        chartLegendHtml()+
+      '</div>'
+    : '';
   var statHtml=
     '<div class="stat-card">'+
       '<div class="stat-donut">'+
@@ -448,6 +477,14 @@ function exportPrint(){
       '.rs-val{font-size:26px;font-weight:300;line-height:1;letter-spacing:-.5px}'+
       '.rs-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:#7c8a6c;font-weight:500;margin-top:3px}'+
       '.tbl-card{background:#fff;border:1px solid #d9dbc9;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(40,58,44,.10);margin:0 0 16px;page-break-inside:auto}'+
+      '.chart-card{padding:14px 16px 4px;page-break-inside:avoid}'+
+      '.chart-card-hd{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#525f48;margin-bottom:10px}'+
+      '.chart-card svg{display:block;max-width:100%;height:auto}'+
+      '.rc-legend-row{display:flex;align-items:center;flex-wrap:wrap;gap:6px 14px;padding:8px 0 10px}'+
+      '.rc-axis{font-size:9.5px;color:#7c8a6c;font-weight:500}'+
+      '.rc-legend{display:flex;align-items:center;gap:4px;font-size:9.5px;color:#525f48;flex-wrap:wrap;margin-left:auto}'+
+      '.rc-legend .rc-dot{width:8px;height:8px;border-radius:2px;display:inline-block;flex-shrink:0;margin-left:8px}'+
+      '.rc-legend .rc-dot:first-child{margin-left:0}'+
       'table{width:100%;border-collapse:collapse;font-size:9.5px}'+
       'th,td{border:1px solid #e6e1cb;padding:4px 6px;text-align:center;color:#28322a;overflow-wrap:break-word}'+
       'th{background:#efe9d8;color:#525f48;font-weight:600;font-size:8.5px;letter-spacing:.2px;text-transform:uppercase}'+
@@ -468,7 +505,7 @@ function exportPrint(){
       '@media print{body{background:#fff}.stat-card,.tbl-card{box-shadow:none}}'+
     '</style></head><body>'+
     '<div class="print-hd"><h2>Rekap Absensi Muda-Mudi Margosari</h2><div class="subtitle">'+bulanLabel+' '+d.tahun+'</div></div>'+
-    statHtml+tableHtml+izinHtml+
+    statHtml+chartHtml+tableHtml+izinHtml+
     '</body></html>'
   );
 }

@@ -14,9 +14,9 @@ function anggotaHtml(listId, searchId){
   var L = list.filter(function(m){ return m.gender==='L'; });
   function card(label, arr, avc){
     var body = arr.map(function(m){
-      return '<div class="mem-item" onclick="openMemberDetail(\''+m.nama.replace(/'/g,"\\'")+'\')" style="cursor:pointer">'+
-        '<div class="avatar '+avc+'" style="width:34px;height:34px;font-size:11px">'+initials(m.nama)+'</div>'+
-        '<div class="mem-info"><div class="mem-name">'+m.nama+'</div>'+
+      return '<div class="mem-item" onclick="openMemberDetail(\''+escJsAttr(m.nama)+'\')" style="cursor:pointer">'+
+        '<div class="avatar '+avc+'" style="width:34px;height:34px;font-size:11px">'+escHtml(initials(m.nama))+'</div>'+
+        '<div class="mem-info"><div class="mem-name">'+escHtml(m.nama)+'</div>'+
         '<div class="mem-gender">'+glabel(m.gender)+'</div></div>'+
         '<span style="color:var(--text3);font-size:16px">›</span>'+
       '</div>';
@@ -48,7 +48,7 @@ function tambahAnggota(suf){
   var nm = document.getElementById('iNama'+suf).value.trim().toUpperCase();
   var gd = document.getElementById('iGender'+suf).value;
   if(!nm) return;
-  if(members.find(function(m){ return m.nama===nm; })){ alert('Nama sudah ada!'); return; }
+  if(members.find(function(m){ return m.nama===nm; })){ appAlert('Nama sudah ada!'); return; }
   members.push({nama:nm, gender:gd});
   members.sort(function(a,b){
     if(a.gender===b.gender) return a.nama.localeCompare(b.nama);
@@ -69,13 +69,13 @@ function ubahGender(i, g, lid, sid){
 function hapusAnggota(i, lid, sid){
   var m = members[i];
   if(!m) return;
-  if(confirm('Hapus '+m.nama+' dari daftar anggota aktif?\n\nData absensi pada sesi yang sudah ada tetap tersimpan.')){
+  appConfirm('Hapus '+m.nama+' dari daftar anggota aktif?\n\nData absensi pada sesi yang sudah ada tetap tersimpan.', function(){
     logActivity('anggota', 'Hapus '+m.nama);
     members.splice(i,1);
     fbSaveAnggota();
     var el = document.getElementById(lid);
     if(el) el.innerHTML = anggotaHtml(lid, sid);
-  }
+  }, {title:'Hapus Anggota', icon:'trash', color:'red'});
 }
 
 function toggleAddForm(id){ var el=document.getElementById(id); if(el) el.classList.toggle('open'); }
@@ -97,7 +97,7 @@ function submitAddAnggota(){
   var nm = document.getElementById('iNama').value.trim().toUpperCase();
   var gd = document.getElementById('iGender').value;
   if(!nm) return;
-  if(members.find(function(m){ return m.nama===nm; })){ alert('Nama sudah ada!'); return; }
+  if(members.find(function(m){ return m.nama===nm; })){ appAlert('Nama sudah ada!'); return; }
   members.push({nama:nm, gender:gd});
   members.sort(function(a,b){
     if(a.gender===b.gender) return a.nama.localeCompare(b.nama);
@@ -122,12 +122,62 @@ function hapusAnggotaFromDetail(){
   if(!_mdetNama) return;
   var idx = members.findIndex(function(m){ return m.nama === _mdetNama; });
   if(idx < 0) return;
-  if(!confirm('Hapus '+_mdetNama+' dari daftar anggota aktif?\n\nData absensi pada sesi yang sudah ada tetap tersimpan.')) return;
-  logActivity('anggota', 'Hapus '+_mdetNama);
-  members.splice(idx, 1);
-  fbSaveAnggota();
-  closeMemberDetail();
-  renderAnggota(); renderAnggotaMob();
+  var namaHapus = _mdetNama;
+  appConfirm('Hapus '+namaHapus+' dari daftar anggota aktif?\n\nData absensi pada sesi yang sudah ada tetap tersimpan.', function(){
+    var idx2 = members.findIndex(function(m){ return m.nama === namaHapus; });
+    if(idx2 < 0) return;
+    logActivity('anggota', 'Hapus '+namaHapus);
+    members.splice(idx2, 1);
+    fbSaveAnggota();
+    closeMemberDetail();
+    renderAnggota(); renderAnggotaMob();
+  }, {title:'Hapus Anggota', icon:'trash', color:'red'});
+}
+
+// Ubah/koreksi nama anggota, termasuk memindahkan seluruh riwayat
+// absensi (sesiData) dari nama lama ke nama baru agar tidak terputus.
+function editNamaAnggota(){
+  if(!_mdetNama) return;
+  var idx = members.findIndex(function(m){ return m.nama === _mdetNama; });
+  if(idx < 0) return;
+
+  var namaLama = _mdetNama;
+  appPrompt('Ubah nama anggota:', namaLama, function(namaBaruRaw){
+    var namaBaru = (namaBaruRaw||'').trim().toUpperCase();
+    if(!namaBaru){ appAlert('Nama tidak boleh kosong!'); return; }
+    if(namaBaru === namaLama) return; // tidak ada perubahan
+    if(members.find(function(m){ return m.nama === namaBaru; })){
+      appAlert('Nama "'+namaBaru+'" sudah dipakai anggota lain!');
+      return;
+    }
+    var idx2 = members.findIndex(function(m){ return m.nama === namaLama; });
+    if(idx2 < 0) return;
+
+    // 1) Update daftar anggota
+    members[idx2].nama = namaBaru;
+    fbSaveAnggota();
+
+    // 2) Migrasi seluruh riwayat absensi dari nama lama -> nama baru
+    Object.keys(sesiData).forEach(function(tgl){
+      var recSesi = sesiData[tgl];
+      if(recSesi && Object.prototype.hasOwnProperty.call(recSesi, namaLama)){
+        recSesi[namaBaru] = recSesi[namaLama];
+        delete recSesi[namaLama];
+        fbSaveSesi(tgl);
+      }
+    });
+
+    logActivity('anggota', 'Ubah nama '+namaLama+' → '+namaBaru);
+
+    // 3) Refresh tampilan
+    _mdetNama = namaBaru;
+    document.getElementById('mdet-name').textContent = namaBaru;
+    var avEl = document.getElementById('mdet-avatar');
+    if(avEl) avEl.textContent = initials(namaBaru);
+    _mdetRows = getMemberSessions(namaBaru);
+    renderMdetTable();
+    renderAnggota(); renderAnggotaMob();
+  }, {title:'Ubah Nama Anggota', icon:'edit', color:'gold'});
 }
 
 function getMemberSessions(nama){
@@ -361,7 +411,7 @@ function getMemberExportRows(nama){
 }
 
 function exportMemberExcel(){
-  if(!_mdetNama){alert('Tidak ada anggota dipilih.');return;}
+  if(!_mdetNama){appAlert('Tidak ada anggota dipilih.');return;}
   var rows=getMemberExportRows(_mdetNama);
   var wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(rows),'Detail');
@@ -369,7 +419,7 @@ function exportMemberExcel(){
 }
 
 function exportMemberCSV(){
-  if(!_mdetNama){alert('Tidak ada anggota dipilih.');return;}
+  if(!_mdetNama){appAlert('Tidak ada anggota dipilih.');return;}
   var rows=getMemberExportRows(_mdetNama);
   var csv=rows.map(function(r){ return r.map(function(c){ return '"'+String(c).replace(/"/g,'""')+'"'; }).join(','); }).join('\n');
   var a=document.createElement('a');
@@ -490,7 +540,7 @@ function _getMemberData(nama, fBln, fThn){
 
 function doExpAng(type){
   var sel = getExpAngSelected();
-  if(!sel.length){ alert('Pilih minimal satu anggota.'); return; }
+  if(!sel.length){ appAlert('Pilih minimal satu anggota.'); return; }
   var fBln = (document.getElementById('expang-bulan')||{}).value||'';
   var fThn = (document.getElementById('expang-tahun')||{}).value||'';
   var bulanLabel = fBln ? (BULAN[parseInt(fBln)]||fBln) : 'Semua Bulan';
@@ -498,7 +548,7 @@ function doExpAng(type){
 
   if(type==='print'){
     if(typeof JSZip==='undefined'||typeof jspdf==='undefined'){
-      alert('Library belum dimuat, coba refresh halaman.'); return;
+      appAlert('Library belum dimuat, coba refresh halaman.'); return;
     }
     var jsPDF = jspdf.jsPDF;
     closeExpAng();

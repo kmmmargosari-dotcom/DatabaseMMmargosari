@@ -27,8 +27,11 @@ function renderDashboard(){
     });
     var datePart = key.split('_')[0];
     var day  = parseInt((datePart.split('-')[2])||'1', 10);
-    var ket  = sesiKet[key]||String(day);
-    sesiStats.push({label:ket, H:sH, I:sI, A:sA});
+    var ket  = sesiKet[key]||'';
+    // Sertakan tanggal pada label agar sesi dengan nama kegiatan yang sama
+    // (mis. "Kelompok" & "Kelompok") tetap bisa dibedakan di grafik.
+    var label = ket ? (ket+' ('+day+')') : String(day);
+    sesiStats.push({label:label, H:sH, I:sI, A:sA});
   });
 
   var totalPossible = kegiatanBulanIni * (totalGenerus||1);
@@ -72,7 +75,7 @@ function renderDashboard(){
         '<div class="ndash-recent-item">'+
         '<div class="ndash-recent-icon"><svg class="ico" style="width:16px;height:16px"><use href="#ico-clipboard"/></svg></div>'+
         '<div class="ndash-recent-info">'+
-          '<div class="ndash-recent-name">'+ket+'</div>'+
+          '<div class="ndash-recent-name">'+escHtml(ket)+'</div>'+
           '<div class="ndash-recent-date">'+fDate+'</div>'+
         '</div>'+
         '<div class="ndash-recent-stats">'+
@@ -86,6 +89,41 @@ function renderDashboard(){
   ['dash-recent-pc','dash-recent-mob'].forEach(function(id){
     var el = document.getElementById(id);
     if(el) el.innerHTML = recentHtml;
+  });
+
+  renderDashKasSummary();
+}
+
+// Ringkasan Kas di Dashboard: saldo akhir terkini + pemasukan/pengeluaran bulan berjalan
+function renderDashKasSummary(){
+  var kasHtml;
+  if(typeof kasTransaksi==='undefined' || !kasTransaksi.length){
+    kasHtml = '<div class="ndash-empty">Belum ada transaksi kas</div>';
+  } else {
+    var running    = kasCalcRunning();
+    var saldoAkhir = running.length ? running[running.length-1].saldo : kasSaldoAwal;
+    var now        = new Date();
+    var prefix     = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+    var masukBulan = 0, keluarBulan = 0;
+    kasTransaksi.forEach(function(t){
+      if((t.tanggal||'').indexOf(prefix)===0){
+        if(t.jenis==='pemasukan') masukBulan += t.nominal;
+        else                      keluarBulan += t.nominal;
+      }
+    });
+    kasHtml =
+      '<div class="ndash-recent-item">'+
+        '<div class="ndash-recent-icon"><svg class="ico" style="width:16px;height:16px"><use href="#ico-money"/></svg></div>'+
+        '<div class="ndash-recent-info">'+
+          '<div class="ndash-recent-name">Saldo Kas Saat Ini</div>'+
+          '<div class="ndash-recent-date">Bulan ini: +'+fmtRp(masukBulan)+' / -'+fmtRp(keluarBulan)+'</div>'+
+        '</div>'+
+        '<div class="ndash-recent-stats"><span class="ndash-rs-h" style="font-size:14px;font-weight:600">'+fmtRp(saldoAkhir)+'</span></div>'+
+      '</div>';
+  }
+  ['dash-kas-pc','dash-kas-mob'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.innerHTML = kasHtml;
   });
 }
 
@@ -129,7 +167,7 @@ function buildDashChart(sesiStats){
 
   var xlbls = sesiStats.map(function(s,i){
     var x = tx(i).toFixed(1);
-    return '<text x="'+x+'" y="'+(H_-6)+'" text-anchor="middle" font-size="8" fill="#8b987c">'+s.label+'</text>';
+    return '<text x="'+x+'" y="'+(H_-6)+'" text-anchor="middle" font-size="8" fill="#8b987c">'+escHtml(s.label)+'</text>';
   }).join('');
 
   return '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch">'+

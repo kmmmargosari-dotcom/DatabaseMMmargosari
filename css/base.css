@@ -1,23 +1,24 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  /* Garden botanical theme — palette & type tokens dari usehallmark.com/examples/garden-01 */
-  --gold:#3f8a53;           /* accent: living leaf-green (primary CTA)  */
-  --gold-dk:#31663f;        /* accent-press: deeper leaf-green hover     */
-  --gold-lt:#e2efdd;        /* tint-moss: soft green band                */
-  --gold-xlt:#eef5ea;       /* tint-moss paler: card wash                */
-  --brown:#a6563a;          /* accent-2: earthy clay / terracotta pop    */
-  --red:#a83a33;--red-lt:#f6e2df;--red-dk:#a83a33;  /* clay-red (Alpa/danger) */
-  --amber:#b07b1f;--amber-lt:#f5ead0;               /* honey-gold (Izin/warn) */
-  --green:#2e7d55;--green-lt:#e2f0e7;               /* leaf-green (Hadir/masuk)*/
-  --border:#d9dbc9;         /* soft green-grey hairline                   */
-  --bg:#f7f3e8;--bg2:#efe9d8;--bg3:#e6e1cb;         /* oat-cream paper bands  */
-  --text:#28322a;--text2:#525f48;--text3:#7c8a6c;  /* botanical ink + muted (kontras aman untuk tabel padat) */
-  --r:8px;--rl:12px;--rxl:18px;
-  --font-display:'Young Serif',Georgia,'Times New Roman',serif;
-  --font-body:'Hanken Grotesk',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  --font-label:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;
-  --shadow:0 1px 2px rgba(40,58,44,.06),0 3px 10px rgba(40,58,44,.07);
-  --shadow-md:0 8px 28px rgba(40,58,44,.12);
+  /* Buku Induk — tema "civic ledger": tinta hijau-pinus di atas kertas daftar
+     hadir lawas, dengan aksen merah-cap (stempel resmi) sebagai sorotan. */
+  --gold:#1f5c3d;           /* accent: tinta hijau-pinus (primary CTA)   */
+  --gold-dk:#153f2a;        /* accent-press: tinta pekat saat ditekan    */
+  --gold-lt:#dbe7d7;        /* tint: pita hijau lembut                   */
+  --gold-xlt:#eef2ea;       /* tint paling pucat: wash kartu             */
+  --brown:#b5432a;          /* accent-2: tinta cap/stempel merah-bata    */
+  --red:#9c3830;--red-lt:#f3e0da;--red-dk:#9c3830;   /* Alfa/danger      */
+  --amber:#a8760a;--amber-lt:#f3e6c8;                /* saffron (Izin)   */
+  --green:#3d7a4e;--green-lt:#dfebe0;                /* daun segar (Hadir)*/
+  --border:#dad5c1;         /* garis kertas hangat                        */
+  --bg:#f6f1e4;--bg2:#ede5d1;--bg3:#e2d9c0;          /* kertas daftar (cream)*/
+  --text:#241f16;--text2:#59503e;--text3:#867a61;    /* tinta hangat + pudar */
+  --r:7px;--rl:11px;--rxl:17px;
+  --font-display:'Zilla Slab',Georgia,'Times New Roman',serif;
+  --font-body:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --font-label:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  --shadow:0 1px 2px rgba(36,31,22,.07),0 3px 10px rgba(36,31,22,.08);
+  --shadow-md:0 10px 30px rgba(36,31,22,.14);
 }
 body{font-family:var(--font-body);font-size:14px;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased}
 
@@ -29,15 +30,15 @@ button:active{transform:scale(0.95)}
 .btn-p:hover{background:var(--gold-dk)}
 .btn-p:active{transform:scale(0.95);background:var(--gold-dk)}
 .btn-full{width:100%}
-.btn-danger{background:var(--red-lt);color:var(--red-dk);border-color:#e6b8b2}
+.btn-danger{background:var(--red-lt);color:var(--red-dk);border-color:#e6bfb4}
 .btn-danger:hover{background:#f0d9d6}
 input,select{font-size:13px;padding:9px 12px;border-radius:var(--r);border:1px solid var(--border);background:var(--bg);color:var(--text);width:100%;outline:none;transition:border-color .15s,box-shadow .15s;font-family:inherit}
 input:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(63,138,83,.15)}
 input::placeholder{color:var(--text3)}
 
-/* ── TYPE: garden display + label fonts ── */
+/* ── TYPE: ledger display + label fonts ── */
 .pc-topbar-title,.mob-pg-hd h3,.ndash-header-title,.setup-title,.login-card-title,.sidebar-title,
-.mob-topbar-brand,.mdet-name,.kas-dash-hd-title,.dash-title{font-family:var(--font-display);font-weight:400;letter-spacing:-.2px}
+.mob-topbar-brand,.mdet-name,.kas-dash-hd-title,.dash-title{font-family:var(--font-display);font-weight:600;letter-spacing:0}
 
 /* ── SVG ICONS ── */
 .ico{display:inline-block;vertical-align:middle;width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
@@ -48,10 +49,10 @@ input::placeholder{color:var(--text3)}
 .bi{background:var(--amber-lt);color:var(--amber)}
 .ba{background:var(--red-lt);color:var(--red)}
 .log-badge{font-size:11px;padding:2px 8px;border-radius:99px;font-weight:500;display:inline-block;white-space:nowrap}
-.log-absen{background:#e9f1e7;color:#2e7d55}
-.log-kas{background:#f5eedd;color:#9c7a1d}
-.log-anggota{background:#f6ede7;color:#a6563a}
-.log-sesi{background:#f5ead5;color:#b07b1f}
+.log-absen{background:var(--green-lt);color:var(--green)}
+.log-kas{background:var(--amber-lt);color:var(--amber)}
+.log-anggota{background:#f3e2d8;color:var(--brown)}
+.log-sesi{background:#dce6e8;color:#2b6070}
 
 /* ── SEGMENT ── */
 .seg{display:flex;background:var(--bg2);border-radius:var(--r);padding:3px;gap:2px}
@@ -74,8 +75,8 @@ th,td{border:1px solid var(--border);padding:6px 8px;text-align:center;white-spa
 th{background:var(--bg2);font-weight:500;font-size:11px;letter-spacing:.2px;color:var(--text2)}
 td.tl{text-align:left}
 tr.gender-sep td{background:var(--bg3);color:var(--text2);font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:5px 8px;text-align:left}
-tr.gender-sep-l td{background:#eef4ea;color:#2e7d55}
-tr.gender-sep-p td{background:#f6ede7;color:#a6563a}
+tr.gender-sep-l td{background:var(--green-lt);color:var(--green)}
+tr.gender-sep-p td{background:#f3e2d8;color:var(--brown)}
 
 /* ── TOOLBAR ── */
 .toolbar{display:flex;gap:8px;padding:9px 12px;border-bottom:1px solid var(--border);background:var(--bg);align-items:center;flex-wrap:wrap}
@@ -87,10 +88,10 @@ tr.gender-sep-p td{background:#f6ede7;color:#a6563a}
 
 /* ── SYNC BADGE & USER INFO ── */
 .sync-badge{display:flex;align-items:center;gap:5px;font-size:11px;padding:5px 11px;border-radius:20px;font-weight:500;letter-spacing:.1px;white-space:nowrap;transition:all .3s;border:1px solid transparent}
-.sync-ok  {background:var(--green-lt);color:var(--green);border-color:#c5ddc9}
-.sync-off {background:var(--red-lt);color:var(--red);border-color:#e6b8b2}
-.sync-save{background:var(--amber-lt);color:var(--amber);border-color:#e9d8a6}
-.sync-pending{background:var(--amber-lt);color:var(--amber);border-color:#e9d8a6}
+.sync-ok  {background:var(--green-lt);color:var(--green);border-color:#c7ddc9}
+.sync-off {background:var(--red-lt);color:var(--red);border-color:#e6bfb4}
+.sync-save{background:var(--amber-lt);color:var(--amber);border-color:#e6cf9e}
+.sync-pending{background:var(--amber-lt);color:var(--amber);border-color:#e6cf9e}
 .pc-sync-wrap{padding:6px 12px 2px}
 #pc-sync-badge{margin:6px 12px;border-radius:20px}
 .user-info{display:flex;align-items:center;gap:8px;padding:12px 14px;border-top:1px solid var(--border);background:var(--bg)}
@@ -139,8 +140,8 @@ tr.gender-sep-p td{background:#f6ede7;color:#a6563a}
 .ab-item{background:var(--bg);border-bottom:1px solid var(--border);animation:fadeUp .15s ease both}
 .ab-row{display:flex;align-items:center;gap:10px;padding:11px 14px}
 .avatar{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;letter-spacing:.3px}
-.av-p{background:var(--gold-lt);color:var(--gold-dk);border:1px solid #cfe1c9}
-.av-l{background:var(--amber-lt);color:var(--amber);border:1px solid #e6d9ab}
+.av-p{background:var(--gold-lt);color:var(--gold-dk);border:1px solid #c7dbc1}
+.av-l{background:var(--amber-lt);color:var(--amber);border:1px solid #e6cf9e}
 .ab-info{flex:1;min-width:0}
 .ab-name{font-size:13px;font-weight:500;line-height:1.3;color:var(--text)}
 .ab-sub{font-size:11px;color:var(--text3);margin-top:1px}
@@ -231,7 +232,7 @@ tr.gender-sep-p td{background:#f6ede7;color:#a6563a}
 .iz3-kegiatan{font-size:9.5px;color:var(--amber);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex-shrink:1}
 .iz3-tag{font-size:9px;font-weight:600;padding:1px 6px;border-radius:5px;white-space:nowrap;flex-shrink:0}
 .iz3-tgl{font-size:9px;color:var(--text3)}
-.izin-sheet-hd{font-size:13px;font-weight:600;color:var(--amber);margin:28px 0 10px;padding:12px 16px;background:var(--amber-lt,#fffbf0);border-left:3px solid var(--amber);border-radius:0 var(--r) var(--r) 0;letter-spacing:.1px}
+.izin-sheet-hd{font-size:13px;font-weight:600;color:var(--amber);margin:28px 0 10px;padding:12px 16px;background:var(--amber-lt);border-left:3px solid var(--amber);border-radius:0 var(--r) var(--r) 0;letter-spacing:.1px}
 
 /* ── REKAP SUMMARY PANEL ── */
 .rs-panel{display:flex;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border);background:var(--bg);gap:0;min-height:0}
@@ -243,3 +244,27 @@ tr.gender-sep-p td{background:#f6ede7;color:#a6563a}
 .rs-item:hover{background:var(--bg2)}
 .rs-val{font-size:26px;font-weight:300;line-height:1;letter-spacing:-.5px}
 .rs-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);font-weight:500;margin-top:3px}
+
+/* ══════════════════════════════════════════════════
+   BUKU INDUK — sentuhan khas "register ledger":
+   label kecil & angka memakai huruf mono seperti mesin
+   ketik formulir, terpisah jelas dari nama orang (serif/
+   sans) supaya kolom angka terasa rapi & mudah dipindai.
+   ══════════════════════════════════════════════════ */
+.sec-title,.db-section-hd,.stat-lbl,.fr label,.iz3-title,.iz3-total,
+.rs-donut-lbl,.rs-lbl,.kas-stat-lbl,.kas-cf-title,.kas-cf-hd-sub,
+.kas-cf-hd-period-lbl,.kas-tbl-title,.kas-dash-hd-sub,.kas-donut-ttl,
+.kas-line-title,.rekap-chart-title,.exp-menu .exp-section-label,
+.dash-item-label,.dash-org,.u-role,.izin-popup-label,.mdet-stat-lbl,
+.mdet-section-title,.mdet-table th,.mdet-status-lbl,.sidebar-label,
+.col-hd,.nstat-sub,.kas-riwayat-table th,.kas-mob-stat-lbl,tr.gender-sep td{
+  font-family:var(--font-label);
+}
+
+.stat-val,.rs-val,.kas-stat-val,.kas-cf-hd-period-val,.kas-mob-stat-val,
+.kas-cf-saldo-akhir-val,.kas-cf-row-val,.kas-mob-total-val,.mdet-stat-val,
+.nstat-val,.kas-donut-leg-val{
+  font-family:var(--font-label);font-weight:600;font-variant-numeric:tabular-nums;
+}
+
+table td:not(.tl){font-family:var(--font-label);font-variant-numeric:tabular-nums}

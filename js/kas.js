@@ -29,16 +29,17 @@ var _KAS_SEED = [
   {id:'seed-jun-05',jenis:'pemasukan',  nominal:15000,  tanggal:'2026-06-09',keterangan:'Shodaqoh Ngaji',     createdAt:3005},
   {id:'seed-jun-06',jenis:'pemasukan',  nominal:24000,  tanggal:'2026-06-16',keterangan:'Shodaqoh Ngaji',     createdAt:3006},
   {id:'seed-jun-07',jenis:'pemasukan',  nominal:52000,  tanggal:'2026-06-16',keterangan:'Sisa keakraban',     createdAt:3007},
-  {id:'seed-jun-08',jenis:'pengeluaran',nominal:120000, tanggal:'2026-06-16',keterangan:'Beli Hadist',        createdAt:3008}
+  {id:'seed-jun-08',jenis:'pengeluaran',nominal:120000, tanggal:'2026-06-16',keterangan:'Beli Hadist',        createdAt:3008},
+  {id:'seed-jun-09',jenis:'pemasukan',  nominal:80000,  tanggal:'2026-06-16',keterangan:'Iuran Kado',         createdAt:3009},
+  {id:'seed-jun-10',jenis:'pemasukan',  nominal:14000,  tanggal:'2026-06-23',keterangan:'Shodaqoh Ngaji',     createdAt:3010},
+  {id:'seed-jun-11',jenis:'pemasukan',  nominal:11000,  tanggal:'2026-06-29',keterangan:'Shodaqoh Ngaji',     createdAt:3011},
+  {id:'seed-jun-12',jenis:'pemasukan',  nominal:8000,   tanggal:'2026-06-30',keterangan:'Shodaqoh Ngaji',     createdAt:3012},
+  {id:'seed-jun-13',jenis:'pemasukan',  nominal:196000, tanggal:'2026-06-30',keterangan:'Iuran Kado+Bayar Hadist', createdAt:3013}
 ];
 
 function seedKasData(){
   if(!_fbReady) return;
   if(kasTransaksi.length > 0) return;
-  if(!localStorage.getItem('kas_saldo_awal')){
-    kasSaldoAwal = 1045700;
-    localStorage.setItem('kas_saldo_awal','1045700');
-  }
   _KAS_SEED.forEach(function(trx){
     var exists = kasTransaksi.find(function(k){ return k.id===trx.id; });
     if(!exists){
@@ -438,15 +439,16 @@ function kasEditTrx(id){
 }
 
 function kasDelTrx(id){
-  if(!confirm('Hapus transaksi ini?')) return;
-  var trx = kasTransaksi.find(function(k){return k.id===id;});
-  var info = trx ? (trx.jenis==='pemasukan'?'Pemasukan':'Pengeluaran')+' Rp'+Math.round(trx.nominal||0).toLocaleString('id-ID')+(trx.keterangan?' ('+trx.keterangan+')':'') : '';
-  kasTransaksi=kasTransaksi.filter(function(k){return k.id!==id;});
-  fbDelKas(id);
-  logActivity('kas', 'Hapus '+info);
-  renderKas();
-  renderKasRiwayat();
-  showToast('Transaksi dihapus');
+  appConfirm('Hapus transaksi ini?', function(){
+    var trx = kasTransaksi.find(function(k){return k.id===id;});
+    var info = trx ? (trx.jenis==='pemasukan'?'Pemasukan':'Pengeluaran')+' Rp'+Math.round(trx.nominal||0).toLocaleString('id-ID')+(trx.keterangan?' ('+trx.keterangan+')':'') : '';
+    kasTransaksi=kasTransaksi.filter(function(k){return k.id!==id;});
+    fbDelKas(id);
+    logActivity('kas', 'Hapus '+info);
+    renderKas();
+    renderKasRiwayat();
+    showToast('Transaksi dihapus');
+  }, {title:'Hapus Transaksi', icon:'trash', color:'red'});
 }
 
 // ── Saldo Awal (starting point April 2026: terkunci, read-only) ──

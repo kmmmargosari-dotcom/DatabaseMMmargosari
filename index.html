@@ -44,7 +44,7 @@
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Hanken+Grotesk:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="css/base.css"/>
   <link rel="stylesheet" href="css/layout.css"/>
   <link rel="stylesheet" href="css/components.css"/>
@@ -144,7 +144,7 @@
           <svg class="ico si-icon"><use href="#ico-money"/></svg> Kas
         </button>
         <button class="si need-admin" id="si-anggota" onclick="goPc('anggota')">
-          <svg class="ico si-icon"><use href="#ico-users"/></svg> Data
+          <svg class="ico si-icon"><use href="#ico-users"/></svg> Anggota
         </button>
       </nav>
       <div id="pc-sync-badge" class="sync-badge sync-ok">🟢 Online</div>
@@ -244,6 +244,15 @@
               </div>
             </div>
 
+            <!-- Ringkasan Kas -->
+            <div class="ndash-recent-card" style="margin-top:14px">
+              <div class="ndash-sec-hd">
+                <span>Ringkasan Kas</span>
+                <button onclick="goPc('kas')" class="ndash-see-all">Lihat Kas</button>
+              </div>
+              <div id="dash-kas-pc"></div>
+            </div>
+
             <!-- Quick Access -->
             <div class="ndash-quick-card">
               <div class="ndash-sec-hd"><span>Aksi Cepat</span></div>
@@ -300,6 +309,15 @@
         <div id="pc-absen-body" style="display:none;flex:1;overflow:hidden;flex-direction:column">
           <div style="padding:10px 16px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);flex-shrink:0;background:var(--bg);display:flex;align-items:center;gap:8px">
             <span id="pc-absen-date" style="flex:1"></span>
+            <button id="pc-bulk-toggle" onclick="toggleBulkMode()" style="font-size:11px;padding:4px 9px">☑ Pilih Banyak</button>
+            <button onclick="openEditSesiPopup()" style="font-size:11px;padding:4px 9px">✏️ Edit Tanggal/Kegiatan</button>
+          </div>
+          <div id="pc-bulk-bar" style="display:none;padding:8px 16px;border-bottom:1px solid var(--border);background:var(--gold-xlt);flex-shrink:0;align-items:center;gap:8px">
+            <span id="pc-bulk-count" style="font-size:12px;font-weight:600;color:var(--gold-dk);flex:1">0 dipilih</span>
+            <button onclick="applyBulkStatus('H')" class="btn-p" style="background:var(--green);padding:6px 12px;font-size:12px">✓ Hadir</button>
+            <button onclick="applyBulkStatus('I')" class="btn-p" style="background:var(--amber);padding:6px 12px;font-size:12px">? Izin</button>
+            <button onclick="applyBulkStatus('A')" class="btn-p" style="background:var(--red);padding:6px 12px;font-size:12px">✕ Alfa</button>
+            <button class="btn-sec" onclick="toggleBulkMode()" style="padding:6px 12px;font-size:12px">Batal</button>
           </div>
           <div class="counter-bar" id="pc-absen-ctr" style="flex-shrink:0"></div>
           <div class="pc-2col" style="flex:1">
@@ -624,6 +642,15 @@
           <div id="dash-recent-mob"></div>
         </div>
 
+        <!-- Ringkasan Kas -->
+        <div class="ndash-mob-card">
+          <div class="ndash-sec-hd">
+            <span>Ringkasan Kas</span>
+            <button onclick="goMob('kas')" class="ndash-see-all">Lihat Kas</button>
+          </div>
+          <div id="dash-kas-mob"></div>
+        </div>
+
         <!-- Quick Access -->
         <div class="ndash-mob-card" style="margin-bottom:8px">
           <div class="ndash-sec-hd"><span>Aksi Cepat</span></div>
@@ -674,7 +701,18 @@
         <button class="mob-back" onclick="goMob('absen-setup')"><svg class="ico"><use href="#ico-arrow-left"/></svg></button>
         <h3 id="mob-absen-title">Absensi</h3>
       </div>
-      <div style="padding:8px 14px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text2);background:var(--bg);flex-shrink:0" id="mob-absen-date"></div>
+      <div style="padding:8px 14px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text2);background:var(--bg);flex-shrink:0;display:flex;align-items:center;gap:8px">
+        <span id="mob-absen-date" style="flex:1"></span>
+        <button id="mob-bulk-toggle" onclick="toggleBulkMode()" style="font-size:10px;padding:4px 8px;flex-shrink:0">☑ Pilih</button>
+        <button onclick="openEditSesiPopup()" style="font-size:10px;padding:4px 8px;flex-shrink:0">✏️ Edit</button>
+      </div>
+      <div id="mob-bulk-bar" style="display:none;padding:6px 12px;border-bottom:1px solid var(--border);background:var(--gold-xlt);flex-shrink:0;align-items:center;gap:6px;flex-wrap:wrap">
+        <span id="mob-bulk-count" style="font-size:11px;font-weight:600;color:var(--gold-dk);flex-basis:100%">0 dipilih</span>
+        <button onclick="applyBulkStatus('H')" class="btn-p" style="background:var(--green);padding:6px 8px;font-size:11px;flex:1">✓ Hadir</button>
+        <button onclick="applyBulkStatus('I')" class="btn-p" style="background:var(--amber);padding:6px 8px;font-size:11px;flex:1">? Izin</button>
+        <button onclick="applyBulkStatus('A')" class="btn-p" style="background:var(--red);padding:6px 8px;font-size:11px;flex:1">✕ Alfa</button>
+        <button class="btn-sec" onclick="toggleBulkMode()" style="padding:6px 8px;font-size:11px;flex-basis:100%">Batal</button>
+      </div>
       <div class="counter-bar" id="mob-absen-ctr" style="flex-shrink:0"></div>
       <div style="padding:8px 12px;border-bottom:1px solid var(--border);background:var(--bg);flex-shrink:0">
         <div class="seg">
@@ -722,7 +760,7 @@
       </div>
       <div class="mob-scroll">
         <div id="rekapStatsM"></div>
-        <div class="scroll-x rekap-tbl"><table><thead id="theadRekapM"></thead><tbody id="tbodyRekapM"></tbody></table></div>
+        <div class="rekap-tbl-wrap"><div class="scroll-x rekap-tbl"><table><thead id="theadRekapM"></thead><tbody id="tbodyRekapM"></tbody></table></div><div class="rekap-tbl-fade">⇠ geser untuk lihat kolom lainnya</div></div>
         <div id="izinSheetM"></div>
       </div>
     </div>
@@ -883,10 +921,6 @@
           <div class="mob-nav-icon"><svg class="ico"><use href="#ico-home"/></svg></div>
           Dashboard
         </button>
-        <button class="mob-nav-item" id="bn-database" onclick="goMob('database')">
-          <div class="mob-nav-icon"><svg class="ico"><use href="#ico-db"/></svg></div>
-          Sesi
-        </button>
         <button class="mob-nav-item need-absen" id="bn-absen-setup" onclick="goMob('absen-setup')">
           <div class="mob-nav-icon"><svg class="ico"><use href="#ico-clipboard"/></svg></div>
           Absensi
@@ -895,13 +929,17 @@
           <div class="mob-nav-icon"><svg class="ico"><use href="#ico-chart"/></svg></div>
           Rekap
         </button>
+        <button class="mob-nav-item" id="bn-database" onclick="goMob('database')">
+          <div class="mob-nav-icon"><svg class="ico"><use href="#ico-db"/></svg></div>
+          Sesi
+        </button>
         <button class="mob-nav-item" id="bn-kas" onclick="goMob('kas')">
           <div class="mob-nav-icon"><svg class="ico"><use href="#ico-money"/></svg></div>
           Kas
         </button>
         <button class="mob-nav-item need-admin" id="bn-anggota" onclick="goMob('anggota')">
           <div class="mob-nav-icon"><svg class="ico"><use href="#ico-users"/></svg></div>
-          Data
+          Anggota
         </button>
       </div>
     </div>
@@ -968,6 +1006,7 @@
     <button onclick="exportMemberExcel()">📊 Excel</button>
     <button onclick="exportMemberCSV()">📄 CSV</button>
     <button onclick="exportMemberPrint()">🖨 Print</button>
+    <button onclick="editNamaAnggota()">✏️ Edit Nama</button>
     <button class="btn-danger" onclick="hapusAnggotaFromDetail()" style="margin-left:auto">🗑 Hapus</button>
     <button class="mdet-close-btn" onclick="closeMemberDetail()">Tutup</button>
   </div>
@@ -1003,6 +1042,29 @@
     <button class="btn-p" style="background:var(--green)" onclick="submitAddAnggota()">Tambah</button>
   </div>
 </div>
+<div id="editsesi-overlay" class="izin-overlay" onclick="closeEditSesiPopup()"></div>
+<div id="editsesi-popup" class="izin-popup" style="width:min(340px,92vw)">
+  <div class="izin-popup-header">
+    <div class="izin-popup-icon" style="background:var(--gold-xlt);color:var(--gold-dk)">
+      <svg class="ico" style="width:17px;height:17px"><use href="#ico-edit"/></svg>
+    </div>
+    <div>
+      <div class="izin-popup-title" style="color:var(--gold-dk)">Edit Sesi</div>
+      <div class="izin-popup-name">Ubah tanggal dan nama kegiatan</div>
+    </div>
+  </div>
+  <div class="izin-popup-body">
+    <label class="izin-popup-label" style="color:var(--gold-dk)">Tanggal Kegiatan</label>
+    <input type="date" id="esTgl" style="width:100%;box-sizing:border-box;margin-bottom:12px"/>
+    <label class="izin-popup-label" style="color:var(--gold-dk)">Nama Kegiatan</label>
+    <input type="text" id="esKet" placeholder="cth: Pengajian Rutin, Rapat Bulanan..." style="width:100%;box-sizing:border-box" onkeydown="if(event.key==='Enter')submitEditSesiDetail()"/>
+    <div id="esWarn" style="display:none;margin-top:10px;font-size:11.5px;color:var(--red);background:#fee2e2;border-radius:8px;padding:8px 10px"></div>
+  </div>
+  <div class="izin-popup-footer">
+    <button class="btn-sec" onclick="closeEditSesiPopup()">Batal</button>
+    <button class="btn-p" style="background:var(--gold-dk)" onclick="submitEditSesiDetail()">Simpan</button>
+  </div>
+</div>
 <div id="izin-overlay" class="izin-overlay" onclick="closeIzinPopup()"></div>
 <div id="izin-popup" class="izin-popup">
   <div class="izin-popup-header">
@@ -1028,6 +1090,26 @@
   </div>
 </div>
 
+<!-- APP POPUP — pengganti alert()/confirm()/prompt() bawaan browser, dipakai di semua modul -->
+<div id="app-popup-overlay" class="izin-overlay" onclick="closeAppPopup()"></div>
+<div id="app-popup" class="izin-popup" style="width:min(360px,92vw)">
+  <div class="izin-popup-header">
+    <div class="izin-popup-icon" id="app-popup-icon">
+      <svg class="ico" style="width:17px;height:17px"><use id="app-popup-icon-use" href="#ico-q"/></svg>
+    </div>
+    <div>
+      <div class="izin-popup-title" id="app-popup-title">Konfirmasi</div>
+    </div>
+  </div>
+  <div class="izin-popup-body">
+    <div id="app-popup-msg" style="font-size:13px;color:var(--text2);line-height:1.55;white-space:pre-line"></div>
+    <input type="text" id="app-popup-input" autocomplete="off" style="width:100%;box-sizing:border-box;margin-top:12px;display:none" onkeydown="if(event.key==='Enter'){event.preventDefault();_appPopupSubmit();}"/>
+  </div>
+  <div class="izin-popup-footer">
+    <button id="app-popup-cancel" onclick="closeAppPopup()">Batal</button>
+    <button class="btn-p" id="app-popup-ok" onclick="_appPopupSubmit()">Ya, Lanjutkan</button>
+  </div>
+</div>
 
 <!-- KAS TAMBAH TRANSAKSI POPUP -->
 <div id="kas-tambah-overlay" class="izin-overlay" onclick="closeKasTambah()"></div>

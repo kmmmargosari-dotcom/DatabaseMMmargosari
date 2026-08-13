@@ -84,7 +84,7 @@ function dbHtml(suffix){
     html+='<div class="db-item"'+(isPinned?' style="border-left:3px solid var(--gold-dk);padding-left:10px"':'')+'>'+
       '<div class="db-info">'+
         '<div class="db-name">'+label+'</div>'+
-        (ket?'<div class="db-ket">'+ket+'</div>':'')+
+        (ket?'<div class="db-ket">'+escHtml(ket)+'</div>':'')+
         '<div class="db-sub">'+(h+iz+al)+' diisi &nbsp;·&nbsp; '+blm+' belum</div>'+
       '</div>'+
       '<div class="db-badges">'+
@@ -114,19 +114,20 @@ function renderDbMob(){
 
 function hapusSesi(tgl){
   var label = sesiLabel(tgl);
-  if(!confirm('Hapus sesi '+label+'?\nSemua data kehadiran akan terhapus permanen.')) return;
-  logActivity('sesi', 'Hapus '+label);
-  delete sesiData[tgl];
-  delete sesiKet[tgl];
-  fbDelSesi(tgl);
-  renderDb(); renderDbMob();
-  try { renderRekap('pc'); } catch(e){}
-  try { renderRekap('mob'); } catch(e){}
-  try { renderDashboard(); } catch(e){}
+  appConfirm('Hapus sesi '+label+'?\nSemua data kehadiran akan terhapus permanen.', function(){
+    logActivity('sesi', 'Hapus '+label);
+    delete sesiData[tgl];
+    delete sesiKet[tgl];
+    fbDelSesi(tgl);
+    renderDb(); renderDbMob();
+    try { renderRekap('pc'); } catch(e){}
+    try { renderRekap('mob'); } catch(e){}
+    try { renderDashboard(); } catch(e){}
+  }, {title:'Hapus Sesi', icon:'trash', color:'red'});
 }
 
 function editSesi(tgl){
-  var d    = new Date(tglDate(tgl)+'T00:00:00');
+  var d      = new Date(tglDate(tgl)+'T00:00:00');
   absenTgl = tgl;
   absenBulan = d.getMonth()+1;
   absenTahun = d.getFullYear();
@@ -142,4 +143,76 @@ function editSesi(tgl){
     showAbsenBody();
     renderAbsenPc();
   }
+}
+
+// Ubah nama kegiatan dan/atau tanggal sesi yang sedang dibuka (baik sesi
+// baru maupun sesi lama yang dibuka lewat "Edit" dari halaman Sesi).
+// Migrasi seluruh data kehadiran ke key sesi yang baru bila tanggal diubah.
+function openEditSesiPopup(){
+  if(!absenTgl) return;
+  var tglEl = document.getElementById('esTgl'); if(tglEl) tglEl.value = tglDate(absenTgl);
+  var ketEl = document.getElementById('esKet'); if(ketEl) ketEl.value = absenKet||'';
+  var warnEl= document.getElementById('esWarn'); if(warnEl){ warnEl.style.display='none'; warnEl.textContent=''; }
+  document.getElementById('editsesi-overlay').classList.add('show');
+  document.getElementById('editsesi-popup').classList.add('show');
+  setTimeout(function(){ if(ketEl) ketEl.focus(); }, 80);
+}
+
+function closeEditSesiPopup(){
+  document.getElementById('editsesi-overlay').classList.remove('show');
+  document.getElementById('editsesi-popup').classList.remove('show');
+}
+
+function submitEditSesiDetail(){
+  if(!absenTgl) return;
+  var warnEl = document.getElementById('esWarn');
+  function warn(msg){ if(warnEl){ warnEl.textContent=msg; warnEl.style.display='block'; } }
+
+  var keyLama = absenTgl;
+  var suffix  = keyLama.indexOf('_')>-1 ? keyLama.split('_')[1] : null;
+
+  var tglBaru = (document.getElementById('esTgl').value||'').trim();
+  var ketBaru = (document.getElementById('esKet').value||'').trim();
+
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(tglBaru)){
+    warn('Tanggal belum valid, silakan pilih tanggal terlebih dahulu.');
+    return;
+  }
+
+  var keyBaru = suffix ? (tglBaru+'_'+suffix) : tglBaru;
+
+  if(keyBaru !== keyLama){
+    if(sesiData[keyBaru]){
+      warn('Tanggal tersebut sudah punya sesi lain ("'+(sesiKet[keyBaru]||'tanpa nama')+'"). Pilih tanggal lain, atau edit sesi tersebut langsung dari halaman Sesi.');
+      return;
+    }
+    sesiData[keyBaru] = sesiData[keyLama] || {};
+    delete sesiData[keyLama];
+    sesiKet[keyBaru] = ketBaru;
+    delete sesiKet[keyLama];
+    if(_dbPinned[keyLama]){ _dbPinned[keyBaru] = 1; delete _dbPinned[keyLama]; try{ localStorage.setItem('db_pinned', JSON.stringify(_dbPinned)); }catch(e){} }
+
+    fbSaveSesi(keyBaru);
+    fbDelSesi(keyLama);
+    logActivity('sesi', 'Ubah sesi '+sesiLabel(keyLama)+' → '+sesiLabel(keyBaru));
+
+    var d = new Date(tglBaru+'T00:00:00');
+    absenTgl = keyBaru; absenBulan = d.getMonth()+1; absenTahun = d.getFullYear();
+  } else if(ketBaru !== absenKet){
+    sesiKet[keyLama] = ketBaru;
+    fbSaveSesi(keyLama);
+    logActivity('sesi', 'Ubah nama kegiatan: '+(absenKet||'(tanpa nama)')+' → '+(ketBaru||'(tanpa nama)'));
+  } else {
+    closeEditSesiPopup();
+    return; // tidak ada perubahan
+  }
+
+  absenKet = ketBaru;
+  closeEditSesiPopup();
+  if(mob()){ renderAbsenMob(); } else { renderAbsenPc(); }
+  syncRekapFilter();
+  renderDb(); renderDbMob();
+  try { renderRekap('pc'); } catch(e){}
+  try { renderRekap('mob'); } catch(e){}
+  try { renderDashboard(); } catch(e){}
 }

@@ -67,7 +67,12 @@ function masukApp(){
 function loginEnter(e){ if(e.key==='Enter') doLogin(); }
 
 function doLogout(){
-  if(!confirm('Yakin mau keluar?')) return;
+  appConfirm('Yakin mau keluar?', function(){
+    _doLogoutConfirmed();
+  }, {title:'Keluar', icon:'logout', color:'amber', okText:'Ya, Keluar'});
+}
+
+function _doLogoutConfirmed(){
   window._fbSignOut(window._auth).then(function(){
     currentUser = null;
     localStorage.removeItem('saved_user');

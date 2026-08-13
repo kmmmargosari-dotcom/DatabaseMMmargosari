@@ -5,6 +5,8 @@
 // ── State ──
 var _smNama = '', _smCtx = '';
 var _izinNama = '', _izinCtx = '';
+var _bulkMode = false;
+var _bulkSelected = {};
 
 // ── Setup / Body toggle ──
 function showAbsenSetup(){
@@ -64,20 +66,24 @@ function sesiLabel(key){
 function mulaiAbsensi(isMob){
   var suf = isMob ? 'M' : '';
   var tgl = document.getElementById('sTgl'+suf).value;
-  if(!tgl){ alert('Pilih tanggal dulu!'); return; }
+  if(!tgl){ appAlert('Pilih tanggal dulu!'); return; }
   var parts  = tgl.split('-');
   var tahun  = parseInt(parts[0]);
   var bulan  = parseInt(parts[1]);
   var ket    = document.getElementById('sKet'+suf).value.trim();
-  var sessionKey = tgl;
   if(sesiData[tgl]){
     var existingKet = sesiKet[tgl]||'(tanpa nama)';
-    var lanjut = confirm('Tanggal ini sudah ada sesi:\n"'+existingKet+'"\n\nBuat sesi BARU untuk hari yang sama?');
-    if(!lanjut) return;
-    var n=2;
-    while(sesiData[tgl+'_'+n]) n++;
-    sessionKey = tgl+'_'+n;
+    appConfirm('Tanggal ini sudah ada sesi:\n"'+existingKet+'"\n\nBuat sesi BARU untuk hari yang sama?', function(){
+      var n=2;
+      while(sesiData[tgl+'_'+n]) n++;
+      _mulaiAbsensiFinish(tgl+'_'+n, bulan, tahun, ket);
+    }, {title:'Sesi Sudah Ada', color:'amber'});
+    return;
   }
+  _mulaiAbsensiFinish(tgl, bulan, tahun, ket);
+}
+
+function _mulaiAbsensiFinish(sessionKey, bulan, tahun, ket){
   absenTgl=sessionKey; absenBulan=bulan; absenTahun=tahun; absenKet=ket;
   if(!sesiData[sessionKey]) sesiData[sessionKey]={};
   sesiKet[sessionKey] = ket;
@@ -117,12 +123,18 @@ function counterHtml(){
     '<span class="ci"><span class="dot dx"></span><span style="color:var(--text3)">'+blm+' Belum</span></span>';
 }
 
-function pillHtml(nama, ctx){
+function pillHtml(nama, ctx, readonly){
   var v = ((sesiData[absenTgl]||{})[nama]||{}).status||'';
-  if(v==='H') return '<button class="sp sp-h" onclick="openStatusMenu(this,\''+nama+'\',\''+ctx+'\')">✓ Hadir</button>';
-  if(v==='I') return '<button class="sp sp-i" onclick="openStatusMenu(this,\''+nama+'\',\''+ctx+'\')">? Izin</button>';
-  if(v==='A') return '<button class="sp sp-a" onclick="openStatusMenu(this,\''+nama+'\',\''+ctx+'\')">✕ Alfa</button>';
-  return '<button class="sp sp-x" onclick="openStatusMenu(this,\''+nama+'\',\''+ctx+'\')">Isi status</button>';
+  if(readonly){
+    if(v==='H') return '<span class="sp sp-h" style="pointer-events:none">✓ Hadir</span>';
+    if(v==='I') return '<span class="sp sp-i" style="pointer-events:none">? Izin</span>';
+    if(v==='A') return '<span class="sp sp-a" style="pointer-events:none">✕ Alfa</span>';
+    return '<span class="sp sp-x" style="pointer-events:none">Belum diisi</span>';
+  }
+  if(v==='H') return '<button class="sp sp-h" onclick="openStatusMenu(this,\''+escJsAttr(nama)+'\',\''+ctx+'\')">✓ Hadir</button>';
+  if(v==='I') return '<button class="sp sp-i" onclick="openStatusMenu(this,\''+escJsAttr(nama)+'\',\''+ctx+'\')">? Izin</button>';
+  if(v==='A') return '<button class="sp sp-a" onclick="openStatusMenu(this,\''+escJsAttr(nama)+'\',\''+ctx+'\')">✕ Alfa</button>';
+  return '<button class="sp sp-x" onclick="openStatusMenu(this,\''+escJsAttr(nama)+'\',\''+ctx+'\')">Isi status</button>';
 }
 
 function buildItem(m, ctx){
@@ -130,15 +142,26 @@ function buildItem(m, ctx){
   var rec  = (sesiData[absenTgl]||{})[m.nama]||{};
   var note = rec.catatan||'';
   var avc  = m.gender==='P'?'av-p':'av-l';
+  var checked = _bulkSelected[m.nama] ? ' checked' : '';
   var html = '<div class="ab-item" id="abitem-'+ctx+'-'+key+'">';
-  html += '<div class="ab-row">';
-  html += '<div class="avatar '+avc+'">'+initials(m.nama)+'</div>';
-  html += '<div class="ab-info"><div class="ab-name">'+m.nama+'</div>';
-  var subTxt = (rec.status==='I' && note) ? '<em style="color:var(--amber)">✎ '+note+'</em>' : '&nbsp;';
+  if(_bulkMode){
+    html += '<div class="ab-row" style="cursor:pointer" onclick="toggleBulkItem(\''+escJsAttr(m.nama)+'\')">';
+    html += '<input type="checkbox" class="bulk-chk"'+checked+' onclick="event.stopPropagation();toggleBulkItem(\''+escJsAttr(m.nama)+'\')" style="width:18px;height:18px;flex-shrink:0;margin-right:2px">';
+  } else {
+    html += '<div class="ab-row">';
+  }
+  html += '<div class="avatar '+avc+'">'+escHtml(initials(m.nama))+'</div>';
+  html += '<div class="ab-info"><div class="ab-name">'+escHtml(m.nama)+'</div>';
+  var subTxt = (rec.status==='I' && note) ? '<em style="color:var(--amber)">✎ '+escHtml(note)+'</em>' : '&nbsp;';
   html += '<div class="ab-sub">'+subTxt+'</div></div>';
-  html += '<div class="ab-right">'+pillHtml(m.nama,ctx);
-  html += '<button class="more-btn" onclick="openStatusMenu(this,\''+m.nama+'\',\''+ctx+'\')">···</button>';
-  html += '</div></div>';
+  if(_bulkMode){
+    html += '<div class="ab-right">'+pillHtml(m.nama,ctx,true)+'</div>';
+  } else {
+    html += '<div class="ab-right">'+pillHtml(m.nama,ctx);
+    html += '<button class="more-btn" onclick="openStatusMenu(this,\''+escJsAttr(m.nama)+'\',\''+ctx+'\')">···</button>';
+    html += '</div>';
+  }
+  html += '</div>';
   html += '</div>';
   return html;
 }
@@ -296,6 +319,61 @@ function redraw(ctx){
   else renderAbsenPc();
 }
 
+// ── Bulk Select (isi status untuk beberapa anggota sekaligus) ──
+function toggleBulkMode(){
+  _bulkMode = !_bulkMode;
+  _bulkSelected = {};
+  openPanel = null;
+  if(mob()) renderAbsenMob(); else renderAbsenPc();
+}
+
+function toggleBulkItem(nama){
+  if(_bulkSelected[nama]) delete _bulkSelected[nama];
+  else _bulkSelected[nama] = true;
+  // Update checkbox-nya saja (bukan render ulang seluruh list) supaya tidak
+  // terasa "refresh"/flicker tiap kali centang anggota saat pilih banyak.
+  var checked = !!_bulkSelected[nama];
+  var key = eid(nama);
+  ['pc-p','pc-l','mob'].forEach(function(ctx){
+    var wrapper = document.getElementById('abitem-'+ctx+'-'+key);
+    if(!wrapper) return;
+    var chk = wrapper.querySelector('.bulk-chk');
+    if(chk) chk.checked = checked;
+  });
+  updateBulkBar();
+}
+
+function updateBulkBar(){
+  var n = Object.keys(_bulkSelected).length;
+  ['pc','mob'].forEach(function(p){
+    var bar = document.getElementById(p+'-bulk-bar');
+    var cnt = document.getElementById(p+'-bulk-count');
+    var tgl = document.getElementById(p+'-bulk-toggle');
+    if(tgl) tgl.textContent = _bulkMode ? '✕ Batal Pilih' : '☑ Pilih Banyak';
+    if(bar) bar.style.display = (_bulkMode && n>0) ? 'flex' : 'none';
+    if(cnt) cnt.textContent = n+' dipilih';
+  });
+}
+
+function applyBulkStatus(status){
+  var names = Object.keys(_bulkSelected);
+  if(!names.length) return;
+  var sl = status==='H'?'Hadir':status==='I'?'Izin':'Alfa';
+  appConfirm('Set status "'+sl+'" untuk '+names.length+' orang terpilih?', function(){
+    if(!sesiData[absenTgl]) sesiData[absenTgl]={};
+    names.forEach(function(nama){
+      if(!sesiData[absenTgl][nama]) sesiData[absenTgl][nama]={};
+      sesiData[absenTgl][nama].status = status;
+      if(status!=='I') delete sesiData[absenTgl][nama].catatan;
+    });
+    logActivity('absen', 'Isi massal '+sl+' untuk '+names.length+' orang'+(absenKet?' ('+absenKet+')':''));
+    fbSaveSesi(absenTgl);
+    _bulkMode = false;
+    _bulkSelected = {};
+    if(mob()) renderAbsenMob(); else renderAbsenPc();
+  }, {title:'Isi Massal', color:'green'});
+}
+
 // ── PC render ──
 function renderAbsenPc(){
   var d = new Date(tglDate(absenTgl)+'T00:00:00');
@@ -311,6 +389,7 @@ function renderAbsenPc(){
   var hl=''; L.forEach(function(m){ hl+=buildItem(m,'pc-l'); });
   var cp = document.getElementById('pc-col-p'); if(cp) cp.innerHTML=hp||'<div class="empty">-</div>';
   var cl = document.getElementById('pc-col-l'); if(cl) cl.innerHTML=hl||'<div class="empty">-</div>';
+  updateBulkBar();
 }
 
 // ── Mobile render ──
@@ -345,4 +424,5 @@ function renderAbsenMob(){
   }
   var el = document.getElementById('mob-absen-list');
   if(el) el.innerHTML=html||'<div class="empty">Tidak ada.</div>';
+  updateBulkBar();
 }

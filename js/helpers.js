@@ -26,6 +26,14 @@ function escHtml(s){
     .replace(/"/g,'&quot;');
 }
 
+// Aman dipakai untuk menyisipkan string ke dalam onclick="...('...')":
+// escape dulu untuk konteks string JS (kutip tunggal + backslash),
+// baru escape untuk konteks atribut HTML.
+function escJsAttr(s){
+  var js = String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  return escHtml(js);
+}
+
 function showToast(msg, duration){
   var t = document.getElementById('app-toast');
   if(!t) return;
@@ -66,6 +74,96 @@ function fmtTglShort(tgl){
   if(parts.length<3) return tgl;
   var MBLN=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
   return parts[2]+' '+(MBLN[parseInt(parts[1],10)-1]||'')+'\''+String(parts[0]).slice(2);
+}
+
+// ── App Popup — pengganti alert()/confirm()/prompt() bawaan browser ──
+// Dipakai supaya semua konfirmasi/isian pakai tampilan popup aplikasi sendiri
+// (bukan popup native browser), dan tidak memblokir/mereset layar.
+var _apOnOk    = null;
+var _apType    = 'confirm';
+var _apColors  = {
+  red:   {bg:'var(--red-lt)',   fg:'var(--red)'},
+  amber: {bg:'var(--amber-lt)', fg:'var(--amber)'},
+  green: {bg:'var(--green-lt)', fg:'var(--green)'},
+  gold:  {bg:'var(--gold-xlt)', fg:'var(--gold-dk)'}
+};
+
+function _showAppPopup(cfg){
+  _apOnOk = cfg.onOk || null;
+  _apType = cfg.type;
+  var col = _apColors[cfg.color||'amber'] || _apColors.amber;
+  var icoEl  = document.getElementById('app-popup-icon');
+  var useEl  = document.getElementById('app-popup-icon-use');
+  var titleEl= document.getElementById('app-popup-title');
+  var msgEl  = document.getElementById('app-popup-msg');
+  var inputEl= document.getElementById('app-popup-input');
+  var okEl   = document.getElementById('app-popup-ok');
+  var cancelEl=document.getElementById('app-popup-cancel');
+  if(icoEl){ icoEl.style.background = col.bg; icoEl.style.color = col.fg; }
+  if(useEl) useEl.setAttribute('href', '#ico-'+(cfg.icon||'q'));
+  if(titleEl){ titleEl.textContent = cfg.title||'Konfirmasi'; titleEl.style.color = col.fg; }
+  if(msgEl) msgEl.textContent = cfg.message||'';
+  if(inputEl){
+    if(cfg.type==='prompt'){
+      inputEl.style.display = 'block';
+      inputEl.value = cfg.defaultValue||'';
+      inputEl.placeholder = cfg.placeholder||'';
+    } else {
+      inputEl.style.display = 'none';
+      inputEl.value = '';
+    }
+  }
+  if(okEl){ okEl.textContent = cfg.okText||'Ya, Lanjutkan'; okEl.style.background = (cfg.color==='red')?'var(--red)':''; okEl.style.borderColor = (cfg.color==='red')?'var(--red-dk)':''; }
+  if(cancelEl) cancelEl.style.display = (cfg.type==='alert') ? 'none' : '';
+  showPopup('app-popup-overlay','app-popup');
+  if(cfg.type==='prompt') setTimeout(function(){ inputEl.focus(); inputEl.select(); }, 80);
+}
+
+function closeAppPopup(){
+  hidePopup('app-popup-overlay','app-popup');
+  _apOnOk = null;
+}
+
+function _appPopupSubmit(){
+  var type = _apType, cb = _apOnOk;
+  if(type==='prompt'){
+    var val = document.getElementById('app-popup-input').value;
+    closeAppPopup();
+    if(cb) cb(val);
+  } else {
+    closeAppPopup();
+    if(cb) cb();
+  }
+}
+
+// Pengganti alert(msg) — popup informasi dengan satu tombol OK.
+function appAlert(message, opts){
+  opts = opts || {};
+  _showAppPopup({
+    type: 'alert', icon: opts.icon||'q', color: opts.color||'amber',
+    title: opts.title||'Pemberitahuan', message: message,
+    okText: opts.okText||'OK', onOk: opts.onOk||null
+  });
+}
+
+// Pengganti confirm(msg) — onConfirm dipanggil hanya jika user menekan tombol Ya/lanjut.
+function appConfirm(message, onConfirm, opts){
+  opts = opts || {};
+  _showAppPopup({
+    type: 'confirm', icon: opts.icon||'q', color: opts.color||'red',
+    title: opts.title||'Konfirmasi', message: message,
+    okText: opts.okText||'Ya, Lanjutkan', onOk: onConfirm
+  });
+}
+
+// Pengganti prompt(msg, def) — onSubmit(value) dipanggil hanya jika user menekan Simpan.
+function appPrompt(message, defaultValue, onSubmit, opts){
+  opts = opts || {};
+  _showAppPopup({
+    type: 'prompt', icon: opts.icon||'edit', color: opts.color||'gold',
+    title: opts.title||'Isi Data', message: message, defaultValue: defaultValue||'',
+    placeholder: opts.placeholder||'', okText: opts.okText||'Simpan', onOk: onSubmit
+  });
 }
 
 function showPopup(ovId, popId){

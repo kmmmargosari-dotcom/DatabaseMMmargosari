@@ -6,12 +6,12 @@ var members = [
   {nama:'ARISKA NURVINAHARI',gender:'P'},{nama:'ENI ISWANTI',gender:'P'},
   {nama:'FITRI NURASTUTI',gender:'P'},{nama:'ILMA WULAN RAMADHANI',gender:'P'},
   {nama:'INA OKTAVIANI',gender:'P'},{nama:'NAZHWA ALIYA PUTRI',gender:'P'},
-  {nama:'RISTYANINGSIH',gender:'P'},{nama:'USWATUN HASANAH',gender:'P'},
+  {nama:'APRILLIA PUTRI CENDANI',gender:'P'},{nama:'MUTIA VERO KIRANIA PUTRI',gender:'P'},
   {nama:'WENI SALATSUL HUSNA',gender:'P'},{nama:'ALVIANA',gender:'P'},
   {nama:'ANISA FEBRIYANTI',gender:'P'},{nama:'LUTFI NUR AFIFAH',gender:'P'},
   {nama:'IDA NURLATIFAH',gender:'P'},{nama:'BIENDA PRATIKASIWI',gender:'P'},
   {nama:'EVI RYSKA AFRIYANI',gender:'P'},{nama:'OKTAFIA CESAR LARASATI',gender:'P'},
-  {nama:'SOFA NISABELA ANDINI',gender:'P'},{nama:'SYAHNAZ AULIA NURJANNAH',gender:'P'},
+  {nama:'SYAHNAZ AULIA NURJANNAH',gender:'P'},
   {nama:'SYEIKHA AULIA NURRAHMAH',gender:'P'},{nama:'UKHTA IZZA AFIFAH',gender:'P'},
   {nama:'ALAM PILAROSE',gender:'L'},{nama:'ARLIS DWI MAHENDRA',gender:'L'},
   {nama:'BAYU SEPTIANTO',gender:'L'},{nama:'FIRSTA DARUL SALAM',gender:'L'},
@@ -40,12 +40,10 @@ var openPanel   = null;
 
 // Kas data
 var kasTransaksi  = [];
-// Starting point Kas ditetapkan SEKALI SAJA: April 2026 = Rp 1.045.700
-var kasSaldoAwal  = parseFloat(localStorage.getItem('kas_saldo_awal')) || 0;
-if(kasSaldoAwal === 0 && localStorage.getItem('kas_saldo_awal') === null){
-  kasSaldoAwal = 1045700;
-  try{ localStorage.setItem('kas_saldo_awal','1045700'); }catch(e){}
-}
+// Saldo awal Kas ditetapkan SEKALI SAJA dan permanen: April 2026 = Rp 1.045.700
+// (tidak boleh diubah dari UI — bulan-bulan berikutnya otomatis dihitung
+// berjalan dari nilai ini + seluruh transaksi kas).
+var kasSaldoAwal  = 1045700;
 
 // ── Activity Log ──
 var _activityLogs = [];

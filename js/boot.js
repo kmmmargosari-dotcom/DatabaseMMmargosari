@@ -42,11 +42,11 @@ window.addEventListener('DOMContentLoaded', function(){
         window._fbAuthStateChanged(window._auth, function(fbUser){
           if(fbUser){
             showApp(fbUser);
-          } else if(localStorage.getItem('_members')){
-            var savedU = localStorage.getItem('saved_user') || 'admin';
-            currentUser = { username: savedU, nama: 'Administrator' };
-            masukApp();
           } else {
+            // Firebase Auth aktif dan memastikan TIDAK ada sesi login.
+            // Jangan bypass ke masukApp() hanya karena ada cache localStorage —
+            // arahkan ke halaman login. Cache tetap tersimpan untuk dipakai
+            // otomatis setelah login berhasil.
             showLogin();
           }
         });
