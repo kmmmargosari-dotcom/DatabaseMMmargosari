@@ -1,59 +1,50 @@
-# Database Muda-Mudi Margosari
+<div align="center">
+  <h1>📄 PDF Gen Template</h1>
+  <p><i>Template HTML/CSS Modern dan Minimalis untuk Generate PDF dari Markdown/HTML</i></p>
 
-Website absensi, rekap kehadiran, kas/keuangan, dan data anggota untuk
-kelompok Muda-Mudi Margosari. Single Page Application berbasis HTML/CSS/
-JavaScript (vanilla, tanpa framework/build-step) dengan backend
-[Firebase](https://firebase.google.com/) (Authentication + Firestore).
+  [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+  [![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)]()
+  [![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)]()
+</div>
 
-## Struktur Project
+---
 
+## ✨ Tentang Proyek
+Template HTML ini dirancang khusus sebagai struktur dasar (boilerplate) untuk mengonversi dokumen HTML atau Markdown menjadi file PDF dengan format yang rapi, profesional, dan siap cetak [cite: 1]. Dilengkapi dengan tipografi modern, styling tabel yang bersih, dan *highlight syntax* otomatis.
+
+## 🚀 Fitur Utama
+- **Tipografi Modern**: Menggunakan sistem font (*system-fonts*) bawaan yang sangat nyaman dibaca seperti `-apple-system`, `Segoe UI`, `Roboto`, hingga `Noto Color Emoji` [cite: 1].
+- **Hierarki Heading yang Jelas**: Warna biru elegan (`#1d4ed8`) untuk judul, dengan garis bawah yang tegas pada `<h1>` [cite: 1].
+- **Siap Cetak (Print-Ready)**: Aturan `@media print` telah dikonfigurasi untuk menghindari elemen seperti tabel, blok kode (`pre`), dan *blockquote* terpotong di tengah halaman (`page-break-inside: avoid`) [cite: 1].
+- **Syntax Highlighting**: Terintegrasi langsung dengan `highlight.js` (tema *Atom One Dark*) untuk menyorot blok kode secara estetik [cite: 1].
+- **Tabel & Blockquote Estetik**: Desain elegan untuk tabel bergaris dengan baris warna selang-seling (Zebra striping) dan *blockquote* rapi beraksen biru [cite: 1].
+
+## 🛠️ Cara Penggunaan
+
+Gunakan file ini sebagai *template* utama Anda. Cukup *copy-paste* konten HTML atau hasil *render* Markdown Anda tepat di dalam tag `<body>` [cite: 1]:
+
+```html
+<body>
+  <!-- Masukkan konten Anda di sini -->
+  <h1>Laporan Analisis Data</h1>
+  <p>Berikut adalah hasil laporan bulan ini...</p>
+  
+  <blockquote>Ini adalah quote penting.</blockquote>
+</body>
 ```
-index.html          Markup utama (shell PC & Mobile, semua halaman/modal)
-logo.jpg             Logo aplikasi
-css/
-  base.css           Variabel desain (warna, radius, shadow) & style dasar
-  layout.css         Layout shell, sidebar, bottom-nav, responsive/media query
-  components.css     Komponen UI umum (tombol, badge, dll)
-  modules.css        Style spesifik per modul (kas, rekap, dsb)
-js/
-  boot.js            Inisialisasi aplikasi & pengecekan status login
-  auth.js            Login/logout via Firebase Authentication
-  firebase.js        Konfigurasi & fungsi baca/tulis Firestore
-  data.js            Data awal (seed) & variabel state global
-  helpers.js         Fungsi utilitas (format tanggal, format rupiah, escape HTML)
-  nav.js             Navigasi antar halaman (PC & Mobile)
-  dashboard.js       Halaman Dashboard
-  absen.js           Halaman Absensi (isi kehadiran per sesi)
-  sesi.js            Halaman Sesi (daftar seluruh sesi absensi)
-  rekap.js           Halaman Rekap Bulanan & export
-  kas.js             Halaman Kas/Keuangan & export
-  anggota.js         Halaman Data Anggota (CRUD) & export
-```
 
-## Menjalankan Project
+Skrip `hljs.highlightAll();` yang berada di bawah sudah otomatis berjalan untuk mendeteksi dan memberi warna pada semua blok kode Anda [cite: 1].
 
-Project ini murni file statis (HTML/CSS/JS), tidak perlu proses build.
+## 🎨 Skema Warna Utama
+- **Teks Utama**: `#333` (Abu-abu sangat gelap) [cite: 1]
+- **Heading & Link**: `#1d4ed8` (Biru) [cite: 1]
+- **Inline Code**: `#dc2626` (Merah dengan latar `#f3f4f6`) [cite: 1]
+- **Blok Kode (Pre)**: `#1f2937` (Dark Slate) dengan teks `#f9fafb` [cite: 1]
 
-1. Siapkan project Firebase sendiri (Authentication dengan Email/Password,
-   dan Firestore Database).
-2. Ganti konfigurasi Firebase (`firebaseConfig`) di bagian atas `index.html`
-   dengan konfigurasi project Firebase Anda.
-3. Buat akun pengguna di Firebase Authentication, lalu sesuaikan pemetaan
-   username → email di `js/auth.js` (`USERNAME_MAP`).
-4. Buka `index.html` langsung di browser, atau sajikan lewat web server
-   statis (mis. `npx serve .`, GitHub Pages, Firebase Hosting, dll).
+## 🤝 Kontribusi
+Silakan *fork* repository ini jika Anda memiliki ide gaya (style) CSS yang lebih menarik, tambahkan fitur Anda, dan kirimkan *Pull Request*. Segala bentuk kontribusi sangat dihargai!
 
-## Keamanan
-
-Akses data (baca/tulis) yang sesungguhnya diatur oleh **Firestore Security
-Rules** di project Firebase Anda — pastikan Rules tersebut membatasi akses
-hanya untuk pengguna yang sudah login sebelum project ini digunakan secara
-publik/produksi.
-
-## Catatan
-
-- Aplikasi mendukung mode offline terbatas (cache di `localStorage`) apabila
-  koneksi ke Firebase gagal dimuat sama sekali.
-- Data anggota, sesi, dan kas disimpan di Firestore; array data di
-  `js/data.js` dan `js/kas.js` hanya dipakai sebagai data awal (seed) saat
-  instalasi pertama kali pada Firestore yang masih kosong.
+---
+<div align="center">
+  Dibuat dengan ❤️ untuk developer yang sering mengekspor dokumen HTML ke PDF.
+</div>
