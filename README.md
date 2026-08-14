@@ -8,7 +8,7 @@ Aplikasi internal untuk absensi, kas, dan data anggota — dokumentasi pribadi r
 
 </div>
 
-> Catatan: repo ini privat, README ini ditulis untuk keperluan dokumentasi pribadi (biar aku sendiri nggak lupa alur & struktur proyeknya kalau buka lagi beberapa bulan ke depan).
+
 
 ---
 
