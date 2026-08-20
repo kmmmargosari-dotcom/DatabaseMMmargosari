@@ -80,7 +80,6 @@ npx serve .
 ```
 .
 ├── index.html              # Markup utama (shell PC & Mobile, semua halaman/modal)
-├── logo.jpg                # Logo aplikasi
 ├── css/
 │   ├── base.css            # Variabel desain (warna, radius, shadow) & style dasar
 │   ├── layout.css          # Layout shell, sidebar, bottom-nav, responsive
