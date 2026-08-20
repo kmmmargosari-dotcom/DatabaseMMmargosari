@@ -1,0 +1,1775 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Database MM Margosari</title>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { initializeFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDocs, persistentLocalCache, persistentMultipleTabManager } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAQdX4r2BrStdRIaRE7MsgGqEMjlnnW3ac",
+      authDomain: "absensirekap-cfbf0.firebaseapp.com",
+      projectId: "absensirekap-cfbf0",
+      storageBucket: "absensirekap-cfbf0.firebasestorage.app",
+      messagingSenderId: "452365600662",
+      appId: "1:452365600662:web:b91a1118668b3fb0b2bfb7",
+      measurementId: "G-63JZN3F1E4"
+    };
+
+    const app  = initializeApp(firebaseConfig);
+    const db   = initializeFirestore(app, {
+      localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()})
+    });
+    const auth = getAuth(app);
+
+    window._db  = db;
+    window._auth = auth;
+    window._fsCol  = collection;
+    window._fsDoc  = doc;
+    window._fsSet  = setDoc;
+    window._fsDel  = deleteDoc;
+    window._fsSnap = onSnapshot;
+    window._fsGetDocs = getDocs;
+    window._fbSignIn  = signInWithEmailAndPassword;
+    window._fbSignOut = signOut;
+    window._fbAuthStateChanged = onAuthStateChanged;
+    window._firebaseReady = true;
+    document.dispatchEvent(new Event('firebase-ready'));
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/base.css"/>
+  <link rel="stylesheet" href="css/layout.css"/>
+  <link rel="stylesheet" href="css/components.css"/>
+  <link rel="stylesheet" href="css/modules.css"/>
+  
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🕌</text></svg>">
+</head>
+<body style="overscroll-behavior: none; touch-action: pan-y;">
+
+<!-- LOADING SCREEN -->
+<div id="loading-screen">
+  <div class="ls-mosq">🕌</div>
+  <div class="ls-title">Database Muda-Mudi<br>Margosari</div>
+  <div class="ls-bar"><div class="ls-bar-fill"></div></div>
+  <div class="ls-sub">Memuat aplikasi...</div>
+</div>
+
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="ico-home" viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></symbol>
+  <symbol id="ico-clipboard" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h4"/></symbol>
+  <symbol id="ico-chart" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></symbol>
+  <symbol id="ico-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v4c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 9v6c0 1.66 4.03 3 9 3s9-1.34 9-3V9"/><path d="M3 15v4c0 1.66 4.03 3 9 3s9-1.34 9-3v-4"/></symbol>
+  <symbol id="ico-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="ico-menu" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
+  <symbol id="ico-user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="ico-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+  <symbol id="ico-x" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+  <symbol id="ico-edit" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></symbol>
+  <symbol id="ico-trash" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></symbol>
+  <symbol id="ico-reset" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4"/></symbol>
+  <symbol id="ico-note" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="12" y2="17"/></symbol>
+  <symbol id="ico-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></symbol>
+  <symbol id="ico-q" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+  <symbol id="ico-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></symbol>
+  <symbol id="ico-home-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></symbol>
+  <symbol id="ico-arrow-left" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></symbol>
+  <symbol id="ico-money" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 12h.01M18 12h.01"/></symbol>
+  <symbol id="ico-plus-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></symbol>
+  <symbol id="ico-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
+  <symbol id="ico-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+  <symbol id="ico-trend-up" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></symbol>
+  <symbol id="ico-trend-down" viewBox="0 0 24 24"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></symbol>
+  <symbol id="ico-wallet" viewBox="0 0 24 24"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></symbol>
+  <symbol id="ico-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+  <symbol id="ico-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+  <symbol id="ico-absen-art" viewBox="0 0 200 200">
+    <circle cx="100" cy="100" r="88" fill="currentColor" opacity="0.06"/>
+    <circle cx="100" cy="100" r="64" fill="currentColor" opacity="0.05"/>
+    <rect x="58" y="64" width="84" height="88" rx="18" fill="currentColor" opacity="0.22"/>
+    <rect x="77" y="48" width="46" height="30" rx="8" fill="currentColor" opacity="0.30"/>
+    <path d="M82 120 l14 14 22 -28" stroke="currentColor" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.95"/>
+    <circle cx="176" cy="44" r="5" fill="currentColor" opacity="0.4"/>
+    <circle cx="28" cy="72" r="4" fill="currentColor" opacity="0.32"/>
+    <circle cx="150" cy="170" r="4" fill="currentColor" opacity="0.32"/>
+  </symbol>
+</svg>
+
+<!-- LOGIN -->
+<div id="pg-login">
+  <div class="login-center">
+    <div class="login-card">
+      <div class="login-card-hero">
+        <div class="login-mosq">🕌</div>
+        <div class="login-card-title">Database Muda-Mudi<br>Margosari</div>
+        <div class="login-card-sub">Masuk untuk melanjutkan</div>
+      </div>
+      <div class="fr">
+        <label>Username</label>
+        <input type="text" id="loginUser" placeholder="Masukkan username" onkeydown="loginEnter(event)" autocomplete="username"/>
+      </div>
+      <div class="fr" style="margin-bottom:8px">
+        <label>Password</label>
+        <input type="password" id="loginPass" placeholder="Masukkan password" onkeydown="loginEnter(event)" autocomplete="current-password"/>
+      </div>
+      <label class="remember-row"><input type="checkbox" id="rememberMe" checked/><span>Ingat saya</span></label>
+      <div class="login-err" id="loginErr"></div>
+      <button class="btn-p btn-full" onclick="doLogin()" style="padding:12px;font-size:13px;letter-spacing:.3px;margin-top:4px">Masuk</button>
+      <div class="login-copy-foot">&copy; 2026 Muda-Mudi Margosari</div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="pg-app" style="display:none">
+
+  <!-- PC -->
+  <div class="pc-shell pc-only">
+
+    <div class="sidebar">
+      <div class="sidebar-hd">
+        <div class="sidebar-title">Database Muda-Mudi<br>Margosari</div>
+        <div class="sidebar-date js-date"></div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-label">Menu</div>
+        <button class="si on" id="si-home" onclick="goPc('home')">
+          <svg class="ico si-icon"><use href="#ico-home"/></svg> Dashboard
+        </button>
+        <button class="si need-absen" id="si-absen" onclick="goPc('absen')">
+          <svg class="ico si-icon"><use href="#ico-clipboard"/></svg> Absensi
+        </button>
+        <button class="si" id="si-kas" onclick="goPc('kas')">
+          <svg class="ico si-icon"><use href="#ico-money"/></svg> Kas
+        </button>
+        <button class="si" id="si-rekap" onclick="goPc('rekap')">
+          <svg class="ico si-icon"><use href="#ico-chart"/></svg> Rekap
+        </button>
+        <button class="si need-admin" id="si-lainnya" onclick="goPc('lainnya')">
+          <svg class="ico si-icon"><use href="#ico-menu"/></svg> Lainnya
+        </button>
+      </nav>
+      <div id="pc-sync-badge" class="sync-badge sync-ok">🟢 Online</div>
+      <div class="user-info">
+        <div class="u-av js-uinit"></div>
+        <div style="flex:1;min-width:0">
+          <div class="u-nama js-uname"></div>
+          <div class="u-role js-urole"></div>
+        </div>
+        <button onclick="doLogout()" title="Keluar" style="padding:5px 7px;border-color:transparent;background:none">
+          <svg class="ico" style="width:14px;height:14px"><use href="#ico-logout"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="pc-content">
+
+      <!-- HOME -->
+      <div class="pane on" id="pc-home">
+        <div class="pc-topbar">
+          <span class="pc-topbar-title">Dashboard</span>
+        </div>
+        <div class="pane-body" style="background:var(--bg2)">
+          <div class="ndash-wrap">
+<!-- Welcome -->
+            <div class="dash-eyebrow">
+              <span class="dash-eyebrow-label">Dashboard</span>
+            </div>
+            <div class="welcome-card welcome-card-home">
+              <div class="welcome-inner">
+                <div class="welcome-greet"><span id="dash-welcome-emoji">☀️</span> <span id="dash-welcome-greet">Selamat Pagi</span>, MinKel</div>
+                <div class="welcome-title">Database Muda-Mudi Margosari</div>
+                <div class="welcome-date">📅 <span class="js-date"></span></div>
+              </div>
+              <div class="welcome-home-badge" aria-hidden="true">🕌</div>
+            </div>
+
+            <!-- Stat Cards -->
+            <div class="sec-lbl-row"><span class="sec-lbl">Ringkasan Bulan Ini</span></div>
+            <div class="ndash-stats">
+              <div class="nstat-card">
+                <div class="nstat-icon" style="background:var(--gold-xlt);color:var(--gold-dk)">
+                  <svg class="ico" style="width:22px;height:22px"><use href="#ico-users"/></svg>
+                </div>
+                <div class="nstat-info">
+                  <div class="nstat-val" id="dash-generus-pc">—</div>
+                  <div class="nstat-lbl">Total Generus</div>
+                  <div class="nstat-sub">Anggota</div>
+                </div>
+              </div>
+              <div class="nstat-card">
+                <div class="nstat-icon" style="background:var(--green-lt);color:var(--green)">
+                  <svg class="ico" style="width:22px;height:22px"><use href="#ico-clipboard"/></svg>
+                </div>
+                <div class="nstat-info">
+                  <div class="nstat-val" id="dash-kegiatan-pc">—</div>
+                  <div class="nstat-lbl">Kegiatan Bulan Ini</div>
+                  <div class="nstat-sub">Sesi</div>
+                </div>
+              </div>
+              <div class="nstat-card">
+                <div class="nstat-icon" style="background:var(--amber-lt);color:var(--amber)">
+                  <svg class="ico" style="width:22px;height:22px"><use href="#ico-chart"/></svg>
+                </div>
+                <div class="nstat-info">
+                  <div class="nstat-val" id="dash-persen-pc">—</div>
+                  <div class="nstat-lbl">Kehadiran Bulan Ini</div>
+                  <div class="nstat-sub">Persentase</div>
+                </div>
+              </div>
+              <div class="nstat-card">
+                <div class="nstat-icon" style="background:var(--green-lt);color:var(--green)">
+                  <svg class="ico" style="width:22px;height:22px"><use href="#ico-check"/></svg>
+                </div>
+                <div class="nstat-info">
+                  <div class="nstat-val" id="dash-hadir-pc">—</div>
+                  <div class="nstat-lbl">Total Berangkat</div>
+                  <div class="nstat-sub">Orang-sesi</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Chart + Recent -->
+            <div class="ndash-mid">
+              <div class="ndash-chart-card">
+                <div class="ndash-sec-hd">
+                  <span>Grafik Kehadiran (Bulan Ini)</span>
+                  <span class="ndash-legend">
+                    <span class="nleg-dot" style="background:#2e7d55"></span>Hadir
+                    <span class="nleg-dot" style="background:#b07b1f;margin-left:10px"></span>Izin
+                    <span class="nleg-dot" style="background:#a83a33;margin-left:10px"></span>Alpa
+                  </span>
+                </div>
+                <div id="dash-chart-pc" class="ndash-chart-wrap"></div>
+              </div>
+              <div class="ndash-recent-card">
+                <div class="ndash-sec-hd">
+                  <span>Kegiatan Terbaru</span>
+                  <button onclick="goPc('absen')" class="ndash-see-all">Lihat Semua</button>
+                </div>
+                <div id="dash-recent-pc"></div>
+              </div>
+            </div>
+
+            <!-- Ringkasan Kas -->
+            <div class="ndash-recent-card" style="margin-top:14px">
+              <div class="ndash-sec-hd">
+                <span>Ringkasan Kas</span>
+                <button onclick="goPc('kas')" class="ndash-see-all">Lihat Kas</button>
+              </div>
+              <div id="dash-kas-pc"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ABSENSI -->
+      <div class="pane" id="pc-absen" style="overflow:hidden">
+        <div class="pc-topbar">
+          <span class="pc-topbar-title">Absensi</span>
+          <button id="pc-btn-selesai" onclick="selesaiAbsensi()" class="btn-p tb-btn" style="display:none">✓ Selesai</button>
+        </div>
+
+        <!-- STATE 1: Hero + pilih tanggal/nama kegiatan + riwayat sesi -->
+        <div id="pc-absen-setup" class="absen-list-wrap" style="background:var(--bg2);overflow-y:auto;overscroll-behavior:none">
+
+          <!-- STAGE 1: Hero + riwayat sesi -->
+          <div id="pc-stage-hero">
+            <div class="welcome-card welcome-card-absen-hero">
+              <div class="welcome-inner">
+                <div class="welcome-greet">Mulai Absensi <span class="w-greet-emoji">✍️</span></div>
+                <div class="welcome-title">Pilih tanggal &amp; nama kegiatan</div>
+                <div class="welcome-date">📅 <span class="js-date"></span></div>
+                <div class="welcome-actions">
+                  <button class="w-btn w-btn-solid" onclick="showAbsenMain()">Mulai Absensi →</button>
+                </div>
+              </div>
+              <div class="welcome-bg absen-art">
+                <svg><use href="#ico-absen-art"/></svg>
+              </div>
+            </div>
+            <div class="sec-lbl-row sesi-filter-toggle" style="margin:18px 22px 0" onclick="toggleSesiFilter('pc')">
+              <span class="sec-lbl">Riwayat Sesi</span>
+              <span class="sesi-filter-arrow" id="sesiFilterArrowPc">▾</span>
+            </div>
+            <div id="sesiFilterRowPc" class="sesi-filter-row" style="display:none">
+              <div class="toolbar" style="flex-wrap:wrap;gap:8px;margin:10px 20px 0">
+                <input id="dbSearch" placeholder="🔍 Cari kegiatan atau tanggal..." style="flex:1;min-width:140px" oninput="renderDb()"/>
+                <select id="dbFilterBulan" onchange="renderDb()" style="min-width:110px">
+                  <option value="">Semua Bulan</option>
+                  <option value="01">Januari</option><option value="02">Februari</option>
+                  <option value="03">Maret</option><option value="04">April</option>
+                  <option value="05">Mei</option><option value="06">Juni</option>
+                  <option value="07">Juli</option><option value="08">Agustus</option>
+                  <option value="09">September</option><option value="10">Oktober</option>
+                  <option value="11">November</option><option value="12">Desember</option>
+                </select>
+                <select id="dbFilterTahun" onchange="renderDb()" style="min-width:80px">
+                  <option value="">Semua Tahun</option>
+                  <option value="2026">2026</option><option value="2027">2027</option>
+                  <option value="2028">2028</option><option value="2029">2029</option>
+                  <option value="2030">2030</option>
+                </select>
+                <select id="dbSort" onchange="renderDb()" style="min-width:120px">
+                  <option value="desc">Terbaru Dulu</option>
+                  <option value="asc">Terlama Dulu</option>
+                </select>
+              </div>
+            </div>
+            <div class="nd-card db-card" style="margin:12px 20px 20px"><div id="dbList"><div class="empty">Belum ada sesi.</div></div></div>
+          </div>
+
+          <!-- STAGE 2: pilih tanggal + nama kegiatan saja -->
+          <div id="pc-stage-main" style="display:none">
+            <button class="stage-back" onclick="showAbsenHero()">← Kembali</button>
+            <div class="absen-newbox nd-card" id="absen-newbox-pc" style="margin:6px 20px 0">
+              <div class="absen-newbox-hd">
+                <span>Mulai Absensi Baru</span>
+                <span class="absen-newbox-ic"><svg class="ico" style="width:15px;height:15px"><use href="#ico-calendar"/></svg></span>
+              </div>
+              <div class="absen-newbox-form">
+                <div class="fr" style="margin:0"><label>Tanggal Kegiatan</label><input type="date" id="sTgl"/></div>
+                <div class="fr" style="margin:0"><label>Nama Kegiatan</label><input type="text" id="sKet" placeholder="cth: Pengajian Rutin..." onkeydown="if(event.key==='Enter')mulaiAbsensi(false)"/></div>
+                <button class="btn-p" onclick="mulaiAbsensi(false)" style="padding:9px 18px;align-self:flex-end;white-space:nowrap">Tampilkan Daftar →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STATE 2: Attendance List -->
+        <div id="pc-absen-body" style="display:none;flex:1;overflow:hidden;flex-direction:column">
+          <div style="padding:10px 16px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);flex-shrink:0;background:var(--bg2);display:flex;align-items:center;gap:8px">
+            <span id="pc-absen-date" onclick="openEditSesiPopup()" title="Klik untuk edit tanggal/kegiatan" style="flex:1;cursor:pointer"></span>
+          </div>
+          <div id="pc-bulk-bar" style="display:none;padding:8px 16px;border-bottom:1px solid var(--border);background:var(--gold-xlt);flex-shrink:0;align-items:center;gap:8px">
+            <span id="pc-bulk-count" style="font-size:12px;font-weight:600;color:var(--gold-dk);flex:1">0 dipilih</span>
+            <button onclick="applyBulkStatus('H')" class="btn-p" style="background:var(--green);padding:6px 12px;font-size:12px">✓ Hadir</button>
+            <button onclick="applyBulkStatus('I')" class="btn-p" style="background:var(--amber);padding:6px 12px;font-size:12px">? Izin</button>
+            <button onclick="applyBulkStatus('A')" class="btn-p" style="background:var(--red);padding:6px 12px;font-size:12px">✕ Alfa</button>
+            <button class="btn-sec" onclick="toggleBulkMode()" style="padding:6px 12px;font-size:12px">Batal</button>
+          </div>
+          <div class="counter-bar" id="pc-absen-ctr" style="flex-shrink:0"></div>
+          <div class="pc-2col" style="flex:1">
+            <div><div class="col-hd">Perempuan</div><div id="pc-col-p"></div></div>
+            <div><div class="col-hd">Laki-laki</div><div id="pc-col-l"></div></div>
+          </div>
+          <div class="selesai-bar">
+            <div class="selesai-bar-info" id="pc-selesai-info"></div>
+            <button class="btn-p" onclick="selesaiAbsensi()" style="padding:9px 20px">✓ Selesai &amp; Simpan</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- REKAP -->
+      <div class="pane" id="pc-rekap">
+        <div class="pc-topbar"><span class="pc-topbar-title">Rekap</span></div>
+        <div class="sec-lbl-row sesi-filter-toggle" style="margin:12px 20px 0" onclick="toggleRekapFilter('pc')">
+          <span class="sec-lbl">Filter &amp; Urutan</span>
+          <span class="sesi-filter-arrow" id="rekapFilterArrowPc">▾</span>
+        </div>
+        <div id="rekapFilterRowPc" class="sesi-filter-row" style="display:none">
+          <div class="toolbar" style="flex-wrap:wrap;gap:8px;margin:10px 20px 0">
+            <select id="rBulan" onchange="renderRekap('pc')">
+              <option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option>
+              <option value="4">April</option><option value="5">Mei</option><option value="6">Juni</option>
+              <option value="7">Juli</option><option value="8">Agustus</option><option value="9">September</option>
+              <option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
+            </select>
+            <select id="rTahun" onchange="renderRekap('pc')">
+              <option value="2026" selected>2026</option><option value="2027">2027</option>
+              <option value="2028">2028</option><option value="2029">2029</option><option value="2030">2030</option>
+            </select>
+            <select id="rGender" onchange="renderRekap('pc')" style="max-width:120px">
+              <option value="S">Semua</option><option value="P">Perempuan</option><option value="L">Laki-laki</option>
+            </select>
+            <select id="rSort" onchange="renderRekap('pc')" style="max-width:140px">
+              <option value="asc">Terlama Dulu</option>
+              <option value="desc">Terbaru Dulu</option>
+            </select>
+          </div>
+        </div>
+        <div class="pane-body">
+          <div id="rekapStats"></div>
+          <div class="scroll-x rekap-tbl"><table><thead id="theadRekap"></thead><tbody id="tbodyRekap"></tbody></table></div>
+          <div id="izinSheet"></div>
+        </div>
+      </div>
+
+      <!-- KAS -->
+      <div class="pane" id="pc-kas">
+        <div class="pc-topbar">
+          <span class="pc-topbar-title">Kas</span>
+        </div>
+        <!-- Hidden stat IDs to keep JS working -->
+        <span id="ks-saldo" style="display:none"></span><span id="ks-masuk" style="display:none"></span><span id="ks-keluar" style="display:none"></span><span id="ks-selisih" style="display:none"></span><span id="ks-masuk-sub" style="display:none"></span><span id="ks-keluar-sub" style="display:none"></span><span id="ks-selisih-sub" style="display:none"></span>
+        <div class="pane-body" style="background:var(--bg2)">
+          <!-- STAT GRID REMOVED -->
+          <div id="kasStatGrid" style="display:none">
+          </div><!-- end hidden kasStatGrid -->
+
+          <!-- Welcome -->
+          <div style="padding:12px 20px 0">
+            <div class="welcome-card welcome-card-kas">
+              <div class="welcome-inner">
+                <div class="welcome-greet">Kelola Kas <span class="w-greet-emoji">🪙</span></div>
+                <div class="welcome-title">Catat pemasukan &amp; pengeluaran</div>
+                <div class="welcome-date">📅 <span class="js-date"></span></div>
+                <div class="welcome-actions">
+                  <button class="w-btn w-btn-solid" onclick="openKasTambah()">+ Tambah Transaksi</button>
+                </div>
+              </div>
+              <div class="welcome-home-badge" aria-hidden="true">💰</div>
+            </div>
+          </div>
+
+          <!-- Cash Flow + Donut Row -->
+          <div class="kas-cf-donut-row">
+
+            <!-- Cash Flow Card -->
+            <div class="kas-cf-card">
+              <div class="kas-cf-hd">
+                <div style="display:flex;align-items:center;gap:8px;flex:1">
+                  <svg class="ico" style="width:14px;height:14px;color:var(--text3)"><use href="#ico-calendar"/></svg>
+                  <span class="kas-cf-title">Cash Flow — Periode</span>
+                </div>
+                <div class="kas-cf-filters">
+                  <select id="kasBulan" onchange="renderKas()">
+                    <option value="01">Januari</option><option value="02">Februari</option>
+                    <option value="03">Maret</option><option value="04">April</option>
+                    <option value="05">Mei</option><option value="06">Juni</option>
+                    <option value="07">Juli</option><option value="08">Agustus</option>
+                    <option value="09">September</option><option value="10">Oktober</option>
+                    <option value="11">November</option><option value="12">Desember</option>
+                  </select>
+                  <select id="kasTahun" onchange="renderKas()">
+                    <option value="2025">2025</option><option value="2026" selected>2026</option>
+                    <option value="2027">2027</option><option value="2028">2028</option>
+                    <option value="2029">2029</option><option value="2030">2030</option>
+                  </select>
+                </div>
+              </div>
+              <div id="kasCfBody">
+                <div class="kas-cf-row" style="align-items:center">
+                  <div class="kas-cf-row-icon" style="background:var(--bg2);color:var(--text3)">
+                    <svg class="ico" style="width:14px;height:14px"><use href="#ico-wallet"/></svg>
+                  </div>
+                  <span class="kas-cf-row-label">Saldo Awal</span>
+                  <span class="kas-cf-row-val" id="cf-saldo-awal" style="color:var(--text)">Rp0</span>
+                </div>
+                <div class="kas-cf-row">
+                  <div class="kas-cf-row-icon" style="background:var(--green-lt);color:var(--green)">
+                    <svg class="ico" style="width:14px;height:14px"><use href="#ico-trend-up"/></svg>
+                  </div>
+                  <span class="kas-cf-row-label">Total Pemasukan</span>
+                  <span class="kas-cf-row-val kas-masuk" id="cf-pemasukan">Rp0</span>
+                </div>
+                <div class="kas-cf-row">
+                  <div class="kas-cf-row-icon" style="background:var(--red-lt);color:var(--red)">
+                    <svg class="ico" style="width:14px;height:14px"><use href="#ico-trend-down"/></svg>
+                  </div>
+                  <span class="kas-cf-row-label">Total Pengeluaran</span>
+                  <span class="kas-cf-row-val kas-keluar" id="cf-pengeluaran">Rp0</span>
+                </div>
+                <div class="kas-cf-row">
+                  <div class="kas-cf-row-icon" style="background:var(--amber-lt);color:var(--amber)">
+                    <svg class="ico" style="width:14px;height:14px"><use href="#ico-clock"/></svg>
+                  </div>
+                  <span class="kas-cf-row-label">Selisih</span>
+                  <span class="kas-cf-row-val" id="cf-selisih">Rp0</span>
+                </div>
+                <div class="kas-cf-saldo-akhir">
+                  <span class="kas-cf-saldo-akhir-lbl">Saldo Akhir</span>
+                  <span class="kas-cf-saldo-akhir-val" id="cf-saldo-akhir">Rp0</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Donut Card -->
+            <div class="kas-donut-card">
+              <div class="kas-donut-ttl">Komposisi Periode</div>
+              <div id="kasDonutSvg" style="display:flex;justify-content:center;align-items:center;flex:1"></div>
+              <div id="kasDonutLegend"></div>
+            </div>
+
+          </div><!-- end kas-cf-donut-row -->
+
+          <!-- Line Chart Card (PC) -->
+          <div class="kas-line-card">
+            <div class="kas-line-hd">
+              <span class="kas-line-title">Tren Pemasukan &amp; Pengeluaran</span>
+              <span class="kas-line-yr" id="kasLineYear">—</span>
+              <div class="kas-line-legend">
+                <span class="kas-line-leg"><span class="kas-line-dot" style="background:#2e7d55"></span>Pemasukan</span>
+                <span class="kas-line-leg"><span class="kas-line-dot" style="background:#a83a33"></span>Pengeluaran</span>
+              </div>
+            </div>
+            <div class="kas-line-body"><div id="kasLineChart"></div></div>
+          </div>
+
+          <!-- Transaction Table -->
+          <div class="kas-tbl-card">
+            <div class="kas-tbl-hd">
+              <span class="kas-tbl-title" id="kasTblTitle">TRANSAKSI PERIODE</span>
+            </div>
+            <div class="scroll-x">
+              <table class="kas-table">
+                <thead>
+                  <tr>
+                    <th>Tanggal</th>
+                    <th>Keterangan</th>
+                    <th class="r">Masuk</th>
+                    <th class="r">Keluar</th>
+                    <th class="r">Saldo</th>
+                    <th style="text-align:center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="kasTblBody">
+                  <tr class="kas-tbl-saldo-awal-row" id="kasTblSaldoAwalRow">
+                    <td style="color:var(--text3);font-size:11px">—</td>
+                    <td style="font-style:italic;color:var(--text2);font-size:12px">Saldo Awal Periode</td>
+                    <td class="r">—</td>
+                    <td class="r">—</td>
+                    <td class="r kas-saldo-awal-val" id="kasTblSaldoAwalVal" style="font-weight:700;color:var(--amber)">Rp0</td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANGGOTA -->
+      <div class="pane" id="pc-anggota">
+        <div class="pc-topbar">
+          <span class="pc-topbar-title">Anggota</span>
+          <button class="btn-p tb-btn" onclick="openAddAnggotaPopup()">+ Tambah</button>
+        </div>
+        <div class="toolbar" style="flex-shrink:0">
+          <input id="srchA" placeholder="Cari nama..." style="flex:1" oninput="renderAnggota()"/>
+          <select id="srchFilterA" onchange="renderAnggota()" style="max-width:110px">
+            <option value="">Semua Status</option>
+            <option value="Aktif">Aktif</option>
+            <option value="Arsip">Arsip</option>
+          </select>
+        </div>
+        <div class="pane-body" id="anggotaList"></div>
+      </div>
+
+      <!-- LAINNYA -->
+      <div class="pane" id="pc-lainnya">
+        <div class="pc-topbar"><span class="pc-topbar-title">Lainnya</span></div>
+        <div class="pane-body" style="background:var(--bg2)">
+          <div class="lainnya-wrap">
+            <!-- Profile -->
+            <div class="menu-profile-card nd-card">
+              <div class="menu-profile">
+                <div class="menu-profile-av js-uinit">A</div>
+                <div class="menu-profile-info">
+                  <div class="menu-profile-name js-uname">Administrator</div>
+                  <div class="menu-profile-role js-urole"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Menu -->
+            <div class="menu-card nd-card">
+              <button class="menu-item" onclick="openActivityLog()">
+                <span class="menu-ic"><svg class="ico"><use href="#ico-clock"/></svg></span>
+                <span class="menu-info"><span class="menu-name">Log Aktivitas</span><span class="menu-sub">Riwayat aktivitas semua pengguna</span></span>
+                <span class="menu-arrow">›</span>
+              </button>
+              <button class="menu-item" onclick="goPc('anggota')">
+                <span class="menu-ic"><svg class="ico"><use href="#ico-users"/></svg></span>
+                <span class="menu-info"><span class="menu-name">Anggota</span><span class="menu-sub">Kelola data anggota &amp; arsip</span></span>
+                <span class="menu-arrow">›</span>
+              </button>
+              <button class="menu-item" onclick="goPc('ekspor')">
+                <span class="menu-ic"><svg class="ico"><use href="#ico-download"/></svg></span>
+                <span class="menu-info"><span class="menu-name">Ekspor</span><span class="menu-sub">Rekap, kas, dan anggota</span></span>
+                <span class="menu-arrow">›</span>
+              </button>
+              <button class="menu-item" onclick="goPc('tentang')">
+                <span class="menu-ic"><svg class="ico"><use href="#ico-info"/></svg></span>
+                <span class="menu-info"><span class="menu-name">Tentang Aplikasi</span><span class="menu-sub">Informasi aplikasi &amp; panduan penggunaan</span></span>
+                <span class="menu-arrow">›</span>
+              </button>
+              <button class="menu-item menu-item-danger" onclick="doLogout()">
+                <span class="menu-ic"><svg class="ico"><use href="#ico-logout"/></svg></span>
+                <span class="menu-info"><span class="menu-name">Logout</span><span class="menu-sub">Keluar dari aplikasi</span></span>
+                <span class="menu-arrow">›</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TENTANG APLIKASI -->
+      <div class="pane" id="pc-tentang">
+        <div class="pc-topbar">
+          <span class="pc-topbar-title">Tentang Aplikasi</span>
+          <button class="tb-btn" onclick="goPc('lainnya')">← Kembali</button>
+        </div>
+        <div class="pane-body" style="background:var(--bg2)">
+          <div class="tentang-wrap">
+
+            <!-- Header -->
+            <div class="tentang-hero">
+              <div class="tentang-hero-ic"><svg class="ico"><use href="#ico-info"/></svg></div>
+              <div class="tentang-hero-info">
+                <div class="tentang-hero-title">Tentang Aplikasi</div>
+                <div class="tentang-hero-sub">Informasi dan panduan penggunaan aplikasi</div>
+              </div>
+            </div>
+
+            <!-- Tentang -->
+            <div class="tentang-card">
+              <div class="tentang-card-hd">Tentang Aplikasi</div>
+              <p class="tentang-text">Aplikasi ini membantu pengelolaan data muda-mudi — mulai dari data anggota, absensi, kas, rekap kegiatan, hingga aktivitas pengguna, arsip data, dan ekspor data — dalam satu tempat yang rapi dan mudah diakses.</p>
+              <div class="tentang-points">
+                <span class="tentang-point"><svg class="ico"><use href="#ico-users"/></svg> Data anggota</span>
+                <span class="tentang-point"><svg class="ico"><use href="#ico-clipboard"/></svg> Absensi</span>
+                <span class="tentang-point"><svg class="ico"><use href="#ico-wallet"/></svg> Kas</span>
+                <span class="tentang-point"><svg class="ico"><use href="#ico-chart"/></svg> Rekap kegiatan</span>
+                <span class="tentang-point"><svg class="ico"><use href="#ico-clock"/></svg> Aktivitas pengguna</span>
+                <span class="tentang-point"><svg class="ico"><use href="#ico-db"/></svg> Arsip data</span>
+                <span class="tentang-point"><svg class="ico"><use href="#ico-download"/></svg> Ekspor data</span>
+              </div>
+            </div>
+
+            <!-- Fitur Utama -->
+            <div class="tentang-sec-title">Fitur Utama</div>
+            <div class="tentang-features">
+              <div class="tentang-feat nd-card">
+                <span class="tentang-feat-ic" style="background:var(--green-lt);color:var(--green)"><svg class="ico"><use href="#ico-clipboard"/></svg></span>
+                <span class="tentang-feat-name">Absensi</span>
+                <span class="tentang-feat-sub">Mencatat dan memantau kehadiran anggota.</span>
+              </div>
+              <div class="tentang-feat nd-card">
+                <span class="tentang-feat-ic" style="background:var(--gold-lt);color:var(--gold-dk)"><svg class="ico"><use href="#ico-wallet"/></svg></span>
+                <span class="tentang-feat-name">Kas</span>
+                <span class="tentang-feat-sub">Mengelola pemasukan, pengeluaran, dan saldo kas.</span>
+              </div>
+              <div class="tentang-feat nd-card">
+                <span class="tentang-feat-ic" style="background:var(--amber-lt);color:var(--amber)"><svg class="ico"><use href="#ico-users"/></svg></span>
+                <span class="tentang-feat-name">Anggota</span>
+                <span class="tentang-feat-sub">Mengelola data anggota aktif maupun arsip.</span>
+              </div>
+              <div class="tentang-feat nd-card">
+                <span class="tentang-feat-ic" style="background:var(--green-lt);color:var(--green)"><svg class="ico"><use href="#ico-chart"/></svg></span>
+                <span class="tentang-feat-name">Rekap</span>
+                <span class="tentang-feat-sub">Melihat ringkasan dan statistik data.</span>
+              </div>
+              <div class="tentang-feat nd-card">
+                <span class="tentang-feat-ic" style="background:var(--amber-lt);color:var(--amber)"><svg class="ico"><use href="#ico-clock"/></svg></span>
+                <span class="tentang-feat-name">Log Aktivitas</span>
+                <span class="tentang-feat-sub">Melihat riwayat aktivitas pengguna.</span>
+              </div>
+              <div class="tentang-feat nd-card">
+                <span class="tentang-feat-ic" style="background:var(--gold-lt);color:var(--gold-dk)"><svg class="ico"><use href="#ico-download"/></svg></span>
+                <span class="tentang-feat-name">Ekspor</span>
+                <span class="tentang-feat-sub">Mengunduh atau mengekspor data yang diperlukan.</span>
+              </div>
+            </div>
+
+            <!-- Cara Menggunakan -->
+            <div class="tentang-sec-title">Cara Menggunakan</div>
+            <div class="tentang-guide">
+
+              <div class="tentang-guide-card nd-card">
+                <div class="tentang-guide-hd">
+                  <span class="tentang-guide-ic" style="background:var(--green-lt);color:var(--green)"><svg class="ico"><use href="#ico-clipboard"/></svg></span>
+                  <span class="tentang-guide-name">Absensi</span>
+                </div>
+                <ol class="tentang-guide-list">
+                  <li>Buka menu <b>Absensi</b> → klik <b>Mulai Absensi</b>.</li>
+                  <li>Pilih <b>tanggal</b> dan isi <b>nama kegiatan</b> → klik <b>Tampilkan Daftar</b>.</li>
+                  <li>Isi status tiap anggota dengan menekan tombol status (<b>Hadir / Izin / Alfa</b>).</li>
+                  <li>Mau isi banyak sekaligus? <b>Tahan nama anggota</b> hingga muncul mode pilih banyak, centang nama-namanya, lalu pilih statusnya.</li>
+                  <li>Setelah selesai, klik <b>Selesai &amp; Simpan</b>.</li>
+                  <li>Mengubah/mengisi ulang: <b>klik kegiatan</b> di daftar <b>Riwayat Sesi</b>. Menghapus sesi: <b>geser ke kiri</b> pada kegiatannya.</li>
+                </ol>
+              </div>
+
+              <div class="tentang-guide-card nd-card">
+                <div class="tentang-guide-hd">
+                  <span class="tentang-guide-ic" style="background:var(--gold-lt);color:var(--gold-dk)"><svg class="ico"><use href="#ico-wallet"/></svg></span>
+                  <span class="tentang-guide-name">Kas</span>
+                </div>
+                <ol class="tentang-guide-list">
+                  <li>Buka menu <b>Kas</b> → klik <b>+ Tambah Transaksi</b>.</li>
+                  <li>Isi <b>nominal</b>, pilih jenis <b>Masuk / Keluar</b>, isi <b>keterangan</b>, dan tentukan <b>tanggal</b>.</li>
+                  <li>Simpan transaksi.</li>
+                  <li>Mengubah transaksi: <b>klik</b> transaksinya. Menghapus: <b>geser ke kiri</b> pada transaksinya.</li>
+                </ol>
+              </div>
+
+              <div class="tentang-guide-card nd-card">
+                <div class="tentang-guide-hd">
+                  <span class="tentang-guide-ic" style="background:var(--amber-lt);color:var(--amber)"><svg class="ico"><use href="#ico-download"/></svg></span>
+                  <span class="tentang-guide-name">Ekspor</span>
+                </div>
+                <ol class="tentang-guide-list">
+                  <li>Buka menu <b>Ekspor</b>.</li>
+                  <li>Pilih data yang mau diambil: <b>Rekap Absensi Bulanan</b>, <b>Laporan Kas</b>, atau <b>Data Anggota</b>.</li>
+                  <li>Atur <b>bulan / tahun</b> (dan jenis kelamin bila perlu), lalu pilih format: <b>Excel</b>, <b>CSV</b>, atau <b>Print</b>.</li>
+                  <li>Hasil <b>Print</b> dibuka sebagai dokumen A4 landscape yang siap dicetak.</li>
+                </ol>
+              </div>
+
+            </div>
+
+            <!-- Footer -->
+            <div class="tentang-foot">Dibuat untuk membantu pengelolaan data secara lebih mudah, cepat, dan terorganisir.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EKSPOR -->
+      <div class="pane" id="pc-ekspor">
+        <div class="pc-topbar"><span class="pc-topbar-title">Ekspor</span></div>
+        <div class="pane-body" style="background:var(--bg2)">
+          <div class="exp-page-wrap">
+            <div class="nd-card exp-card">
+              <div class="exp-card-hd">Rekap Absensi Bulanan</div>
+              <div class="exp-card-body">
+                <div class="exp-filters">
+                  <select id="exRekapBulan">
+                    <option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option>
+                    <option value="4">April</option><option value="5">Mei</option><option value="6">Juni</option>
+                    <option value="7">Juli</option><option value="8">Agustus</option><option value="9">September</option>
+                    <option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
+                  </select>
+                  <select id="exRekapTahun">
+                    <option value="2026" selected>2026</option><option value="2027">2027</option>
+                    <option value="2028">2028</option><option value="2029">2029</option><option value="2030">2030</option>
+                  </select>
+                  <select id="exRekapGender" style="max-width:120px">
+                    <option value="S">Semua</option><option value="P">Perempuan</option><option value="L">Laki-laki</option>
+                  </select>
+                </div>
+                <div class="exp-actions">
+                  <button onclick="eksporRekap('excel')"><span>📊</span> Excel</button>
+                  <button onclick="eksporRekap('csv')"><span>📄</span> CSV</button>
+                  <button onclick="eksporRekap('print')"><span>🖨</span> Print</button>
+                </div>
+              </div>
+            </div>
+            <div class="nd-card exp-card">
+              <div class="exp-card-hd">Laporan Kas</div>
+              <div class="exp-card-body">
+                <div class="exp-filters">
+                  <select id="exKasBulan">
+                    <option value="01">Januari</option><option value="02">Februari</option>
+                    <option value="03">Maret</option><option value="04">April</option>
+                    <option value="05">Mei</option><option value="06">Juni</option>
+                    <option value="07">Juli</option><option value="08">Agustus</option>
+                    <option value="09">September</option><option value="10">Oktober</option>
+                    <option value="11">November</option><option value="12">Desember</option>
+                  </select>
+                  <select id="exKasTahun">
+                    <option value="2025">2025</option><option value="2026" selected>2026</option>
+                    <option value="2027">2027</option><option value="2028">2028</option>
+                    <option value="2029">2029</option><option value="2030">2030</option>
+                  </select>
+                </div>
+                <div class="exp-actions">
+                  <button onclick="eksporKas('excel')"><span>📊</span> Excel</button>
+                  <button onclick="eksporKas('csv')"><span>📄</span> CSV</button>
+                  <button onclick="eksporKas('print')"><span>🖨</span> Print</button>
+                </div>
+              </div>
+            </div>
+            <div class="nd-card exp-card">
+              <div class="exp-card-hd">Data Anggota</div>
+              <div class="exp-card-body">
+                <p class="exp-note">Pilih anggota yang ingin diekspor (Excel / CSV / Print ZIP-PDF). Ekspor satu anggota tersedia di halaman detail anggota.</p>
+                <button class="btn-p" onclick="openExpAng()" style="align-self:flex-start"><span>👥</span> Pilih Anggota &amp; Ekspor</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MOBILE -->
+  <div class="mob-shell mob-only">
+
+    <!-- HOME -->
+    <div class="mob-page on" id="mob-home" style="overflow-y:auto;background:var(--bg2);overscroll-behavior:none">
+<div class="ndash-mob-wrap">
+        <!-- Eyebrow -->
+        <div class="dash-eyebrow">
+          <span class="dash-eyebrow-label">Dashboard</span>
+        </div>
+        <!-- Welcome -->
+        <div class="welcome-card welcome-card-mob welcome-card-home">
+          <div class="welcome-inner">
+            <div class="welcome-greet"><span id="dash-welcome-emoji-mob">☀️</span> <span id="dash-welcome-greet-mob">Selamat Pagi</span>, MinKel</div>
+            <div class="welcome-title">Database Muda-Mudi Margosari</div>
+            <div class="welcome-date">📅 <span class="js-date"></span></div>
+          </div>
+          <div class="welcome-home-badge" aria-hidden="true">🕌</div>
+        </div>
+
+        <!-- Stat Cards 2x2 -->
+        <div class="sec-lbl-row"><span class="sec-lbl">Ringkasan Bulan Ini</span></div>
+        <div class="ndash-mob-stats">
+          <div class="nstat-card">
+            <div class="nstat-icon" style="background:var(--gold-xlt);color:var(--gold-dk)">
+              <svg class="ico" style="width:20px;height:20px"><use href="#ico-users"/></svg>
+            </div>
+            <div class="nstat-info">
+              <div class="nstat-val" id="dash-generus-mob">—</div>
+              <div class="nstat-lbl">Total Generus</div>
+              <div class="nstat-sub">Anggota</div>
+            </div>
+          </div>
+          <div class="nstat-card">
+            <div class="nstat-icon" style="background:var(--green-lt);color:var(--green)">
+              <svg class="ico" style="width:20px;height:20px"><use href="#ico-clipboard"/></svg>
+            </div>
+            <div class="nstat-info">
+              <div class="nstat-val" id="dash-kegiatan-mob">—</div>
+              <div class="nstat-lbl">Kegiatan Bulan Ini</div>
+              <div class="nstat-sub">Sesi</div>
+            </div>
+          </div>
+          <div class="nstat-card">
+            <div class="nstat-icon" style="background:var(--amber-lt);color:var(--amber)">
+              <svg class="ico" style="width:20px;height:20px"><use href="#ico-chart"/></svg>
+            </div>
+            <div class="nstat-info">
+              <div class="nstat-val" id="dash-persen-mob">—</div>
+              <div class="nstat-lbl">Kehadiran Bulan Ini</div>
+              <div class="nstat-sub">Persentase</div>
+            </div>
+          </div>
+          <div class="nstat-card">
+            <div class="nstat-icon" style="background:var(--green-lt);color:var(--green)">
+              <svg class="ico" style="width:20px;height:20px"><use href="#ico-check"/></svg>
+            </div>
+            <div class="nstat-info">
+              <div class="nstat-val" id="dash-hadir-mob">—</div>
+              <div class="nstat-lbl">Total Berangkat</div>
+              <div class="nstat-sub">Orang-sesi</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="ndash-mob-card">
+          <div class="ndash-sec-hd">
+            <span>Grafik Kehadiran (Bulan Ini)</span>
+          </div>
+          <div class="ndash-mob-legend">
+            <span class="nleg-dot" style="background:#2e7d55"></span>Hadir
+            <span class="nleg-dot" style="background:#b07b1f;margin-left:8px"></span>Izin
+            <span class="nleg-dot" style="background:#a83a33;margin-left:8px"></span>Alpa
+          </div>
+          <div id="dash-chart-mob" class="ndash-chart-wrap"></div>
+        </div>
+
+        <!-- Recent Sessions -->
+        <div class="ndash-mob-card">
+          <div class="ndash-sec-hd">
+            <span>Kegiatan Terbaru</span>
+            <button onclick="goMob('absen')" class="ndash-see-all">Lihat Semua</button>
+          </div>
+          <div id="dash-recent-mob"></div>
+        </div>
+
+        <!-- Ringkasan Kas -->
+        <div class="ndash-mob-card">
+          <div class="ndash-sec-hd">
+            <span>Ringkasan Kas</span>
+            <button onclick="goMob('kas')" class="ndash-see-all">Lihat Kas</button>
+          </div>
+          <div id="dash-kas-mob"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABSENSI LIST -->
+    <div class="mob-page" id="mob-absen" style="overflow:hidden">
+      <div class="mob-pg-hd" style="flex-shrink:0">
+        <h3>Absensi</h3>
+      </div>
+      <div class="mob-scroll" style="background:var(--bg2)">
+        <!-- STAGE 1: Hero -->
+        <div id="mob-stage-hero">
+          <div class="welcome-card welcome-card-mob welcome-card-absen-hero" style="margin:12px">
+            <div class="welcome-inner">
+              <div class="welcome-greet">Mulai Absensi <span class="w-greet-emoji">✍️</span></div>
+              <div class="welcome-title">Pilih tanggal &amp; nama kegiatan</div>
+              <div class="welcome-date">📅 <span class="js-date"></span></div>
+              <div class="welcome-actions">
+                <button class="w-btn w-btn-solid" onclick="showMobAbsenMain()">Mulai Absensi →</button>
+              </div>
+            </div>
+            <div class="welcome-bg absen-art">
+              <svg><use href="#ico-absen-art"/></svg>
+            </div>
+          </div>
+<div class="sec-lbl-row sesi-filter-toggle" style="margin:4px 16px 0" onclick="toggleSesiFilter('mob')">
+            <span class="sec-lbl">Riwayat Sesi</span>
+            <span class="sesi-filter-arrow" id="sesiFilterArrowM">▾</span>
+          </div>
+          <div id="sesiFilterRowM" class="sesi-filter-row" style="display:none">
+            <div class="toolbar" style="flex-wrap:wrap;gap:8px;margin:10px 12px 0">
+              <input id="dbSearchM" placeholder="🔍 Cari kegiatan..." style="flex:1;min-width:120px" oninput="renderDbMob()"/>
+              <select id="dbFilterBulanM" onchange="renderDbMob()" style="min-width:100px">
+                <option value="">Semua Bulan</option>
+                <option value="01">Januari</option><option value="02">Februari</option>
+                <option value="03">Maret</option><option value="04">April</option>
+                <option value="05">Mei</option><option value="06">Juni</option>
+                <option value="07">Juli</option><option value="08">Agustus</option>
+                <option value="09">September</option><option value="10">Oktober</option>
+                <option value="11">November</option><option value="12">Desember</option>
+              </select>
+              <select id="dbFilterTahunM" onchange="renderDbMob()" style="min-width:75px">
+                <option value="">Semua Tahun</option>
+                <option value="2026">2026</option><option value="2027">2027</option>
+                <option value="2028">2028</option><option value="2029">2029</option>
+                <option value="2030">2030</option>
+              </select>
+              <select id="dbSortM" onchange="renderDbMob()" style="min-width:105px">
+                <option value="desc">Terbaru Dulu</option>
+                <option value="asc">Terlama Dulu</option>
+              </select>
+            </div>
+          </div>
+          <div class="nd-card db-card" style="margin:12px"><div id="dbListM"><div class="empty">Belum ada sesi.</div></div></div>
+        </div>
+
+        <!-- STAGE 2: pilih tanggal + nama kegiatan saja -->
+        <div id="mob-stage-main" style="display:none">
+          <button class="stage-back" onclick="showMobAbsenHero()">← Kembali</button>
+          <div class="absen-newbox nd-card" id="absen-newbox-mob" style="margin:6px 12px 0">
+            <div class="absen-newbox-hd">
+              <span>Mulai Absensi Baru</span>
+              <span class="absen-newbox-ic"><svg class="ico" style="width:14px;height:14px"><use href="#ico-calendar"/></svg></span>
+            </div>
+            <div class="absen-newbox-form absen-newbox-form-col">
+              <div class="fr" style="margin:0"><label>Tanggal Kegiatan</label><input type="date" id="sTglM"/></div>
+              <div class="fr" style="margin:0"><label>Nama Kegiatan</label><input type="text" id="sKetM" placeholder="cth: Pengajian Rutin..." onkeydown="if(event.key==='Enter')mulaiAbsensi(true)"/></div>
+              <button class="btn-p" onclick="mulaiAbsensi(true)" style="padding:11px;width:100%">Tampilkan Daftar →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABSENSI PAGE (isi absensi) -->
+    <div class="mob-page" id="mob-absen-page" style="overflow:hidden">
+      <div class="mob-pg-hd" style="flex-shrink:0">
+        <button class="mob-back" onclick="goMob('absen')"><svg class="ico"><use href="#ico-arrow-left"/></svg></button>
+        <h3 id="mob-absen-title">Absensi</h3>
+      </div>
+      <div style="padding:8px 14px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text2);background:var(--bg2);flex-shrink:0;display:flex;align-items:center;gap:8px">
+        <span id="mob-absen-date" onclick="openEditSesiPopup()" title="Klik untuk edit tanggal/kegiatan" style="flex:1;cursor:pointer"></span>
+      </div>
+      <div id="mob-bulk-bar" style="display:none;padding:6px 12px;border-bottom:1px solid var(--border);background:var(--gold-xlt);flex-shrink:0;align-items:center;gap:6px;flex-wrap:wrap">
+        <span id="mob-bulk-count" style="font-size:11px;font-weight:600;color:var(--gold-dk);flex-basis:100%">0 dipilih</span>
+        <button onclick="applyBulkStatus('H')" class="btn-p" style="background:var(--green);padding:6px 8px;font-size:11px;flex:1">✓ Hadir</button>
+        <button onclick="applyBulkStatus('I')" class="btn-p" style="background:var(--amber);padding:6px 8px;font-size:11px;flex:1">? Izin</button>
+        <button onclick="applyBulkStatus('A')" class="btn-p" style="background:var(--red);padding:6px 8px;font-size:11px;flex:1">✕ Alfa</button>
+        <button class="btn-sec" onclick="toggleBulkMode()" style="padding:6px 8px;font-size:11px;flex-basis:100%">Batal</button>
+      </div>
+      <div class="counter-bar" id="mob-absen-ctr" style="flex-shrink:0"></div>
+      <div style="padding:8px 12px;border-bottom:1px solid var(--border);background:var(--bg2);flex-shrink:0">
+        <div class="seg">
+          <button class="seg-btn mseg on" id="mseg-S" onclick="setAbsenGender('S')">Semua</button>
+          <button class="seg-btn mseg" id="mseg-P" onclick="setAbsenGender('P')">Perempuan</button>
+          <button class="seg-btn mseg" id="mseg-L" onclick="setAbsenGender('L')">Laki-laki</button>
+        </div>
+      </div>
+      <div id="mob-absen-list" class="mob-scroll"></div>
+      <div class="selesai-bar" style="flex-shrink:0">
+        <div class="selesai-bar-info" id="mob-selesai-info"></div>
+        <button class="btn-p" onclick="selesaiAbsensiMob()" style="padding:9px 18px;font-size:13px">✓ Selesai</button>
+      </div>
+    </div>
+
+    <!-- REKAP -->
+    <div class="mob-page" id="mob-rekap" style="overflow:hidden">
+      <div class="mob-pg-hd" style="flex-shrink:0">
+        <h3>Rekap</h3>
+      </div>
+      <div class="sec-lbl-row sesi-filter-toggle" style="margin:12px 16px 0;flex-shrink:0" onclick="toggleRekapFilter('mob')">
+        <span class="sec-lbl">Filter &amp; Urutan</span>
+        <span class="sesi-filter-arrow" id="rekapFilterArrowM">▾</span>
+      </div>
+      <div id="rekapFilterRowM" class="sesi-filter-row" style="display:none">
+        <div class="toolbar" style="flex-wrap:wrap;gap:8px;margin:10px 16px 0">
+          <select id="rBulanM" onchange="renderRekap('mob')">
+            <option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option>
+            <option value="4">April</option><option value="5">Mei</option><option value="6">Juni</option>
+            <option value="7">Juli</option><option value="8">Agustus</option><option value="9">September</option>
+            <option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
+          </select>
+          <select id="rTahunM" onchange="renderRekap('mob')">
+            <option value="2026" selected>2026</option><option value="2027">2027</option>
+            <option value="2028">2028</option><option value="2029">2029</option><option value="2030">2030</option>
+          </select>
+          <select id="rGenderM" onchange="renderRekap('mob')" style="max-width:100px">
+            <option value="S">Semua</option><option value="P">Perempuan</option><option value="L">Laki-laki</option>
+          </select>
+          <select id="rSortM" onchange="renderRekap('mob')" style="max-width:130px">
+            <option value="asc">Terlama Dulu</option>
+            <option value="desc">Terbaru Dulu</option>
+          </select>
+        </div>
+      </div>
+<div class="mob-scroll">
+        <div id="rekapStatsM"></div>
+        <div class="rekap-tbl-wrap"><div class="scroll-x rekap-tbl"><table><thead id="theadRekapM"></thead><tbody id="tbodyRekapM"></tbody></table></div><div class="rekap-tbl-fade">⇠ geser untuk lihat kolom lainnya</div></div>
+        <div id="izinSheetM"></div>
+      </div>
+    </div>
+
+    <!-- LAINNYA -->
+    <div class="mob-page" id="mob-lainnya" style="overflow:hidden">
+      <div class="mob-pg-hd" style="flex-shrink:0">
+        <h3>Lainnya</h3>
+      </div>
+      <div class="mob-scroll" style="background:var(--bg2)">
+        <div class="lainnya-wrap">
+          <!-- Profile -->
+          <div class="menu-profile-card nd-card">
+            <div class="menu-profile">
+              <div class="menu-profile-av js-uinit">A</div>
+              <div class="menu-profile-info">
+                <div class="menu-profile-name js-uname">Administrator</div>
+                <div class="menu-profile-role js-urole"></div>
+              </div>
+              <span id="mob-sync-badge" class="sync-badge sync-ok">🟢 Online</span>
+            </div>
+          </div>
+
+          <!-- Menu -->
+          <div class="menu-card nd-card">
+            <button class="menu-item" onclick="openActivityLog()">
+              <span class="menu-ic"><svg class="ico"><use href="#ico-clock"/></svg></span>
+              <span class="menu-info"><span class="menu-name">Log Aktivitas</span><span class="menu-sub">Riwayat aktivitas semua pengguna</span></span>
+              <span class="menu-arrow">›</span>
+            </button>
+            <button class="menu-item" onclick="goMob('anggota')">
+              <span class="menu-ic"><svg class="ico"><use href="#ico-users"/></svg></span>
+              <span class="menu-info"><span class="menu-name">Anggota</span><span class="menu-sub">Kelola data anggota &amp; arsip</span></span>
+              <span class="menu-arrow">›</span>
+            </button>
+            <button class="menu-item" onclick="goMob('ekspor')">
+              <span class="menu-ic"><svg class="ico"><use href="#ico-download"/></svg></span>
+              <span class="menu-info"><span class="menu-name">Ekspor</span><span class="menu-sub">Rekap, kas, dan anggota</span></span>
+              <span class="menu-arrow">›</span>
+            </button>
+            <button class="menu-item" onclick="goMob('tentang')">
+              <span class="menu-ic"><svg class="ico"><use href="#ico-info"/></svg></span>
+              <span class="menu-info"><span class="menu-name">Tentang Aplikasi</span><span class="menu-sub">Informasi aplikasi &amp; panduan penggunaan</span></span>
+              <span class="menu-arrow">›</span>
+            </button>
+            <button class="menu-item menu-item-danger" onclick="doLogout()">
+              <span class="menu-ic"><svg class="ico"><use href="#ico-logout"/></svg></span>
+              <span class="menu-info"><span class="menu-name">Logout</span><span class="menu-sub">Keluar dari aplikasi</span></span>
+              <span class="menu-arrow">›</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TENTANG APLIKASI -->
+    <div class="mob-page" id="mob-tentang" style="overflow:hidden">
+      <div class="mob-pg-hd" style="flex-shrink:0">
+        <button class="mob-back" onclick="goMob('lainnya')"><svg class="ico"><use href="#ico-arrow-left"/></svg></button>
+        <h3>Tentang Aplikasi</h3>
+      </div>
+      <div class="mob-scroll" style="background:var(--bg2)">
+        <div class="tentang-wrap">
+
+          <!-- Header -->
+          <div class="tentang-hero">
+            <div class="tentang-hero-ic"><svg class="ico"><use href="#ico-info"/></svg></div>
+            <div class="tentang-hero-info">
+              <div class="tentang-hero-title">Tentang Aplikasi</div>
+              <div class="tentang-hero-sub">Informasi dan panduan penggunaan aplikasi</div>
+            </div>
+          </div>
+
+          <!-- Tentang -->
+          <div class="tentang-card">
+            <div class="tentang-card-hd">Tentang Aplikasi</div>
+            <p class="tentang-text">Aplikasi ini membantu pengelolaan data muda-mudi — mulai dari data anggota, absensi, kas, rekap kegiatan, hingga aktivitas pengguna, arsip data, dan ekspor data — dalam satu tempat yang rapi dan mudah diakses.</p>
+            <div class="tentang-points">
+              <span class="tentang-point"><svg class="ico"><use href="#ico-users"/></svg> Data anggota</span>
+              <span class="tentang-point"><svg class="ico"><use href="#ico-clipboard"/></svg> Absensi</span>
+              <span class="tentang-point"><svg class="ico"><use href="#ico-wallet"/></svg> Kas</span>
+              <span class="tentang-point"><svg class="ico"><use href="#ico-chart"/></svg> Rekap kegiatan</span>
+              <span class="tentang-point"><svg class="ico"><use href="#ico-clock"/></svg> Aktivitas pengguna</span>
+              <span class="tentang-point"><svg class="ico"><use href="#ico-db"/></svg> Arsip data</span>
+              <span class="tentang-point"><svg class="ico"><use href="#ico-download"/></svg> Ekspor data</span>
+            </div>
+          </div>
+
+          <!-- Fitur Utama -->
+          <div class="tentang-sec-title">Fitur Utama</div>
+          <div class="tentang-features">
+            <div class="tentang-feat nd-card">
+              <span class="tentang-feat-ic" style="background:var(--green-lt);color:var(--green)"><svg class="ico"><use href="#ico-clipboard"/></svg></span>
+              <span class="tentang-feat-name">Absensi</span>
+              <span class="tentang-feat-sub">Mencatat dan memantau kehadiran anggota.</span>
+            </div>
+            <div class="tentang-feat nd-card">
+              <span class="tentang-feat-ic" style="background:var(--gold-lt);color:var(--gold-dk)"><svg class="ico"><use href="#ico-wallet"/></svg></span>
+              <span class="tentang-feat-name">Kas</span>
+              <span class="tentang-feat-sub">Mengelola pemasukan, pengeluaran, dan saldo kas.</span>
+            </div>
+            <div class="tentang-feat nd-card">
+              <span class="tentang-feat-ic" style="background:var(--amber-lt);color:var(--amber)"><svg class="ico"><use href="#ico-users"/></svg></span>
+              <span class="tentang-feat-name">Anggota</span>
+              <span class="tentang-feat-sub">Mengelola data anggota aktif maupun arsip.</span>
+            </div>
+            <div class="tentang-feat nd-card">
+              <span class="tentang-feat-ic" style="background:var(--green-lt);color:var(--green)"><svg class="ico"><use href="#ico-chart"/></svg></span>
+              <span class="tentang-feat-name">Rekap</span>
+              <span class="tentang-feat-sub">Melihat ringkasan dan statistik data.</span>
+            </div>
+            <div class="tentang-feat nd-card">
+              <span class="tentang-feat-ic" style="background:var(--amber-lt);color:var(--amber)"><svg class="ico"><use href="#ico-clock"/></svg></span>
+              <span class="tentang-feat-name">Log Aktivitas</span>
+              <span class="tentang-feat-sub">Melihat riwayat aktivitas pengguna.</span>
+            </div>
+            <div class="tentang-feat nd-card">
+              <span class="tentang-feat-ic" style="background:var(--gold-lt);color:var(--gold-dk)"><svg class="ico"><use href="#ico-download"/></svg></span>
+              <span class="tentang-feat-name">Ekspor</span>
+              <span class="tentang-feat-sub">Mengunduh atau mengekspor data yang diperlukan.</span>
+            </div>
+          </div>
+
+          <!-- Cara Menggunakan -->
+          <div class="tentang-sec-title">Cara Menggunakan</div>
+          <div class="tentang-guide">
+
+            <div class="tentang-guide-card nd-card">
+              <div class="tentang-guide-hd">
+                <span class="tentang-guide-ic" style="background:var(--green-lt);color:var(--green)"><svg class="ico"><use href="#ico-clipboard"/></svg></span>
+                <span class="tentang-guide-name">Absensi</span>
+              </div>
+              <ol class="tentang-guide-list">
+                <li>Buka menu <b>Absensi</b> → klik <b>Mulai Absensi</b>.</li>
+                <li>Pilih <b>tanggal</b> dan isi <b>nama kegiatan</b> → klik <b>Tampilkan Daftar</b>.</li>
+                <li>Isi status tiap anggota dengan menekan tombol status (<b>Hadir / Izin / Alfa</b>).</li>
+                <li>Mau isi banyak sekaligus? <b>Tahan nama anggota</b> hingga muncul mode pilih banyak, centang nama-namanya, lalu pilih statusnya.</li>
+                <li>Setelah selesai, klik <b>Selesai &amp; Simpan</b>.</li>
+                <li>Mengubah/mengisi ulang: <b>klik kegiatan</b> di daftar <b>Riwayat Sesi</b>. Menghapus sesi: <b>geser ke kiri</b> pada kegiatannya.</li>
+              </ol>
+            </div>
+
+            <div class="tentang-guide-card nd-card">
+              <div class="tentang-guide-hd">
+                <span class="tentang-guide-ic" style="background:var(--gold-lt);color:var(--gold-dk)"><svg class="ico"><use href="#ico-wallet"/></svg></span>
+                <span class="tentang-guide-name">Kas</span>
+              </div>
+              <ol class="tentang-guide-list">
+                <li>Buka menu <b>Kas</b> → klik <b>+ Tambah Transaksi</b>.</li>
+                <li>Isi <b>nominal</b>, pilih jenis <b>Masuk / Keluar</b>, isi <b>keterangan</b>, dan tentukan <b>tanggal</b>.</li>
+                <li>Simpan transaksi.</li>
+                <li>Mengubah transaksi: <b>klik</b> transaksinya. Menghapus: <b>geser ke kiri</b> pada transaksinya.</li>
+              </ol>
+            </div>
+
+            <div class="tentang-guide-card nd-card">
+              <div class="tentang-guide-hd">
+                <span class="tentang-guide-ic" style="background:var(--amber-lt);color:var(--amber)"><svg class="ico"><use href="#ico-download"/></svg></span>
+                <span class="tentang-guide-name">Ekspor</span>
+              </div>
+              <ol class="tentang-guide-list">
+                <li>Buka menu <b>Ekspor</b>.</li>
+                <li>Pilih data yang mau diambil: <b>Rekap Absensi Bulanan</b>, <b>Laporan Kas</b>, atau <b>Data Anggota</b>.</li>
+                <li>Atur <b>bulan / tahun</b> (dan jenis kelamin bila perlu), lalu pilih format: <b>Excel</b>, <b>CSV</b>, atau <b>Print</b>.</li>
+                <li>Hasil <b>Print</b> dibuka sebagai dokumen A4 landscape yang siap dicetak.</li>
+              </ol>
+            </div>
+
+          </div>
+
+          <!-- Footer -->
+          <div class="tentang-foot">Dibuat untuk membantu pengelolaan data secara lebih mudah, cepat, dan terorganisir.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EKSPOR -->
+    <div class="mob-page" id="mob-ekspor" style="overflow:hidden">
+      <div class="mob-pg-hd" style="flex-shrink:0">
+        <button class="mob-back" onclick="goMob('lainnya')"><svg class="ico"><use href="#ico-arrow-left"/></svg></button>
+        <h3>Ekspor</h3>
+      </div>
+      <div class="mob-scroll" style="background:var(--bg2)">
+        <div class="exp-page-wrap">
+          <div class="nd-card exp-card">
+            <div class="exp-card-hd">Rekap Absensi Bulanan</div>
+            <div class="exp-card-body">
+              <div class="exp-filters">
+                <select id="exRekapBulanM">
+                  <option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option>
+                  <option value="4">April</option><option value="5">Mei</option><option value="6">Juni</option>
+                  <option value="7">Juli</option><option value="8">Agustus</option><option value="9">September</option>
+                  <option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
+                </select>
+                <select id="exRekapTahunM">
+                  <option value="2026" selected>2026</option><option value="2027">2027</option>
+                  <option value="2028">2028</option><option value="2029">2029</option><option value="2030">2030</option>
+                </select>
+                <select id="exRekapGenderM" style="max-width:110px">
+                  <option value="S">Semua</option><option value="P">Perempuan</option><option value="L">Laki-laki</option>
+                </select>
+              </div>
+              <div class="exp-actions">
+                <button onclick="eksporRekap('excel')"><span>📊</span> Excel</button>
+                <button onclick="eksporRekap('csv')"><span>📄</span> CSV</button>
+                <button onclick="eksporRekap('print')"><span>🖨</span> Print</button>
+              </div>
+            </div>
+          </div>
+          <div class="nd-card exp-card">
+            <div class="exp-card-hd">Laporan Kas</div>
+            <div class="exp-card-body">
+              <div class="exp-filters">
+                <select id="exKasBulanM">
+                  <option value="01">Januari</option><option value="02">Februari</option>
+                  <option value="03">Maret</option><option value="04">April</option>
+                  <option value="05">Mei</option><option value="06">Juni</option>
+                  <option value="07">Juli</option><option value="08">Agustus</option>
+                  <option value="09">September</option><option value="10">Oktober</option>
+                  <option value="11">November</option><option value="12">Desember</option>
+                </select>
+                <select id="exKasTahunM">
+                  <option value="2025">2025</option><option value="2026" selected>2026</option>
+                  <option value="2027">2027</option><option value="2028">2028</option>
+                  <option value="2029">2029</option><option value="2030">2030</option>
+                </select>
+              </div>
+              <div class="exp-actions">
+                <button onclick="eksporKas('excel')"><span>📊</span> Excel</button>
+                <button onclick="eksporKas('csv')"><span>📄</span> CSV</button>
+                <button onclick="eksporKas('print')"><span>🖨</span> Print</button>
+              </div>
+            </div>
+          </div>
+          <div class="nd-card exp-card">
+            <div class="exp-card-hd">Data Anggota</div>
+            <div class="exp-card-body">
+              <p class="exp-note">Pilih anggota yang ingin diekspor (Excel / CSV / Print ZIP-PDF).</p>
+              <button class="btn-p" onclick="openExpAng()" style="align-self:flex-start"><span>👥</span> Pilih Anggota &amp; Ekspor</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANGGOTA -->
+    <div class="mob-page" id="mob-anggota" style="overflow:hidden">
+      <div class="mob-pg-hd" style="flex-shrink:0">
+        <button class="mob-back" onclick="goMob('lainnya')"><svg class="ico"><use href="#ico-arrow-left"/></svg></button>
+        <h3>Anggota</h3>
+        <button class="btn-p" onclick="openAddAnggotaPopup()" style="margin-left:4px;padding:5px 10px;font-size:12px">+ Tambah</button>
+      </div>
+      <div class="toolbar" style="flex-shrink:0">
+        <input id="srchAM" placeholder="Cari nama..." style="flex:1" oninput="renderAnggotaMob()"/>
+        <select id="srchFilterAM" onchange="renderAnggotaMob()" style="max-width:100px">
+          <option value="">Semua Status</option>
+          <option value="Aktif">Aktif</option>
+          <option value="Arsip">Arsip</option>
+        </select>
+      </div>
+      <div id="anggotaListM" class="mob-scroll"></div>
+    </div>
+
+    <!-- KAS MOBILE -->
+    <div class="mob-page" id="mob-kas" style="overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:none">
+      <div class="mob-pg-hd" style="flex-shrink:0">
+        <h3>Kas</h3>
+      </div>
+      <!-- Hidden mobile stat IDs -->
+      <span id="mks-saldo" style="display:none"></span><span id="mks-masuk" style="display:none"></span><span id="mks-keluar" style="display:none"></span><span id="mks-selisih" style="display:none"></span><span id="mks-masuk-sub" style="display:none"></span><span id="mks-keluar-sub" style="display:none"></span><span id="mks-selisih-sub" style="display:none"></span>
+      <!-- Welcome -->
+      <div class="welcome-card welcome-card-mob welcome-card-kas" style="margin:12px 14px 0">
+        <div class="welcome-inner">
+          <div class="welcome-greet">Kelola Kas <span class="w-greet-emoji">🪙</span></div>
+          <div class="welcome-title">Catat pemasukan &amp; pengeluaran</div>
+          <div class="welcome-date">📅 <span class="js-date"></span></div>
+          <div class="welcome-actions">
+            <button class="w-btn w-btn-solid" onclick="openKasTambah()">+ Tambah Transaksi</button>
+          </div>
+        </div>
+        <div class="welcome-home-badge" aria-hidden="true">💰</div>
+      </div>
+      <!-- Cash Flow card -->
+      <div class="kas-mob-cf" style="margin:12px 14px 0">
+        <div class="kas-cf-hd" style="flex-wrap:wrap;gap:8px">
+          <span class="kas-cf-title" style="width:100%">Cash Flow — Periode</span>
+          <div class="kas-cf-filters" style="flex-wrap:wrap">
+            <select id="kasBulanM" onchange="renderKas()" style="font-size:11px;padding:5px 8px;min-width:90px">
+              <option value="01">Januari</option><option value="02">Februari</option>
+              <option value="03">Maret</option><option value="04">April</option>
+              <option value="05">Mei</option><option value="06">Juni</option>
+              <option value="07">Juli</option><option value="08">Agustus</option>
+              <option value="09">September</option><option value="10">Oktober</option>
+              <option value="11">November</option><option value="12">Desember</option>
+            </select>
+            <select id="kasTahunM" onchange="renderKas()" style="font-size:11px;padding:5px 8px;min-width:75px">
+              <option value="2025">2025</option><option value="2026" selected>2026</option>
+              <option value="2027">2027</option><option value="2028">2028</option>
+              <option value="2029">2029</option><option value="2030">2030</option>
+            </select>
+          </div>
+        </div>
+        <div class="kas-cf-row" style="align-items:center">
+          <div class="kas-cf-row-icon" style="background:var(--bg2);color:var(--text3)">
+            <svg class="ico" style="width:13px;height:13px"><use href="#ico-wallet"/></svg>
+          </div>
+          <span class="kas-cf-row-label" style="font-size:12px">Saldo Awal</span>
+          <span class="kas-cf-row-val" id="mcf-saldo-awal" style="color:var(--text);font-size:12px">Rp0</span>
+        </div>
+        <div class="kas-cf-row">
+          <div class="kas-cf-row-icon" style="background:var(--green-lt);color:var(--green)">
+            <svg class="ico" style="width:13px;height:13px"><use href="#ico-trend-up"/></svg>
+          </div>
+          <span class="kas-cf-row-label" style="font-size:12px">Total Pemasukan</span>
+          <span class="kas-cf-row-val kas-masuk" id="mcf-pemasukan" style="font-size:12px">Rp0</span>
+        </div>
+        <div class="kas-cf-row">
+          <div class="kas-cf-row-icon" style="background:var(--red-lt);color:var(--red)">
+            <svg class="ico" style="width:13px;height:13px"><use href="#ico-trend-down"/></svg>
+          </div>
+          <span class="kas-cf-row-label" style="font-size:12px">Total Pengeluaran</span>
+          <span class="kas-cf-row-val kas-keluar" id="mcf-pengeluaran" style="font-size:12px">Rp0</span>
+        </div>
+        <div class="kas-cf-row">
+          <div class="kas-cf-row-icon" style="background:var(--amber-lt);color:var(--amber)">
+            <svg class="ico" style="width:13px;height:13px"><use href="#ico-clock"/></svg>
+          </div>
+          <span class="kas-cf-row-label" style="font-size:12px">Selisih</span>
+          <span class="kas-cf-row-val" id="mcf-selisih" style="font-size:12px">Rp0</span>
+        </div>
+        <div class="kas-cf-saldo-akhir">
+          <span class="kas-cf-saldo-akhir-lbl" style="font-size:13px">Saldo Akhir</span>
+          <span class="kas-cf-saldo-akhir-val" id="mcf-saldo-akhir" style="font-size:16px">Rp0</span>
+        </div>
+      </div>
+      <!-- Donut Komposisi card (mobile) -->
+      <div class="kas-mob-donut-card" style="margin:12px 14px 0">
+        <div class="kas-mob-donut-inner">
+          <div>
+            <div class="kas-donut-ttl" style="margin-bottom:8px">Komposisi Periode</div>
+            <div id="kasDonutLegendM"></div>
+          </div>
+          <div id="kasDonutSvgM" style="display:flex;justify-content:center;align-items:center;flex-shrink:0;width:108px;height:108px"></div>
+        </div>
+      </div>
+      <!-- Line Chart Card (Mobile) -->
+      <div class="kas-mob-line-card">
+        <div class="kas-line-hd" style="padding:10px 14px">
+          <span class="kas-line-title" style="font-size:10px">Tren Tahunan</span>
+          <span class="kas-line-yr" id="kasLineYearM" style="font-size:11px">—</span>
+          <div class="kas-line-legend">
+            <span class="kas-line-leg" style="font-size:10px"><span class="kas-line-dot" style="background:#2e7d55;width:7px;height:7px"></span>Masuk</span>
+            <span class="kas-line-leg" style="font-size:10px"><span class="kas-line-dot" style="background:#a83a33;width:7px;height:7px"></span>Keluar</span>
+          </div>
+        </div>
+        <div class="kas-line-body" style="padding:10px 14px 8px"><div id="kasLineChartM"></div></div>
+      </div>
+      <!-- Mobile transaction list -->
+      <div style="padding:12px 14px 6px;flex-shrink:0">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text3)" id="kasMobTblTitle">TRANSAKSI PERIODE</div>
+      </div>
+      <div id="kasMobTblBody" style="padding:0 14px 90px;flex-shrink:0"></div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <div class="mob-bottom-nav">
+      <div class="mob-nav-pill">
+        <button class="mob-nav-item on" id="bn-home" onclick="goMob('home')">
+          <div class="mob-nav-icon"><svg class="ico"><use href="#ico-home"/></svg></div>
+          Dashboard
+        </button>
+        <button class="mob-nav-item need-absen" id="bn-absen" onclick="goMob('absen')">
+          <div class="mob-nav-icon"><svg class="ico"><use href="#ico-clipboard"/></svg></div>
+          Absensi
+        </button>
+        <button class="mob-nav-item" id="bn-kas" onclick="goMob('kas')">
+          <div class="mob-nav-icon"><svg class="ico"><use href="#ico-money"/></svg></div>
+          Kas
+        </button>
+        <button class="mob-nav-item" id="bn-rekap" onclick="goMob('rekap')">
+          <div class="mob-nav-icon"><svg class="ico"><use href="#ico-chart"/></svg></div>
+          Rekap
+        </button>
+        <button class="mob-nav-item" id="bn-lainnya" onclick="goMob('lainnya')">
+          <div class="mob-nav-icon"><svg class="ico"><use href="#ico-menu"/></svg></div>
+          Lainnya
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MEMBER DETAIL MODAL -->
+<div id="mdet-overlay" class="mdet-overlay" onclick="closeMemberDetail()"></div>
+<div id="mdet-modal" class="mdet-modal">
+  <div class="mdet-header">
+    <div id="mdet-avatar" class="avatar" style="width:42px;height:42px;font-size:14px;flex-shrink:0"></div>
+    <div style="flex:1;min-width:0">
+      <div id="mdet-name" class="mdet-name"></div>
+      <div id="mdet-gender" class="mdet-gender"></div>
+    </div>
+    <button class="mdet-close" onclick="closeMemberDetail()">✕</button>
+  </div>
+  <div id="mdet-stats" class="mdet-stats"></div>
+  <div id="mdet-donut-wrap" style="display:flex;align-items:center;gap:18px;padding:14px 18px 10px;border-bottom:1px solid var(--border);background:var(--bg);flex-shrink:0">
+    <svg id="mdet-donut-svg" width="80" height="80" viewBox="0 0 80 80" style="flex-shrink:0">
+      <circle cx="40" cy="40" r="28" fill="none" stroke="var(--border)" stroke-width="14"/>
+      <g id="mdet-donut-arcs"></g>
+      <text id="mdet-donut-pct" x="40" y="44" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text)">—</text>
+    </svg>
+    <div id="mdet-donut-legend" style="display:flex;flex-direction:column;gap:5px;font-size:12px"></div>
+  </div>
+  <div class="mdet-filter-bar">
+    <select id="mdet-f-tahun" onchange="applyMdetFilter()" style="min-width:76px">
+      <option value="">Semua Tahun</option>
+      <option value="2026">2026</option><option value="2027">2027</option>
+      <option value="2028">2028</option><option value="2029">2029</option>
+      <option value="2030">2030</option>
+    </select>
+    <select id="mdet-f-bulan" onchange="applyMdetFilter()" style="min-width:100px">
+      <option value="">Semua Bulan</option>
+      <option value="01">Januari</option><option value="02">Februari</option>
+      <option value="03">Maret</option><option value="04">April</option>
+      <option value="05">Mei</option><option value="06">Juni</option>
+      <option value="07">Juli</option><option value="08">Agustus</option>
+      <option value="09">September</option><option value="10">Oktober</option>
+      <option value="11">November</option><option value="12">Desember</option>
+    </select>
+    <button id="mdet-sort-btn" class="mdet-sort-btn" onclick="toggleMdetSort()" title="Urutan tanggal">↑ A→Z</button>
+  </div>
+  <div class="mdet-status-bar">
+    <span class="mdet-status-lbl">Filter Status:</span>
+    <button id="mdsf-H" class="mdet-sf-btn sf-h on" onclick="toggleMdetStatus('H')">✓ Hadir</button>
+    <button id="mdsf-I" class="mdet-sf-btn sf-i on" onclick="toggleMdetStatus('I')">? Izin</button>
+    <button id="mdsf-A" class="mdet-sf-btn sf-a on" onclick="toggleMdetStatus('A')">✕ Alfa</button>
+    <button id="mdsf-X" class="mdet-sf-btn sf-x on" onclick="toggleMdetStatus('X')">— Belum</button>
+    <button class="mdet-sf-reset" onclick="resetMdetStatus()">Reset</button>
+  </div>
+  <div class="mdet-section-title">
+    Riwayat Kehadiran &nbsp;<span id="mdet-count" style="font-weight:400;color:var(--text3)"></span>
+  </div>
+  <div class="mdet-table-wrap">
+    <table class="mdet-table">
+      <thead><tr><th>No</th><th>Tanggal</th><th>Kegiatan</th><th>Status</th><th>Keterangan</th></tr></thead>
+      <tbody id="mdet-tbody"></tbody>
+    </table>
+  </div>
+  <div class="mdet-footer">
+    <button onclick="exportMemberExcel()">📊 Excel</button>
+    <button onclick="exportMemberCSV()">📄 CSV</button>
+    <button onclick="exportMemberPrint()">🖨 Print</button>
+    <button onclick="editNamaAnggota()">✏️ Edit Nama</button>
+    <button id="mdet-arsip-btn" onclick="arsipToggleAnggota()" style="color:var(--gold-dk);border-color:var(--gold);background:var(--gold-xlt)">🗂 Arsipkan</button>
+    <button class="btn-danger" onclick="hapusAnggotaFromDetail()" style="margin-left:auto">🗑 Hapus</button>
+    <button class="mdet-close-btn" onclick="closeMemberDetail()">Tutup</button>
+  </div>
+</div>
+
+<!-- STATUS FLOATING MENU -->
+<div id="status-menu-overlay" onclick="closeStatusMenu()"></div>
+<div id="status-menu" class="status-menu">
+  <div class="status-menu-title">Update Status</div>
+  <div id="status-menu-items"></div>
+</div>
+
+<!-- IZIN POPUP -->
+<div id="add-anggota-overlay" class="izin-overlay" onclick="closeAddAnggotaPopup()"></div>
+<div id="add-anggota-popup" class="izin-popup" style="width:min(340px,92vw)">
+  <div class="izin-popup-header">
+    <div class="izin-popup-icon" style="background:var(--green-lt);color:var(--green)">
+      <svg style="width:17px;height:17px;fill:currentColor" viewBox="0 0 24 24"><path d="M12 4a4 4 0 1 1 0 8 4 4 0 0 1 0-8zm0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4z"/></svg>
+    </div>
+    <div>
+      <div class="izin-popup-title" style="color:var(--green)">Tambah Anggota</div>
+      <div class="izin-popup-name">Isi nama dan jenis kelamin</div>
+    </div>
+  </div>
+  <div class="izin-popup-body">
+    <label class="izin-popup-label" style="color:var(--green)">Nama Lengkap</label>
+    <input type="text" id="iNama" placeholder="Nama lengkap..." style="width:100%;box-sizing:border-box;margin-bottom:12px" onkeydown="if(event.key==='Enter')submitAddAnggota()"/>
+    <label class="izin-popup-label" style="color:var(--green)">Jenis Kelamin</label>
+    <select id="iGender" style="width:100%;box-sizing:border-box"><option value="P">Perempuan</option><option value="L">Laki-laki</option></select>
+  </div>
+  <div class="izin-popup-footer">
+    <button class="btn-sec" onclick="closeAddAnggotaPopup()">Batal</button>
+    <button class="btn-p" style="background:var(--green)" onclick="submitAddAnggota()">Tambah</button>
+  </div>
+</div>
+<div id="editsesi-overlay" class="izin-overlay" onclick="closeEditSesiPopup()"></div>
+<div id="editsesi-popup" class="izin-popup" style="width:min(340px,92vw)">
+  <div class="izin-popup-header">
+    <div class="izin-popup-icon" style="background:var(--gold-xlt);color:var(--gold-dk)">
+      <svg class="ico" style="width:17px;height:17px"><use href="#ico-edit"/></svg>
+    </div>
+    <div>
+      <div class="izin-popup-title" style="color:var(--gold-dk)">Edit Sesi</div>
+      <div class="izin-popup-name">Ubah tanggal dan nama kegiatan</div>
+    </div>
+  </div>
+  <div class="izin-popup-body">
+    <label class="izin-popup-label" style="color:var(--gold-dk)">Tanggal Kegiatan</label>
+    <input type="date" id="esTgl" style="width:100%;box-sizing:border-box;margin-bottom:12px"/>
+    <label class="izin-popup-label" style="color:var(--gold-dk)">Nama Kegiatan</label>
+    <input type="text" id="esKet" placeholder="cth: Pengajian Rutin, Rapat Bulanan..." style="width:100%;box-sizing:border-box" onkeydown="if(event.key==='Enter')submitEditSesiDetail()"/>
+    <div id="esWarn" style="display:none;margin-top:10px;font-size:11.5px;color:var(--red);background:#fee2e2;border-radius:8px;padding:8px 10px"></div>
+  </div>
+  <div class="izin-popup-footer">
+    <button class="btn-sec" onclick="closeEditSesiPopup()">Batal</button>
+    <button class="btn-p" style="background:var(--gold-dk)" onclick="submitEditSesiDetail()">Simpan</button>
+  </div>
+</div>
+<div id="izin-overlay" class="izin-overlay" onclick="closeIzinPopup()"></div>
+<div id="izin-popup" class="izin-popup">
+  <div class="izin-popup-header">
+    <span class="izin-popup-icon">?</span>
+    <div>
+      <div class="izin-popup-title">Izin</div>
+      <div class="izin-popup-name" id="izin-popup-name"></div>
+    </div>
+  </div>
+  <div class="izin-popup-body">
+    <label class="izin-popup-label">Keterangan</label>
+    <div class="izin-templates" style="margin-bottom:8px">
+      <button class="izin-tpl" onclick="fillIzinPopup('Sakit')">Sakit</button>
+      <button class="izin-tpl" onclick="fillIzinPopup('Kerja')">Kerja</button>
+      <button class="izin-tpl" onclick="fillIzinPopup('Kuliah')">Kuliah</button>
+      <button class="izin-tpl" onclick="fillIzinPopup('Keluarga')">Keluarga</button>
+    </div>
+    <input type="text" id="izin-popup-note" placeholder="cth: sakit, ada acara keluarga..." autocomplete="off"/>
+  </div>
+  <div class="izin-popup-footer">
+    <button onclick="closeIzinPopup()">Batal</button>
+    <button class="btn-p izin-save-btn" onclick="saveIzinPopup()">Simpan Izin</button>
+  </div>
+</div>
+
+<!-- APP POPUP — pengganti alert()/confirm()/prompt() bawaan browser, dipakai di semua modul -->
+<div id="app-popup-overlay" class="izin-overlay" onclick="closeAppPopup()"></div>
+<div id="app-popup" class="izin-popup" style="width:min(360px,92vw)">
+  <div class="izin-popup-header">
+    <div class="izin-popup-icon" id="app-popup-icon">
+      <svg class="ico" style="width:17px;height:17px"><use id="app-popup-icon-use" href="#ico-q"/></svg>
+    </div>
+    <div>
+      <div class="izin-popup-title" id="app-popup-title">Konfirmasi</div>
+    </div>
+  </div>
+  <div class="izin-popup-body">
+    <div id="app-popup-msg" style="font-size:13px;color:var(--text2);line-height:1.55;white-space:pre-line"></div>
+    <input type="text" id="app-popup-input" autocomplete="off" style="width:100%;box-sizing:border-box;margin-top:12px;display:none" onkeydown="if(event.key==='Enter'){event.preventDefault();_appPopupSubmit();}"/>
+  </div>
+  <div class="izin-popup-footer">
+    <button id="app-popup-cancel" onclick="closeAppPopup()">Batal</button>
+    <button class="btn-p" id="app-popup-ok" onclick="_appPopupSubmit()">Ya, Lanjutkan</button>
+  </div>
+</div>
+
+<!-- UPDATE NOTIFICATION — muncul hanya ketika ada pembaruan yang butuh refresh -->
+<div id="update-overlay" class="izin-overlay" onclick="closeUpdateNotification()"></div>
+<div id="update-popup" class="izin-popup update-popup">
+  <div class="izin-popup-header">
+    <div class="izin-popup-icon" style="background:var(--gold-lt);color:var(--gold-dk)">
+      <svg class="ico" style="width:17px;height:17px"><use href="#ico-reset"/></svg>
+    </div>
+    <div>
+      <div class="izin-popup-title" style="color:var(--gold-dk)">Aplikasi Telah Diperbarui</div>
+      <div class="izin-popup-name">Ada pembaruan pada aplikasi</div>
+    </div>
+    <button class="update-popup-close" onclick="closeUpdateNotification()" title="Tutup">✕</button>
+  </div>
+  <div class="izin-popup-body">
+    <div class="update-popup-msg">Ada pembaruan pada aplikasi. Silakan refresh halaman terlebih dahulu agar perubahan terbaru dapat digunakan.</div>
+  </div>
+  <div class="izin-popup-footer">
+    <button onclick="closeUpdateNotification()">Nanti</button>
+    <button class="btn-p update-popup-btn" onclick="refreshNow()">↻ Refresh Sekarang</button>
+  </div>
+</div>
+
+<!-- KAS TAMBAH TRANSAKSI POPUP -->
+<div id="kas-tambah-overlay" class="izin-overlay" onclick="closeKasTambah()"></div>
+<div id="kas-tambah-popup" class="izin-popup kas-popup">
+  <div class="izin-popup-header">
+    <div class="izin-popup-icon" style="background:var(--gold-lt);color:var(--brown)">
+      <svg style="width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+    </div>
+    <div style="flex:1">
+      <div class="izin-popup-title" style="color:var(--brown)" id="kasTambahTitle">Tambah Transaksi</div>
+      <div class="izin-popup-name">Isi detail transaksi kas</div>
+    </div>
+    <button onclick="closeKasTambah()" style="background:none;border:none;font-size:16px;cursor:pointer;color:var(--text3);padding:4px 6px">✕</button>
+  </div>
+  <div class="izin-popup-body" style="padding:16px">
+    <input type="hidden" id="kasEditId"/>
+    <div class="fr">
+      <label>Jenis Transaksi</label>
+      <div class="seg" style="margin-top:2px">
+        <button class="seg-btn on" id="kasJenisP" onclick="setKasJenis('pemasukan')">⬆️ Pemasukan</button>
+        <button class="seg-btn" id="kasJenisK" onclick="setKasJenis('pengeluaran')">⬇️ Pengeluaran</button>
+      </div>
+      <input type="hidden" id="kasJenis" value="pemasukan"/>
+    </div>
+    <div class="fr">
+      <label>Nominal (Rp)</label>
+      <input type="number" id="kasNominal" placeholder="0" min="0" style="width:100%"/>
+    </div>
+    <div class="fr">
+      <label>Tanggal</label>
+      <input type="date" id="kasTanggal" style="width:100%"/>
+    </div>
+    <div class="fr" style="margin-bottom:0">
+      <label>Keterangan</label>
+      <input type="text" id="kasKeterangan" placeholder="cth: Iuran bulanan, Snack..." style="width:100%"/>
+    </div>
+  </div>
+  <div class="izin-popup-footer">
+    <button onclick="closeKasTambah()">Batal</button>
+    <button class="btn-p" style="background:var(--brown);border-color:var(--brown)" onclick="submitKasTambah()">💾 Simpan</button>
+  </div>
+</div>
+
+<!-- EXPORT ANGGOTA POPUP -->
+<div id="expang-overlay" class="izin-overlay" onclick="closeExpAng()"></div>
+<div id="expang-popup" class="izin-popup" style="width:min(420px,95vw)">
+  <div class="izin-popup-header">
+    <div class="izin-popup-icon" style="background:var(--green-lt);color:var(--green)">👥</div>
+    <div>
+      <div class="izin-popup-title" style="color:var(--green)">Export Data Anggota</div>
+      <div class="izin-popup-name">Pilih anggota dan periode</div>
+    </div>
+    <button onclick="closeExpAng()" style="margin-left:auto;background:none;border:none;font-size:16px;cursor:pointer;color:var(--text3)">✕</button>
+  </div>
+  <div class="izin-popup-body" style="max-height:55vh;overflow-y:auto">
+    <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
+      <select id="expang-bulan" style="flex:1;min-width:100px">
+        <option value="">Semua Bulan</option>
+        <option value="01">Januari</option><option value="02">Februari</option>
+        <option value="03">Maret</option><option value="04">April</option>
+        <option value="05">Mei</option><option value="06">Juni</option>
+        <option value="07">Juli</option><option value="08">Agustus</option>
+        <option value="09">September</option><option value="10">Oktober</option>
+        <option value="11">November</option><option value="12">Desember</option>
+      </select>
+      <select id="expang-tahun" style="flex:1;min-width:80px">
+        <option value="">Semua Tahun</option>
+        <option value="2026">2026</option><option value="2027">2027</option>
+        <option value="2028">2028</option><option value="2029">2029</option>
+        <option value="2030">2030</option>
+      </select>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+      <button class="exp-sel-btn" onclick="expangSelAll(true)">Pilih Semua</button>
+      <button class="exp-sel-btn" onclick="expangSelAll(false)">Hapus Semua</button>
+    </div>
+    <div id="expang-list"></div>
+  </div>
+  <div class="izin-popup-footer" style="flex-wrap:wrap;gap:6px">
+    <button class="btn-sec" onclick="closeExpAng()">Batal</button>
+    <button class="exp-act-btn" style="background:var(--green)" onclick="doExpAng('excel')">📊 Excel</button>
+    <button class="exp-act-btn" style="background:var(--green)" onclick="doExpAng('csv')">📄 CSV</button>
+    <button class="exp-act-btn" style="background:var(--green)" onclick="doExpAng('print')">🖨 Print</button>
+  </div>
+</div>
+<script src="js/firebase.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/data.js"></script>
+<script src="js/helpers.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/absen.js"></script>
+<script src="js/rekap.js"></script>
+<script src="js/sesi.js"></script>
+<script src="js/anggota.js"></script>
+<script src="js/kas.js"></script>
+<script src="js/ekspor.js"></script>
+<script src="js/boot.js"></script>
+
+<!-- ACTIVITY LOG POPUP -->
+<div id="log-overlay" class="izin-overlay" onclick="closeActivityLog()"></div>
+<div id="log-popup" class="izin-popup" style="width:min(680px,96vw);max-height:88vh;overflow:hidden;display:none;flex-direction:column">
+  <div class="izin-popup-header" style="flex-shrink:0">
+    <div class="izin-popup-icon" style="background:var(--amber-lt);color:var(--amber)">🕐</div>
+    <div style="flex:1">
+      <div class="izin-popup-title" style="color:var(--amber)">Activity Log</div>
+      <div class="izin-popup-name">Riwayat aktivitas pengguna</div>
+    </div>
+    <button onclick="closeActivityLog()" style="background:none;border:none;font-size:16px;cursor:pointer;color:var(--text3);padding:4px 6px;margin-left:auto">✕</button>
+  </div>
+  <div style="padding:8px 14px;border-bottom:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;flex-shrink:0;align-items:center">
+    <input type="text" id="logSearch" placeholder="🔍 Cari aktivitas..." style="flex:1;min-width:120px;font-size:12px;padding:7px 10px" oninput="renderActivityLogFor('')"/>
+    <select id="logFilter" onchange="renderActivityLogFor('')" style="font-size:12px;padding:6px 8px;width:auto;min-width:100px">
+      <option value="">Semua</option>
+      <option value="absen">Absensi</option>
+      <option value="kas">Kas</option>
+      <option value="anggota">Anggota</option>
+      <option value="sesi">Sesi</option>
+    </select>
+    <select id="logSort" onchange="renderActivityLogFor('')" style="font-size:12px;padding:6px 8px;width:auto;min-width:110px">
+      <option value="desc">Terbaru Dulu</option>
+      <option value="asc">Terlama Dulu</option>
+    </select>
+  </div>
+  <div style="overflow-y:auto;flex:1;overscroll-behavior:none">
+    <table class="kas-riwayat-table">
+      <thead>
+        <tr>
+          <th>Waktu</th>
+          <th>User</th>
+          <th>Aksi</th>
+          <th>Detail</th>
+        </tr>
+      </thead>
+      <tbody id="logTbody"></tbody>
+    </table>
+    <div id="logEmpty" class="empty" style="display:none">Belum ada aktivitas.</div>
+  </div>
+  <div class="izin-popup-footer">
+    <button onclick="closeActivityLog()">Tutup</button>
+    <button class="btn-p" style="background:var(--brown);border-color:var(--brown)" onclick="logExport()">📊 Export</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="app-toast">...</div>
+
+<script>
+  (function(){
+    var lastY = 0;
+    document.addEventListener('scroll', function(e){
+      if(Math.abs(window.pageYOffset - lastY) > 1){
+        e.preventDefault();
+        window.scrollTo(0, lastY);
+      }
+      lastY = window.pageYOffset;
+    }, {passive: false});
+  })();
+</script>
+</body>
+</html>
