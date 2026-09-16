@@ -36,6 +36,19 @@ function renderRekap(source){
 
   var prefix = tahun+'-'+String(bulan).padStart(2,'0');
   var sL     = Object.keys(sesiData).filter(function(t){ return t.startsWith(prefix); }).sort();
+  // Fallback: bila periode terpilih kosong, pakai periode terakhir yang ADA datanya
+  // supaya 5 kartu tidak kosong — filter ikut disesuaikan.
+  if(!sL.length){
+    var allKeys = Object.keys(sesiData).sort();
+    if(allKeys.length){
+      var lk = allKeys[allKeys.length-1].split('_')[0].split('-');
+      tahun = parseInt(lk[0],10); bulan = parseInt(lk[1],10);
+      prefix = tahun+'-'+String(bulan).padStart(2,'0');
+      sL = Object.keys(sesiData).filter(function(t){ return t.startsWith(prefix); }).sort();
+      ['rBulan','rBulanM'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=bulan; });
+      ['rTahun','rTahunM'].forEach(function(id){ var el=document.getElementById(id); if(el){ var o=el.querySelector('option[value="'+tahun+'"]'); if(o) el.value=tahun; } });
+    }
+  }
   if(sortVal==='desc') sL.reverse();
 
   // Daftar anggota dari roster snapshot + entri sesi (anti join ke
@@ -46,36 +59,44 @@ function renderRekap(source){
   var mX   = _rr.X;
   var mAll = rg==='S' ? mP.concat(mL).concat(mX) : (rg==='P' ? mP : mL);
 
-  // Stats + Donut panel
+  // Stats dihitung dari SELURUH roster (tidak ikut filter cari)
   var _rsH=0,_rsI=0,_rsA=0,_rsTot=mAll.length*sL.length;
   mAll.forEach(function(m){ sL.forEach(function(t){
     var v=((sesiData[t]||{})[m.nama]||{}).status||'';
     if(v==='H')_rsH++; else if(v==='I')_rsI++; else if(v==='A')_rsA++;
   });});
   var _rsAvg    = _rsTot ? Math.round(_rsH/_rsTot*100) : 0;
-  var _rsAvgClr = _rsAvg>=80?'#2e7d55':_rsAvg>=60?'#b07b1f':'#a83a33';
-  // ── Insight: trend vs bulan lalu + peringkat anggota ──
-  var _insight = buildRekapInsight(bulan, tahun, sL, mAll);
-  ['rekapStats','rekapStatsM'].forEach(function(id){
-    var el = document.getElementById(id); if(!el) return;
-    if(!sL.length){ el.innerHTML=''; return; }
-    el.innerHTML=
-      '<div class="rs-panel">'+
-        '<div class="rs-donut-area">'+
-          '<div class="rs-donut-lbl">Distribusi</div>'+
-          buildDonutSvg(_rsH,_rsI,_rsA,_rsTot-(_rsH+_rsI+_rsA))+
-        '</div>'+
-        '<div class="rs-divider"></div>'+
-        '<div class="rs-stats">'+
-          rsItem(sL.length,'Pertemuan','var(--text)')+
-          rsItem(_rsH,'Hadir','#2e7d55')+
-          rsItem(_rsI,'Izin','#b07b1f')+
-          rsItem(_rsA,'Alfa','#a83a33')+
-          rsItem(_rsAvg+'%','Rata-rata',_rsAvgClr)+
-        '</div>'+
-      '</div>'+
-      _insight.html;
+
+  // Search filter (nama generus) — hanya untuk tabel matriks.
+  // Kartu statistik & grafik tetap memakai roster penuh.
+  var mFull = mAll;
+  var qEl = document.getElementById(source==='mob'?'rSearchM':'rSearch');
+  var q = qEl ? qEl.value.trim().toLowerCase() : '';
+  if(q) mAll = mAll.filter(function(m){ return m.nama.toLowerCase().indexOf(q)>=0; });
+  // ── Insight: trend vs bulan lalu (roster penuh) ──
+  var _insight = buildRekapInsight(bulan, tahun, sL, mFull);
+  var bulanLbl = BULAN[bulan]+' '+tahun;
+  [{id:'rekapStats',mob:false},{id:'rekapStatsM',mob:true}].forEach(function(o){
+    var el = document.getElementById(o.id); if(!el) return;
+    if(!sL.length){ el.innerHTML='<div class="ndash-empty">Belum ada sesi absensi sama sekali.</div>'; return; }
+    el.innerHTML = rekapCardsHtml(_rsAvg, sL.length, _rsH, _rsI, _rsA, bulanLbl, o.mob) + _insight.html;
   });
+
+  // Label periode + pil sesi + footer matriks
+  var perEl = document.getElementById('rekap-periode-lbl');
+  if(perEl) perEl.textContent = sL.length ? ('Bulan '+BULAN[bulan]+' - Berjalan') : 'Belum Ada Data';
+  ['rekap-sesi-pill','rekap-sesi-pill-m'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.textContent = sL.length+' Sesi';
+  });
+  var footTxt = sL.length ? ('Menampilkan <b>'+mAll.length+'</b> Generus Terdaftar') : 'Belum ada data pada periode ini';
+  var fp=document.getElementById('rekap-foot-pc'); if(fp) fp.innerHTML=footTxt;
+  var fm=document.getElementById('rekap-foot-m');
+  if(fm) fm.innerHTML = sL.length
+    ? '<span>← geser untuk lihat kolom lainnya →</span><span class="rekap-tag rekap-tag-grey">Menampilkan <b>'+mAll.length+'</b> Generus</span>'
+    : footTxt;
+  // Sinkron segmen gender + sort visible
+  syncRekapSeg(rg);
+  var sv=document.getElementById('rSortV'); if(sv) sv.value=sortVal;
 
   // Table header + body — dibangun dari builder murni (sumber tunggal
   // dengan exportPrint) sehingga selalu sinkron dengan sL/mAll yang dipakai.
@@ -88,8 +109,8 @@ function renderRekap(source){
     el.innerHTML = rekapTbodyHtml(sL, mAll, rg);
   });
 
-  // Chart
-  renderRekapChart(sL, mAll, bulan, tahun);
+  // Chart (roster penuh, tidak ikut filter cari)
+  renderRekapChart(sL, mFull, bulan, tahun);
 
   // Section Keterangan Izin dihapus — alasan izin tampil inline di sel
   // tabel (di bawah badge kuning). Container dikosongkan (CSS :empty
@@ -115,10 +136,11 @@ function rekapNote(nama, t){
 // periode yang dipilih di Export (bukan filter halaman Rekap).
 function rekapTheadHtml(sL){
   if(!sL.length) return '';
-  var hd='<tr><th>No</th><th style="text-align:left;min-width:110px">Nama</th>';
+  var hd='<tr><th class="rx-no">No</th><th class="rx-nama">Nama</th>';
   sL.forEach(function(t){
     var d=new Date(tglDate(t)+'T00:00:00');
-    hd+='<th style="line-height:1.3"><div>'+d.getDate()+'/'+(d.getMonth()+1)+'</div><div style="font-size:9px;font-weight:400;color:var(--text3);letter-spacing:.2px">'+HARI[d.getDay()]+'</div></th>';
+    var tip=d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear()+' • '+HARI[d.getDay()]+(sesiKet[t]?' • '+sesiKet[t]:'');
+    hd+='<th title="'+escHtml(tip)+'">'+d.getDate()+'</th>';
   });
   hd+='<th>H</th><th>I</th><th>A</th><th>%</th></tr>';
   var kg='<tr style="background:var(--gold-xlt)"><td style="font-size:9px;color:var(--text3);font-weight:500;letter-spacing:.3px;text-transform:uppercase">Keg.</td><td style="text-align:left;font-size:9px;color:var(--text3)">—</td>';
@@ -229,7 +251,7 @@ function buildRekapInsight(bulan, tahun, sL, mAll){
     var delta=avg-prev.avg;
     trend={avg:prev.avg, delta:delta, dir:delta>0?'naik':delta<0?'turun':'stabil'};
   }
-  return {html: insightHtml(trend, pm), trend:trend, avg:avg};
+  return {html: insightHtml(trend, pm, avg, BULAN[bulan]), trend:trend, avg:avg};
 }
 
 function trendBadgeHtml(trend, pm){
@@ -242,10 +264,77 @@ function trendBadgeHtml(trend, pm){
   return '<span class="rs-trend-badge rs-trend-flat">＝ Stabil vs '+lbl+' ('+trend.avg+'%)</span>';
 }
 
-function insightHtml(trend, pm){
-  return '<div class="rs-insight">'+
-    '<div class="rs-insight-hd"><span class="rs-insight-title">Insight Bulan Ini</span>'+trendBadgeHtml(trend,pm)+'</div>'+
+// 5 kartu statistik ala screenshot (aksen kiri hijau/kuning/merah).
+// Mobile: 2+2 + kartu Alfa full-width horizontal.
+function rekapCardsHtml(avg, nSesi, h, iz, al, bulanLbl, isMob){
+  function card(acc, icon, iconBg, iconFg, tag, tagCls, num, numCls, lbl, sub){
+    return '<div class="rekap-card'+(acc?' '+acc:'')+'">'+
+      '<div class="rekap-card-top"><span class="rekap-ic" style="background:'+iconBg+';color:'+iconFg+'"><span class="msym" style="font-size:20px">'+icon+'</span></span>'+
+      '<span class="rekap-tag '+tagCls+'">'+tag+'</span></div>'+
+      '<div class="rekap-num'+(numCls?' '+numCls:'')+'">'+num+'</div>'+
+      '<div class="rekap-lbl">'+lbl+'</div>'+
+      '<div class="rekap-sub">'+sub+'</div></div>';
+  }
+  return '<div class="rekap-cards">'+
+    card('', 'autorenew', '#ecfdf5', '#047857', '<span>'+avg+'%</span>TERCAPAI', 'rekap-tag-green rekap-tag-stack', avg+'%', '',
+      'Rasio Kehadiran', '<b>Target: 70%</b> • Bulan '+escHtml(bulanLbl.split(' ')[0]))+
+    card('', 'calendar_month', '#fafaf9', '#57534e', nSesi+' Sesi', 'rekap-tag-grey', nSesi, '',
+      'Total Pertemuan', 'Kegiatan Terlaksana')+
+    card('acc-green', 'check', '#ecfdf5', '#047857', h+' Hadir', 'rekap-tag-green', h, 'green',
+      'Total Hadir (H)', 'Orang-Sesi Generus')+
+    card('acc-amber', 'info', '#fef3c7', '#b45309', iz+' Izin', 'rekap-tag-amber', iz, 'amber',
+      'Total Izin (I)', 'Kerja, Sakit, Acara')+
+    (isMob
+      ? '<div class="rekap-card rekap-alfa-mob">'+
+        '<div class="rekap-alfa-left"><span class="rekap-ic" style="background:#fef2f2;color:#e11d48"><span class="msym" style="font-size:20px">close</span></span>'+
+        '<span><span class="rekap-num red">'+al+'</span>'+
+        '<span class="rekap-lbl">Total Alfa (A)</span></span></div>'+
+        '<div class="rekap-alfa-right"><span class="rekap-tag rekap-tag-red">'+al+' Alfa</span>'+
+        '<span class="rekap-sub">Tanpa Keterangan</span></div></div>'
+      : card('acc-red', 'close', '#fee2e2', '#b91c1c', al+' Alfa', 'rekap-tag-red', al, 'red',
+        'Total Alfa (A)', 'Tanpa Keterangan'))+
   '</div>';
+}
+
+function insightHtml(trend, pm, avg, curLbl){
+  var right, mid;
+  if(!trend){
+    mid = 'Belum ada data bulan lalu untuk perbandingan.';
+    right = '';
+  } else {
+    var naik = trend.dir==='naik', turun = trend.dir==='turun';
+    var dlbl = (trend.delta>0?'+':'')+trend.delta+'%';
+    var dic = naik?'trending_up':turun?'trending_down':'remove';
+    mid = 'Rasio Kehadiran generus '+(naik?'naik':turun?'turun':'stabil')+' dibanding bulan lalu: '+
+      '<span class="rekap-delta'+(turun?' down':'')+'">↓ '+dlbl+'</span>';
+    right = BULAN[pm.bulan]+': <b>'+trend.avg+'%</b> → '+escHtml(curLbl)+': <b>'+avg+'%</b>';
+  }
+  var ic = (!trend||trend.dir==='turun') ? 'trending_down' : (trend.dir==='naik' ? 'trending_up' : 'remove');
+  var icBg = (!trend||trend.dir==='turun') ? '#fee2e2' : '#dcfce7';
+  var icFg = (!trend||trend.dir==='turun') ? '#b91c1c' : '#047857';
+  return '<div class="rekap-insight">'+
+    '<span class="rekap-insight-ic" style="background:'+icBg+';color:'+icFg+'"><span class="msym" style="font-size:17px">'+ic+'</span></span>'+
+    '<span class="rekap-insight-title">Insight Bulan Ini</span>'+
+    '<span>'+mid+'</span>'+
+    (right?'<span class="rekap-prev">'+right+'</span>':'')+
+  '</div>';
+}
+
+// Segmen gender (tombol) <-> select tersembunyi.
+function rekapSetGender(which, g){
+  var id = which==='mob' ? 'rGenderM' : 'rGender';
+  var el = document.getElementById(id);
+  if(el) el.value = g;
+  renderRekap(which);
+}
+function syncRekapSeg(rg){
+  ['rSegPc','rSegM'].forEach(function(id){
+    var seg = document.getElementById(id); if(!seg) return;
+    var btns = seg.querySelectorAll('button');
+    btns.forEach(function(b){
+      if(b.classList) b.classList.toggle('on', b.getAttribute('data-g')===rg);
+    });
+  });
 }
 
 function rsItem(v, l, c){
@@ -270,13 +359,19 @@ function renderRekapChart(sL, mAll, bulan, tahun){
     if(!el){
       el = document.createElement('div');
       el.id = id;
-      el.className = 'rekap-chart-card';
+      el.className = 'rekap-chart-card-lux';
       var ref = document.getElementById(i===0?'rekapStats':'rekapStatsM');
       if(ref && ref.parentNode) ref.parentNode.insertBefore(el, ref.nextSibling);
     }
-    el.innerHTML = '<div class="rekap-chart-hd"><span class="rekap-chart-title">Grafik Kehadiran per Pertemuan</span></div>'+
-      '<div class="rekap-chart-body">'+svg+'</div>'+
-      chartLegendHtml();
+    el.className = 'rekap-chart-card-lux';
+    el.innerHTML = '<div class="rekap-chart-hd-lux"><div><h3>GRAFIK KEHADIRAN PER PERTEMUAN</h3>'+
+      '<p>Komparasi jumlah Hadir, Izin, dan Alfa pada '+perSesi.length+' sesi kegiatan bulan '+BULAN[bulan]+'</p></div>'+
+      '<div class="rekap-legend-pills"><span><i style="background:#2e7d55"></i>Hadir</span><span><i style="background:#b07b1f"></i>Izin</span><span><i style="background:#a83a33"></i>Alfa</span></div></div>'+
+      '<div class="rekap-chart-body" style="padding:14px 16px 6px;overflow-x:auto">'+svg+'</div>'+
+      '<div class="rc-legend-row" style="padding:8px 16px 14px;border-top:1px solid #eee9db;margin-top:4px">'+
+        '<span class="rc-axis">↑ Jumlah Presensi Generus</span>'+
+        '<span class="rc-axis" style="margin-left:auto">→ Tanggal Pertemuan Kegiatan ('+BULAN[bulan]+' '+tahun+')</span>'+
+      '</div>';
   });
 }
 

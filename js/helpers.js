@@ -315,7 +315,9 @@ function attachSwipeDelete(el, onConfirm){
   var startX=0, curX=0, dragging=false, pointerId=null, suppressed=false;
 
   function setX(x){ if(content) content.style.transform='translateX('+x+'px)'; }
+  function setReveal(x){ if(reveal) reveal.style.opacity = x<-8 ? '1' : '0'; }
   function closeAnim(){
+    setReveal(0);
     if(content){ content.style.transition='transform .22s ease'; setX(0); setTimeout(function(){ if(content) content.style.transition=''; },240); }
   }
 
@@ -332,6 +334,7 @@ function attachSwipeDelete(el, onConfirm){
     if(dx > 0) dx = 0; // hanya geser ke kiri
     curX = dx;
     setX(dx);
+    setReveal(dx);
     if(dx < -6) suppressed = true;
   });
   function endDrag(e){
@@ -339,6 +342,7 @@ function attachSwipeDelete(el, onConfirm){
     dragging=false; pointerId=null;
     if(curX <= -openW){
       setX(0);
+      setReveal(0);
       suppressed = true;
       setTimeout(function(){ if(onConfirm) onConfirm(); }, 140);
     } else {

@@ -3,7 +3,7 @@
 ══════════════════════════════════ */
 #loading-screen{
   position:fixed;inset:0;z-index:9999;
-  background:var(--bg2);
+  background:#f7f5f0;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
   transition:opacity .4s ease, visibility .4s ease;
 }
@@ -23,13 +23,55 @@
 @media (prefers-reduced-motion:reduce){.ls-logo,.ls-logo-layer{animation:none!important;opacity:1!important;clip-path:none!important;transform:none!important;filter:none!important}}
 .ls-title{font-size:16px;font-weight:400;color:var(--text);letter-spacing:-.2px;text-align:center;line-height:1.4}
 .ls-sub{font-size:11px;color:var(--text3);letter-spacing:.3px}
-.ls-bar{width:140px;height:3px;background:var(--bg3);border-radius:99px;overflow:hidden;margin-top:4px}
-.ls-bar-fill{height:100%;background:var(--gold);border-radius:99px;animation:lsBar 1.2s ease-in-out infinite}
+.ls-bar{width:140px;height:3px;background:#e8e4da;border-radius:99px;overflow:hidden;margin-top:4px}
+.ls-bar-fill{height:100%;background:#1b4332;border-radius:99px;animation:lsBar 1.2s ease-in-out infinite}
 @keyframes lsBar{0%{width:0%;margin-left:0} 50%{width:70%;margin-left:0} 100%{width:0%;margin-left:140px}}
 
 /* ══════════════════════════════════
-   LOGIN
-══════════════════════════════════ */
+   LOGIN LUX (acuan: kartu putih, strip aksen, ambient blobs)
+═════════════════════════════════ */
+.login-lux{position:relative;overflow:hidden}
+.login-bg{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-color:#fbf9f6;
+  background-image:radial-gradient(at 0% 0%,rgba(27,67,50,.05) 0,transparent 50%),radial-gradient(at 100% 100%,rgba(180,83,9,.04) 0,transparent 50%)}
+.login-blob{position:absolute;border-radius:50%;filter:blur(70px)}
+.login-blob-a{top:-120px;left:-120px;width:380px;height:380px;background:rgba(196,226,210,.5)}
+.login-blob-b{bottom:-120px;right:-120px;width:380px;height:380px;background:rgba(253,230,180,.45)}
+.login-lux .login-center{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:none;padding:24px 16px;gap:18px;font-family:'Plus Jakarta Sans',system-ui,sans-serif}
+.login-lux .login-card{background:#fdfcfa;border:1px solid #e7e5e4;border-radius:24px;padding:32px 30px;width:100%;max-width:440px;
+  box-shadow:0 20px 40px -15px rgba(27,67,50,.12);position:relative;overflow:hidden}
+.login-lux .login-card::before{content:"";position:absolute;top:0;left:0;right:0;height:6px;
+  background:linear-gradient(90deg,#1b4332,#26654c 45%,#b45309)}
+.login-brand{text-align:center;padding:6px 0 20px}
+.login-logo{display:inline-flex;padding:10px;border-radius:18px;background:#f2f8f4;margin-bottom:14px}
+.login-logo img{width:80px;height:80px;object-fit:contain}
+.login-brand h1{font-size:22px;font-weight:700;color:#0b1d16;letter-spacing:-.3px;line-height:1.35}
+.login-brand h1 strong{display:block;font-weight:800;color:#1b4332;font-size:25px}
+.login-brand p{font-size:12.5px;color:#78716c;margin-top:8px;line-height:1.6}
+.login-div{position:relative;margin-top:20px;font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#a8a29e}
+.login-div::before{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:#e7e5e4}
+.login-div span{position:relative;background:#fdfcfa;padding:0 12px}
+.login-lux .fr label{font-size:12px;font-weight:600;color:#44403c}
+.login-input{position:relative}
+.login-input .msym{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:18px;color:#a8a29e;pointer-events:none}
+.login-lux .login-input input{width:100%;padding:10px 40px 10px 40px;background:#fafaf9;border:1px solid #e7e5e4;border-radius:12px;font-size:13.5px;color:#292524;font-family:inherit}
+.login-lux .login-input input:focus{outline:none;border-color:#1b4332;background:#fdfcfa;box-shadow:0 0 0 3px rgba(27,67,50,.12)}
+.login-eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:#a8a29e;cursor:pointer;padding:6px;display:flex}
+.login-eye:hover{color:#57534e}
+.login-eye .msym{position:static;transform:none}
+.login-lux .remember-row span{color:#57534e}
+.login-submit{display:flex;align-items:center;justify-content:center;gap:8px;background:#1b4332!important;border-color:#1b4332!important;
+  padding:11px!important;font-size:14px!important;font-weight:600!important;border-radius:12px!important}
+.login-submit:hover{background:#143326!important}
+.login-submit span{font-weight:800}
+.login-help{text-align:center;font-size:12px;color:#78716c;margin-top:16px;padding-top:14px;border-top:1px solid #f5f5f4}
+.login-help a{color:#1b4332;font-weight:600}
+.login-foot{text-align:center;font-size:11.5px;color:#78716c;font-weight:500;line-height:1.6;max-width:440px}
+.login-foot span{color:#a8a29e;font-size:10.5px}
+@media(max-width:480px){.login-lux .login-card{padding:26px 20px}.login-logo img{width:68px;height:68px}}
+/* ══════════════════════════════════
+   LOGIN (legacy)
+═════════════════════════════════ */
 .login-center{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg2);padding:24px}
 .login-card{background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:36px 32px;width:100%;max-width:380px;box-shadow:var(--shadow-soft)}
 .login-card-hero{text-align:center;padding-bottom:24px;border-bottom:1px solid var(--border);margin-bottom:24px}
@@ -48,31 +90,38 @@
 ════════════════════════════════ */
 @media(min-width:769px){
   .mob-only{display:none!important}
-  body{background:var(--bg2)}
-  .pc-shell{display:flex;height:100vh;overflow:hidden;max-width:1280px;margin:0 auto;background:var(--bg2);box-shadow:var(--shadow-md)}
+  /* Full-bleed: nempel pojok, tidak lagi kotak di tengah */
+  body{background:#f7f5f0}
+  .pc-shell{display:flex;height:100vh;overflow:hidden;max-width:none;width:100%;margin:0;background:#f7f5f0;box-shadow:none}
 
-  /* SIDEBAR */
-  .sidebar{width:200px;flex-shrink:0;border-right:1px solid var(--border);display:flex;flex-direction:column;background:var(--bg)}
-  .sidebar-hd{padding:22px 16px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
-  .sidebar-logo{width:34px;height:34px;object-fit:contain;flex-shrink:0}
+  /* SIDEBAR — putih kaca ala acuan */
+  .sidebar{width:272px;flex-shrink:0;border-right:1px solid #e8e4da;display:flex;flex-direction:column;
+    background:rgba(253,252,250,.92);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+    box-shadow:0 1px 2px rgba(0,0,0,.04);z-index:20}
+  .sidebar-hd{padding:20px 24px;border-bottom:1px solid #eeebe3;display:flex;align-items:center;gap:14px}
+  .sidebar-logo{width:40px;height:40px;object-fit:contain;flex-shrink:0;background:#fdfcfa;border:1px solid #e8e4da;border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.05)}
   .sidebar-hd-text{flex:1;min-width:0}
-  .sidebar-title{font-size:13px;font-weight:500;color:var(--text);line-height:1.4}
-  .sidebar-date{font-size:10px;color:var(--text3);margin-top:4px}
-  .sidebar-nav{padding:10px 8px;flex:1;overflow-y:auto}
-  .sidebar-label{font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);padding:12px 10px 5px}
-  .si{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--r);cursor:pointer;font-size:13px;color:var(--text2);border:none;background:none;width:100%;text-align:left;transition:all .18s;font-family:inherit;user-select:none;-webkit-user-select:none}
-  .si:hover{background:var(--bg2);color:var(--text)}
-  .si.on{background:var(--gold-lt);color:var(--brown);font-weight:500}
+  .sidebar-title{font-size:13px;font-weight:700;color:#111827;line-height:1.35;letter-spacing:-.2px}
+  .sidebar-date{font-size:11px;color:#6b7280;margin-top:2px;font-weight:500}
+  .sidebar-nav{padding:20px 16px;flex:1;overflow-y:auto}
+  .sidebar-label{font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#9ca3af;padding:0 12px 8px}
+  .si{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;cursor:pointer;font-size:13.5px;color:#4b5563;border:none;background:none;width:100%;text-align:left;transition:all .18s;font-family:inherit;user-select:none;-webkit-user-select:none;font-weight:500;margin-bottom:6px}
+  .si:hover{background:#ede9de;color:#111827}
+  .si.on{background:#0f5132;color:#fff;font-weight:600;box-shadow:0 1px 2px rgba(15,81,50,.2)}
   .si-icon{width:16px;text-align:center;flex-shrink:0;opacity:.6}
-  .si.on .si-icon{opacity:1}
+  .si.on .si-icon{opacity:1;color:#6ee7b7}
+  /* Badge sync + profil bawah ala acuan */
+  #pc-sync-badge{margin:0 16px 12px;border-radius:999px;justify-content:center}
+  .user-info{background:#fdfcfa;border:1px solid #e5dfd2;border-radius:16px;margin:0 16px 16px;padding:12px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
 
-  /* TOP BAR */
-  .pc-topbar{display:flex;align-items:center;padding:0 20px;height:48px;background:var(--bg2);flex-shrink:0;gap:12px}
+  /* TOP BAR — putih kaca */
+  .pc-topbar{display:flex;align-items:center;padding:0 24px;height:64px;background:rgba(253,252,250,.85);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid #e8e4da;flex-shrink:0;gap:12px}
   .pc-topbar-title{font-size:14px;font-weight:500;flex:1;letter-spacing:-.1px}
   .tb-btn{padding:5px 10px;font-size:12px}
 
   /* PANES */
-  .pc-content{flex:1;overflow:hidden;display:flex;flex-direction:column}
+  .pc-content{flex:1;overflow:hidden;display:flex;flex-direction:column;min-width:0;background:#f7f5f0}
+  .pane-body{background:#f7f5f0}
   .pane{display:none;flex:1;overflow:hidden;flex-direction:column}
   .pane.on{display:flex}
   .pane.fade-in{animation:fadeSlideIn .22s cubic-bezier(.22,.72,0,1) both}
@@ -124,7 +173,7 @@
   .mob-nav-pill{
     display:flex;width:min(92%,520px);max-width:520px;
     gap:2px;padding:7px 8px;
-    background:rgba(246,241,228,.74);
+    background:rgba(253,252,250,.85);
     -webkit-backdrop-filter:blur(18px) saturate(1.4);
     backdrop-filter:blur(18px) saturate(1.4);
     border-radius:26px;
@@ -143,12 +192,12 @@
   .mob-nav-item:hover{opacity:1}
   .mob-nav-item:hover .mob-nav-icon{transform:scale(1.08);opacity:1}
   .mob-nav-item.on{
-    background:var(--gold-lt);
-    border-color:var(--gold);
-    color:var(--gold-dk);font-weight:600;
-    box-shadow:0 2px 10px rgba(31,92,61,.18),inset 0 0 0 1px rgba(255,255,255,.35);
+    background:#1b4332;
+    border-color:#1b4332;
+    color:#fff;font-weight:700;
+    box-shadow:0 4px 12px rgba(27,67,50,.3);
   }
-  .mob-nav-item.on .mob-nav-icon{opacity:1;color:var(--gold-dk)}
+  .mob-nav-item.on .mob-nav-icon{opacity:1;color:#fff}
   .mob-nav-item:active{transform:scale(0.92)}
 
   /* Extra clearance so page content is not covered by the floating dock */

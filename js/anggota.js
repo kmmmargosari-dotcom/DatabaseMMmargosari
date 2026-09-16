@@ -700,3 +700,10 @@ function doExpAng(type){
     closeExpAng();
   }
 }
+
+// Badge jumlah anggota aktif di menu Lainnya (PC + mobile).
+function renderLainnya(){
+  var n = 0;
+  try { n = activeMembers().length; } catch(e){}
+  ['lain-jml-pc','lain-jml-m'].forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent=n+' Aktif'; });
+}

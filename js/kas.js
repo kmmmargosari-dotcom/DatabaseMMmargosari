@@ -148,7 +148,7 @@ function renderKas(){
   setText('cf-pemasukan',    fmtRp(totalMasuk));
   setText('cf-pengeluaran',  fmtRp(totalKeluar));
   var cfSel = document.getElementById('cf-selisih');
-  if(cfSel){ cfSel.textContent=(selisih<0?'-':'')+fmtRp(Math.abs(selisih)); cfSel.style.color=selisih>=0?'var(--green)':'var(--red)'; }
+  if(cfSel){ cfSel.textContent=(selisih<0?'-':'')+fmtRp(Math.abs(selisih)); cfSel.style.color=selisih>=0?'#1b694b':'#ad3426'; }
   setText('cf-saldo-akhir', fmtRp(saldoAkhir));
   setText('kasCfPeriodeLabel',  periodeLabel);
   setText('kasCfPeriodeLabelM', periodeLabel);
@@ -157,35 +157,34 @@ function renderKas(){
   if(titleEl) titleEl.textContent = 'TRANSAKSI PERIODE '+BULAN_ID[bulanNum].toUpperCase()+' '+tahun;
   var tbody = document.getElementById('kasTblBody');
   if(tbody){
-    var html='';
+    var html='<div class="swipe-content kas-tbl-row kas-tbl-row-static"><span class="c-tgl">—</span><span class="c-ket">Saldo Awal Periode</span><span class="r">—</span><span class="r">—</span><span class="r c-saldo" id="kasTblSaldoAwalVal">'+fmtRp(saldoAwal)+'</span></div>';
     if(periodItems.length===0){
-      html+='<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:24px;font-style:italic">Belum ada transaksi periode ini.</td></tr>';
+      html+='<div style="text-align:center;color:var(--text3);padding:24px;font-style:italic;font-size:12.5px">Belum ada transaksi periode ini.</div>';
     } else {
       periodItems.forEach(function(item){
         var trx=item.trx;
-        var masukStr  = trx.jenis==='pemasukan'   ?'<span class="kas-masuk">'+fmtRp(trx.nominal)+'</span>':'<span style="color:var(--text3)">—</span>';
-        var keluarStr = trx.jenis==='pengeluaran' ?'<span class="kas-keluar">'+fmtRp(trx.nominal)+'</span>':'<span style="color:var(--text3)">—</span>';
-        html+='<tr>';
-        html+='<td style="white-space:nowrap;color:var(--text2);font-size:11.5px">'+fmtTglShort(trx.tanggal)+'</td>';
-        html+='<td>'+escHtml(trx.keterangan||'')+'</td>';
-        html+='<td class="r">'+masukStr+'</td>';
-        html+='<td class="r">'+keluarStr+'</td>';
-        html+='<td class="r" style="font-weight:600">'+fmtRp(item.saldo)+'</td>';
-        html+='<td style="text-align:center;white-space:nowrap">'+
-          '<button onclick="kasEditTrx(\''+trx.id+'\')" title="Edit" style="font-size:11px;padding:3px 7px;margin-right:2px"><svg class="ico" style="width:11px;height:11px"><use href="#ico-edit"/></svg></button>'+
-          '<button onclick="kasDelTrx(\''+trx.id+'\')" title="Hapus" style="font-size:11px;padding:3px 7px" class="btn-danger"><svg class="ico" style="width:11px;height:11px"><use href="#ico-trash"/></svg></button>'+
-        '</td>';
-        html+='</tr>';
+        var masukStr  = trx.jenis==='pemasukan'   ?'<span class="kas-masuk">'+fmtRp(trx.nominal)+'</span>':'<span style="color:#a8a29e">—</span>';
+        var keluarStr = trx.jenis==='pengeluaran' ?'<span class="kas-keluar">'+fmtRp(trx.nominal)+'</span>':'<span style="color:#a8a29e">—</span>';
+        html+='<div class="swipe-row" data-key="'+trx.id+'">';
+        html+='<div class="swipe-reveal"><span>Buang</span></div>';
+        html+='<div class="swipe-content kas-tbl-row" onclick="kasEditTrx(\''+trx.id+'\')" title="Klik untuk edit" style="cursor:pointer">';
+        html+='<span class="c-tgl">'+fmtTglShort(trx.tanggal)+'</span>';
+        html+='<span class="c-ket">'+escHtml(trx.keterangan||'')+'</span>';
+        html+='<span class="r">'+masukStr+'</span>';
+        html+='<span class="r">'+keluarStr+'</span>';
+        html+='<span class="r c-saldo">'+fmtRp(item.saldo)+'</span>';
+        html+='</div>';
+        html+='</div>';
       });
     }
-    html+='<tr class="kas-total-row">';
-    html+='<td colspan="2" style="text-align:left;letter-spacing:.3px">TOTAL</td>';
-    html+='<td class="r kas-masuk">'+fmtRp(totalMasuk)+'</td>';
-    html+='<td class="r kas-keluar">'+fmtRp(totalKeluar)+'</td>';
-    html+='<td class="r" style="color:var(--brown)">'+fmtRp(saldoAkhir)+'</td>';
-    html+='<td></td>';
-    html+='</tr>';
-    tbody.innerHTML='<tr class="kas-tbl-saldo-awal-row" id="kasTblSaldoAwalRow"><td style="color:var(--text3);font-size:11px">—</td><td style="font-style:italic;color:var(--text2);font-size:12px">Saldo Awal Periode</td><td class="r">—</td><td class="r">—</td><td class="r kas-saldo-awal-val" id="kasTblSaldoAwalVal" style="font-weight:700;color:var(--amber)">'+fmtRp(saldoAwal)+'</td><td></td></tr>'+html;
+    html+='<div class="kas-total-row">';
+    html+='<span style="letter-spacing:.3px">TOTAL</span><span></span>';
+    html+='<span class="r kas-masuk">'+fmtRp(totalMasuk)+'</span>';
+    html+='<span class="r kas-keluar">'+fmtRp(totalKeluar)+'</span>';
+    html+='<span class="r" style="color:#ad3426">'+fmtRp(saldoAkhir)+'</span>';
+    html+='</div>';
+    tbody.innerHTML=html;
+    initSwipeRows(tbody, function(r){ return r.getAttribute('data-key'); }, function(k){ kasDelTrx(k); });
   }
 
   setText('mks-saldo',  fmtRp(saldoTotal));
@@ -202,7 +201,7 @@ function renderKas(){
   setText('mcf-pemasukan',   fmtRp(totalMasuk));
   setText('mcf-pengeluaran', fmtRp(totalKeluar));
   var mcfSel = document.getElementById('mcf-selisih');
-  if(mcfSel){ mcfSel.textContent=(selisih<0?'-':'')+fmtRp(Math.abs(selisih)); mcfSel.style.color=selisih>=0?'var(--green)':'var(--red)'; }
+  if(mcfSel){ mcfSel.textContent=(selisih<0?'-':'')+fmtRp(Math.abs(selisih)); mcfSel.style.color=selisih>=0?'#1b694b':'#ad3426'; }
   setText('mcf-saldo-akhir', fmtRp(saldoAkhir));
 
   var mTitle = document.getElementById('kasMobTblTitle');
@@ -216,11 +215,11 @@ function renderKas(){
       periodItems.forEach(function(item){
         var trx=item.trx;
         var isPemasukan=trx.jenis==='pemasukan';
-        var dotColor=isPemasukan?'var(--green)':'var(--red)';
+        var dotColor=isPemasukan?'#1b694b':'#ad3426';
         var nominalStr=(isPemasukan?'+':'-')+fmtRp(trx.nominal);
-        var nominalColor=isPemasukan?'var(--green)':'var(--red)';
+        var nominalColor=isPemasukan?'#1b694b':'#ad3426';
         mHtml+='<div class="swipe-row" data-key="'+trx.id+'">';
-        mHtml+='<div class="swipe-reveal"><span>Hapus</span></div>';
+        mHtml+='<div class="swipe-reveal"><span>Buang</span></div>';
         mHtml+='<div class="swipe-content kas-mob-trx-item" onclick="kasEditTrx(\''+trx.id+'\')" style="cursor:pointer">';
         mHtml+='<div class="kas-mob-trx-dot" style="background:'+dotColor+'"></div>';
         mHtml+='<div class="kas-mob-trx-info"><div class="kas-mob-trx-date">'+fmtTglShort(trx.tanggal)+'</div><div class="kas-mob-trx-ket">'+escHtml(trx.keterangan||'')+'</div></div>';
@@ -231,7 +230,7 @@ function renderKas(){
       mHtml+='</div>';
       mHtml+='<div class="kas-mob-total-row" style="margin-top:8px;border-radius:var(--rl)">';
       mHtml+='<span class="kas-mob-total-lbl">Masuk: <span class="kas-masuk">'+fmtRp(totalMasuk)+'</span> &nbsp;·&nbsp; Keluar: <span class="kas-keluar">'+fmtRp(totalKeluar)+'</span></span>';
-      mHtml+='<span class="kas-mob-total-val" style="color:var(--brown)">'+fmtRp(saldoAkhir)+'</span>';
+      mHtml+='<span class="kas-mob-total-val" style="color:#ad3426">'+fmtRp(saldoAkhir)+'</span>';
       mHtml+='</div>';
       mBody.innerHTML = mHtml;
       initSwipeRows(mBody, function(r){ return r.getAttribute('data-key'); }, function(k){ kasDelTrx(k); });
@@ -247,7 +246,7 @@ function renderKasDonut(totalMasuk, totalKeluar){
   var targets=[{svg:'kasDonutSvg',leg:'kasDonutLegend'},{svg:'kasDonutSvgM',leg:'kasDonutLegendM'}];
   var total=totalMasuk+totalKeluar;
   var selisih=totalMasuk-totalKeluar;
-  var cColor=selisih>=0?'#2e7d55':'#a83a33';
+  var cColor=selisih>=0?'#1e583c':'#a83232';
   targets.forEach(function(t){
     var svgEl=document.getElementById(t.svg);
     var legEl=document.getElementById(t.leg);
@@ -257,17 +256,17 @@ function renderKasDonut(totalMasuk, totalKeluar){
     if(isMob){r=42;cx=54;cy=54;W=108;stroke=22;}
     var circ=2*Math.PI*r;
     var svgHtml='<svg width="'+W+'" height="'+W+'" viewBox="0 0 '+W+' '+W+'" style="overflow:visible">';
-    svgHtml+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="var(--bg2,#f0ece4)" stroke-width="'+stroke+'"/>';
+    svgHtml+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#f0e9dc" stroke-width="'+stroke+'"/>';
     if(total>0){
       var pM=totalMasuk/total,pK=totalKeluar/total;
       if(totalMasuk>0){
-        svgHtml+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#2e7d55" stroke-width="'+stroke+'"'+
+        svgHtml+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#1e583c" stroke-width="'+stroke+'"'+
           ' stroke-dasharray="'+(circ*pM)+' '+(circ*(1-pM))+'"'+
           ' stroke-dashoffset="'+(circ*0.25)+'"'+
           ' style="transition:stroke-dasharray .35s"/>';
       }
       if(totalKeluar>0){
-        svgHtml+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#a83a33" stroke-width="'+stroke+'"'+
+        svgHtml+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#a83232" stroke-width="'+stroke+'"'+
           ' stroke-dasharray="'+(circ*pK)+' '+(circ*(1-pK))+'"'+
           ' stroke-dashoffset="'+(circ*(0.25-pM))+'"'+
           ' style="transition:stroke-dasharray .35s"/>';
@@ -283,8 +282,8 @@ function renderKasDonut(totalMasuk, totalKeluar){
         legEl.innerHTML='<div style="color:var(--text3);font-size:11px;padding:4px 0">Belum ada transaksi</div>';
       } else {
         legEl.innerHTML='<div class="kas-donut-legend">'+
-          '<div class="kas-donut-leg-item"><span class="kas-donut-dot" style="background:#2e7d55"></span><span class="kas-donut-leg-lbl">Masuk</span><span class="kas-donut-leg-val" style="color:#2e7d55">'+fmtRp(totalMasuk)+'</span></div>'+
-          '<div class="kas-donut-leg-item"><span class="kas-donut-dot" style="background:#a83a33"></span><span class="kas-donut-leg-lbl">Keluar</span><span class="kas-donut-leg-val" style="color:#a83a33">'+fmtRp(totalKeluar)+'</span></div>'+
+          '<div class="kas-donut-leg-item"><span class="kas-donut-dot" style="background:#1e583c"></span><span class="kas-donut-leg-lbl">Masuk</span><span class="kas-donut-leg-val" style="color:#047857">'+fmtRp(totalMasuk)+'</span></div>'+
+          '<div class="kas-donut-leg-item"><span class="kas-donut-dot" style="background:#a83232"></span><span class="kas-donut-leg-lbl">Keluar</span><span class="kas-donut-leg-val" style="color:#ad3426">'+fmtRp(totalKeluar)+'</span></div>'+
           '</div>';
       }
     }
@@ -349,8 +348,8 @@ function renderKasLineChart(tahun){
       d+='L '+(W-padR).toFixed(2)+' '+(padT+cH).toFixed(2)+' L '+padL+' '+(padT+cH).toFixed(2)+' Z';
       return '<path d="'+d+'" fill="'+color+'" opacity="0.08"/>';
     }
-    svg+=area(masuk,'#2e7d55');
-    svg+=area(keluar,'#a83a33');
+    svg+=area(masuk,'#1b694b');
+    svg+=area(keluar,'#9e2a2b');
 
     // lines (smooth curve)
     function line(data,color){
@@ -358,8 +357,8 @@ function renderKasLineChart(tahun){
       data.forEach(function(v,i){ pts.push([xP(i), yP(v)]); });
       return '<path d="'+smoothLinePath(pts)+'" fill="none" stroke="'+color+'" stroke-width="'+(isMob?1.8:2.2)+'" stroke-linejoin="round" stroke-linecap="round"/>';
     }
-    svg+=line(masuk,'#2e7d55');
-    svg+=line(keluar,'#a83a33');
+    svg+=line(masuk,'#1b694b');
+    svg+=line(keluar,'#9e2a2b');
 
     // dots + value labels for non-zero
     function dots(data,color){
@@ -374,8 +373,8 @@ function renderKasLineChart(tahun){
       });
       return s;
     }
-    svg+=dots(masuk,'#2e7d55');
-    svg+=dots(keluar,'#a83a33');
+    svg+=dots(masuk,'#1b694b');
+    svg+=dots(keluar,'#9e2a2b');
 
     // x-axis month labels
     BULAN.forEach(function(lbl,i){
@@ -458,22 +457,22 @@ function kasEditTrx(id){
 }
 
 function kasDelTrx(id){
-  appConfirm('Hapus transaksi ini?', function(){
-    var trx = kasTransaksi.find(function(k){return k.id===id;});
-    var info = trx ? (trx.jenis==='pemasukan'?'Pemasukan':'Pengeluaran')+' Rp'+Math.round(trx.nominal||0).toLocaleString('id-ID')+(trx.keterangan?' ('+trx.keterangan+')':'') : '';
+  var trx0 = kasTransaksi.find(function(k){return k.id===id;});
+  var info0 = trx0 ? (trx0.jenis==='pemasukan'?'Pemasukan':'Pengeluaran')+' '+fmtRp(trx0.nominal||0)+(trx0.keterangan?' ('+trx0.keterangan+')':'') : 'transaksi ini';
+  appConfirm('Buang '+info0+'?\nData yang dibuang tidak bisa dikembalikan.', function(){
     function doDelete(){
       kasTransaksi=kasTransaksi.filter(function(k){return k.id!==id;});
       fbDelKas(id);
-      logActivity('kas', 'Hapus '+info);
+      logActivity('kas', 'Buang '+info0);
       renderKas();
-      showToast('Transaksi dihapus');
+      showToast('Transaksi dibuang');
     }
-    var rows = document.querySelectorAll('#kasMobTblBody .swipe-row[data-key="'+id+'"]');
+    var rows = document.querySelectorAll('#kasMobTblBody .swipe-row[data-key="'+id+'"], #kasTblBody .swipe-row[data-key="'+id+'"]');
     if(rows.length){
       var n = rows.length;
       rows.forEach(function(r){ animateRemove(r, function(){ if(--n===0) doDelete(); }); });
     } else doDelete();
-  }, {title:'Hapus Transaksi', icon:'trash', color:'red'});
+  }, {title:'Buang Transaksi?', icon:'trash', color:'red', okText:'Ya, Buang'});
 }
 
 // ── Saldo Awal (starting point April 2026: terkunci, read-only) ──

@@ -1,5 +1,5 @@
 // Service worker: app shell offline-first, API Firebase selalu network.
-var CACHE = 'mm-margosari-v2';
+var CACHE = 'mm-margosari-v3';
 var SHELL = [
   './',
   './index.html',

@@ -1,26 +1,26 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 *{-webkit-tap-highlight-color:transparent}
 :root{
-  /* Tema: tinta hijau-pinus di atas kertas cream, aksen merah-cap. */
-  --gold:#1f5c3d;           /* accent: tinta hijau-pinus (primary CTA)   */
-  --gold-dk:#153f2a;        /* accent-press: tinta pekat saat ditekan    */
-  --gold-lt:#dbe7d7;        /* tint: pita hijau lembut                   */
-  --gold-xlt:#eef2ea;       /* tint paling pucat: wash kartu             */
-  --brown:#b5432a;          /* accent-2: tinta cap/stempel merah-bata    */
-  --red:#9c3830;--red-lt:#f3e0da;--red-dk:#9c3830;   /* Alfa/danger      */
-  --amber:#a8760a;--amber-lt:#f3e6c8;                /* saffron (Izin)   */
-  --green:#3d7a4e;--green-lt:#dfebe0;                /* daun segar (Hadir)*/
-  --border:#dad5c1;         /* garis kertas hangat                        */
-  --bg:#f6f1e4;--bg2:#ede5d1;--bg3:#e2d9c0;          /* kertas daftar (cream)*/
-  --text:#241f16;--text2:#59503e;--text3:#867a61;    /* tinta hangat + pudar */
+  /* Tema luxury: hijau #1b4332 di atas stone terang, tanpa krem coklat. */
+  --gold:#1b4332;           /* accent: hijau tua (primary CTA)           */
+  --gold-dk:#143628;        /* accent-press: hijau pekat saat ditekan    */
+  --gold-lt:#e8f0eb;        /* tint: pita hijau lembut                   */
+  --gold-xlt:#eaf4eb;       /* tint paling pucat: wash kartu             */
+  --brown:#57534e;          /* netral stone (pengganti merah-bata)       */
+  --red:#b91c1c;--red-lt:#fee2e2;--red-dk:#991b1b;    /* Alfa/danger      */
+  --amber:#b45309;--amber-lt:#fef3c7;                /* amber (Izin)     */
+  --green:#15803d;--green-lt:#dcfce7;                /* hijau (Hadir)    */
+  --border:#e7e5e4;         /* garis stone netral                         */
+  --bg:#fdfcfa;--bg2:#f7f5f0;--bg3:#e8e4da;          /* putih hangat + sand*/
+  --text:#292524;--text2:#57534e;--text3:#78716c;    /* stone + pudar     */
   --r:7px;--rl:11px;--rxl:17px;
   --rbig:19px;
   --font-display:'Zilla Slab',Georgia,'Times New Roman',serif;
   --font-body:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   --font-label:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
-  --shadow:0 1px 2px rgba(36,31,22,.07),0 3px 10px rgba(36,31,22,.08);
-  --shadow-md:0 10px 30px rgba(36,31,22,.14);
-  --shadow-soft:0 2px 6px rgba(36,31,22,.05),0 10px 26px rgba(36,31,22,.10);
+  --shadow:0 1px 2px rgba(28,25,23,.07),0 3px 10px rgba(28,25,23,.08);
+  --shadow-md:0 10px 30px rgba(28,25,23,.14);
+  --shadow-soft:0 2px 6px rgba(28,25,23,.05),0 10px 26px rgba(28,25,23,.10);
 }
 body{font-family:var(--font-body);font-size:14px;color:var(--text);background:var(--bg2);-webkit-font-smoothing:antialiased}
 
@@ -52,7 +52,7 @@ input::placeholder{color:var(--text3)}
 .log-badge{font-size:11px;padding:2px 8px;border-radius:99px;font-weight:500;display:inline-block;white-space:nowrap}
 .log-absen{background:var(--green-lt);color:var(--green)}
 .log-kas{background:var(--amber-lt);color:var(--amber)}
-.log-anggota{background:#f3e2d8;color:var(--brown)}
+.log-anggota{background:#e8f0eb;color:#1b4332}
 .log-sesi{background:#dce6e8;color:#2b6070}
 
 /* ── SEGMENT ── */
@@ -77,7 +77,7 @@ th{background:var(--bg2);font-weight:500;font-size:11px;letter-spacing:.2px;colo
 td.tl{text-align:left}
 tr.gender-sep td{background:var(--bg3);color:var(--text2);font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:5px 8px;text-align:left}
 tr.gender-sep-l td{background:var(--green-lt);color:var(--green)}
-tr.gender-sep-p td{background:#f3e2d8;color:var(--brown)}
+tr.gender-sep-p td{background:#e8f0eb;color:#1b4332}
 
 /* ── TOOLBAR ── */
 .toolbar{display:flex;gap:8px;padding:9px 12px;border-bottom:1px solid var(--border);background:var(--bg2);align-items:center;flex-wrap:wrap}

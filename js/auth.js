@@ -66,6 +66,16 @@ function masukApp(){
 
 function loginEnter(e){ if(e.key==='Enter') doLogin(); }
 
+function toggleLoginPass(){
+  var inp = document.getElementById('loginPass');
+  var eye = document.getElementById('loginEye');
+  if(!inp) return;
+  var show = inp.type === 'password';
+  inp.type = show ? 'text' : 'password';
+  if(eye) eye.textContent = show ? 'visibility_off' : 'visibility';
+  inp.focus();
+}
+
 function doLogout(){
   appConfirm('Yakin mau keluar?', function(){
     _doLogoutConfirmed();

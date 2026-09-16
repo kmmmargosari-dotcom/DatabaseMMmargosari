@@ -41,6 +41,15 @@ function dbHtml(suffix){
   var aktif = activeMembers();
   var html='';
   var lastSection='';
+  var grouped = (!q&&!fBln&&!fThn);
+  var secCount = {};
+  if(grouped){
+    sL.forEach(function(t){
+      var d = new Date(tglDate(t)+'T00:00:00');
+      var sec = BULAN[d.getMonth()+1]+' '+d.getFullYear();
+      secCount[sec] = (secCount[sec]||0)+1;
+    });
+  }
 
   sL.forEach(function(t){
     var label = sesiLabel(t);
@@ -52,29 +61,48 @@ function dbHtml(suffix){
       if(v==='H') h++; else if(v==='I') iz++; else if(v==='A') al++; else blm++;
     });
 
-    if(!q&&!fBln&&!fThn){
+    if(grouped){
       var d   = new Date(tglDate(t)+'T00:00:00');
       var sec = BULAN[d.getMonth()+1]+' '+d.getFullYear();
-      if(sec!==lastSection){ lastSection=sec; html+='<div class="db-section-hd">'+sec+'</div>'; }
+      if(sec!==lastSection){
+        lastSection=sec;
+        html+='<div class="abs-month-hd"><span class="abs-month-pill">'+escHtml(sec)+'</span>'+
+          '<span class="abs-month-count">• '+(secCount[sec]||0)+' Sesi Terlaksana</span>'+
+          '<span class="abs-month-line"></span></div>';
+      }
     }
 
-    html+='<div class="swipe-row" data-key="'+t+'">'+
+    var belumCls = blm===0 ? 'abs-belum-ok' : 'abs-belum-warn';
+    html+='<div class="swipe-row abs-row" data-key="'+t+'">'+
       '<div class="swipe-reveal"><span>Hapus</span></div>'+
-      '<div class="swipe-content db-item" onclick="editSesi(\''+t+'\')" style="cursor:pointer">'+
-        '<div class="db-info">'+
-          '<div class="db-name">'+label+'</div>'+
-          (ket?'<div class="db-ket">'+escHtml(ket)+'</div>':'')+
-          '<div class="db-sub">'+(h+iz+al)+' diisi &nbsp;·&nbsp; '+blm+' belum</div>'+
+      '<div class="swipe-content abs-card" onclick="editSesi(\''+t+'\')" style="cursor:pointer">'+
+        '<div class="abs-card-info">'+
+          '<div class="abs-card-title"><span>'+label+'</span>'+
+          (ket?'<span class="abs-ket-pill">'+escHtml(ket)+'</span>':'')+'</div>'+
+          '<div class="abs-card-sub"><b>'+(h+iz+al)+' diisi</b> • <span class="'+belumCls+'">'+blm+' belum</span>'+
+          (blm===0?'<span class="abs-lengkap"> • Lengkap 100%</span>':'')+'</div>'+
         '</div>'+
-        '<div class="db-badges">'+
-          (h?'<span class="badge bh">'+h+'H</span>':'')+
-          (iz?'<span class="badge bi">'+iz+'I</span>':'')+
-          (al?'<span class="badge ba">'+al+'A</span>':'')+
+        '<div class="abs-card-right">'+
+          '<span class="abs-bdg abs-bdg-h" title="'+h+' Hadir">'+h+'H</span>'+
+          '<span class="abs-bdg abs-bdg-i" title="'+iz+' Izin">'+iz+'I</span>'+
+          '<span class="abs-bdg abs-bdg-a" title="'+al+' Alpa">'+al+'A</span>'+
+          '<span class="abs-go">›</span>'+
         '</div>'+
       '</div>'+
     '</div>';
   });
   return html;
+}
+
+// Statistik hero absensi: total sesi tercatat + total generus aktif.
+function updateAbsHeroStats(){
+  var nSesi = Object.keys(typeof sesiData!=='undefined'?sesiData:{}).length;
+  var nGen  = 0;
+  try { nGen = activeMembers().length; } catch(e){}
+  ['abs-hero-sesi-pc','abs-hero-sesi-m'].forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent=nSesi; });
+  ['abs-hero-gen-pc','abs-hero-gen-m'].forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent=nGen; });
+  var ft = document.getElementById('abs-foot-pc'); if(ft) ft.textContent = 'Menampilkan '+nSesi+' sesi presensi generus Margosari';
+  var fm = document.getElementById('abs-foot-m'); if(fm) fm.textContent = 'Menampilkan '+nSesi+' sesi';
 }
 
 function renderDb(){
@@ -83,6 +111,7 @@ function renderDb(){
     el.innerHTML = dbHtml('');
     initSwipeRows(el, function(r){ return r.getAttribute('data-key'); }, function(k){ hapusSesi(k); });
   }
+  updateAbsHeroStats();
 }
 
 function renderDbMob(){
@@ -91,6 +120,7 @@ function renderDbMob(){
     el.innerHTML = dbHtml('M');
     initSwipeRows(el, function(r){ return r.getAttribute('data-key'); }, function(k){ hapusSesi(k); });
   }
+  updateAbsHeroStats();
 }
 
 function hapusSesi(tgl){

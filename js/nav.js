@@ -59,6 +59,7 @@ function goPcCall(name){
     if(name==='absen') showAbsenSetup();
     if(name==='kas')   renderKas();
     if(name==='anggota') renderAnggota();
+    if(name==='lainnya') renderLainnya();
     if(name==='ekspor') renderEkspor();
   }
 
@@ -94,6 +95,7 @@ function goMobCall(name){
     if(name==='absen') showMobAbsenHero();
     if(name==='kas')   renderKas();
     if(name==='anggota') renderAnggotaMob();
+    if(name==='lainnya') renderLainnya();
     if(name==='ekspor') renderEkspor();
   }
 
