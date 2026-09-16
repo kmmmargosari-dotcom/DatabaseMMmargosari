@@ -2,13 +2,32 @@
 // BOOT — DOMContentLoaded + auto-login via Firebase Auth
 // ══════════════════════════════════════════════════
 
+if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+  });
+}
+
 window.addEventListener('DOMContentLoaded', function(){
   document.getElementById('pg-login').style.display = 'none';
   document.getElementById('pg-app').style.display   = 'none';
 
+  // Animasi logo butuh ~2 detik: kunci durasi minimal loading supaya
+  // sempat terlihat. Kalau Firebase lama, tidak menambah tunggu.
+  var _bootStart = Date.now();
+  var LS_MIN = 2300;
+  function lsDelay(){
+    return Math.max(400, LS_MIN - (Date.now() - _bootStart));
+  }
+
+  function removeLoader(){
+    var l = document.getElementById('loading-screen');
+    if(l && l.parentNode) l.parentNode.removeChild(l);
+  }
+
   function showLogin(){
     var ls = document.getElementById('loading-screen');
-    if(ls) ls.classList.add('fade-out');
+    if(ls){ ls.classList.add('fade-out'); setTimeout(removeLoader, 900); }
     setTimeout(function(){
       document.getElementById('pg-login').style.display = '';
       // Isi username dari localStorage bila ada
@@ -17,18 +36,18 @@ window.addEventListener('DOMContentLoaded', function(){
         var uEl = document.getElementById('loginUser');
         if(uEl) uEl.value = savedU;
       }
-    }, 420);
+    }, lsDelay());
   }
 
   function showApp(fbUser){
     var ls = document.getElementById('loading-screen');
-    if(ls) ls.classList.add('fade-out');
+    if(ls){ ls.classList.add('fade-out'); setTimeout(removeLoader, 900); }
     setTimeout(function(){
       // Tentukan username dari email Firebase
       var savedU = localStorage.getItem('saved_user') || 'admin';
       currentUser = { username: savedU, nama: 'Administrator' };
       masukApp();
-    }, 420);
+    }, lsDelay());
   }
 
   function startAppWithFirebase(){

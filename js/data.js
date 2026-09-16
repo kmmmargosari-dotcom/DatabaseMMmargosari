@@ -19,10 +19,60 @@ var members = [
   {nama:'ZULFAN ARI SENA',gender:'L'}
 ];
 
-// sesiData[tgl][nama] = {status:'H'|'I'|'A', catatan:''}
+// sesiData[tgl][nama] = {status:'H'|'I'|'A', catatan:'', gender:'P'|'L'}
+// gender ditulis saat pengisian (snapshot) agar riwayat tidak ikut berubah
+// bila gender anggota diubah belakangan.
 var sesiData = {};
 // sesiKet[tgl] = kegiatan string
 var sesiKet  = {};
+// sesiRoster[tgl] = [{nama, gender}] — potret daftar anggota aktif tepat
+// saat sesi DIBUAT. Rekap bulan lama dibangun dari roster ini (gabungan
+// dengan nama-nama entri), BUKAN dari koleksi anggota terkini, sehingga
+// arsip/hapus/ubah-gender tidak pernah mengubah rekap lama.
+var sesiRoster = {};
+
+// Gender anggota saat ini (untuk pengisian snapshot & migrasi).
+function memberGenderNow(nama){
+  var m = members.find(function(x){ return x.nama===nama; });
+  return m ? m.gender : null;
+}
+
+// Cek apakah nama pernah tercatat di sesi absensi mana pun.
+function memberHasHistory(nama){
+  return Object.keys(sesiData).some(function(t){
+    return Object.prototype.hasOwnProperty.call(sesiData[t]||{}, nama);
+  });
+}
+
+// Tulis snapshot gender ke satu entri bila belum ada (tidak menimpa).
+function stampEntryGender(tgl, nama){
+  var s = sesiData[tgl]||{};
+  var e = s[nama];
+  if(!e || e.gender) return;
+  var g = memberGenderNow(nama);
+  if(g) e.gender = g;
+}
+
+// Migrasi data lama -> snapshot (idempoten, tidak merusak data):
+// - entri tanpa gender diisi dari anggota kini (tak dikenal -> '?')
+// - sesi tanpa roster dibangun dari nama-nama entrinya
+// Dijalankan otomatis setiap data siap; sesi tersentuh akan ikut
+// tersimpan ke Firestore saat berikutnya disimpan.
+function migrateLegacySnapshots(){
+  Object.keys(sesiData).forEach(function(t){
+    var s = sesiData[t]||{};
+    Object.keys(s).forEach(function(nm){
+      var e = s[nm]||{};
+      if(!e.gender) e.gender = memberGenderNow(nm) || '?';
+    });
+    if(!sesiRoster[t]){
+      sesiRoster[t] = Object.keys(s).map(function(nm){
+        var e = s[nm]||{};
+        return {nama:nm, gender:e.gender || memberGenderNow(nm) || '?'};
+      });
+    }
+  });
+}
 
 // Anggota yang berstatus aktif (tidak diarsipkan). Anggota arsip tidak
 // muncul di daftar isi absensi dan tidak ikut perhitungan rekap/dashboard.
@@ -97,18 +147,13 @@ function renderActivityLogFor(filterAksi){
   list.forEach(function(e){
     var d = new Date(e.waktu);
     var ts = d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
-    var ico = '';
-    if(e.aksi==='absen') ico = '📋';
-    else if(e.aksi==='kas') ico = '💰';
-    else if(e.aksi==='anggota') ico = '👤';
-    else if(e.aksi==='sesi') ico = '📅';
-    else ico = '🔧';
+
     var aksiClass = 'log-badge log-'+e.aksi;
     var aksiLabel = e.aksi.charAt(0).toUpperCase()+e.aksi.slice(1);
     h += '<tr>'+
       '<td style="white-space:nowrap;font-size:11px;color:var(--text2)">'+ts+'</td>'+
       '<td style="white-space:nowrap">'+e.user+'</td>'+
-      '<td><span class="'+aksiClass+'">'+ico+' '+aksiLabel+'</span></td>'+
+      '<td><span class="'+aksiClass+'">'+aksiLabel+'</span></td>'+
       '<td style="font-size:12px">'+escHtml(e.detail)+'</td>'+
     '</tr>';
   });
@@ -149,6 +194,7 @@ function backupData(){
     localStorage.setItem('_members', JSON.stringify(members));
     localStorage.setItem('_sesiData', JSON.stringify(sesiData));
     localStorage.setItem('_sesiKet', JSON.stringify(sesiKet));
+    localStorage.setItem('_sesiRoster', JSON.stringify(sesiRoster));
     localStorage.setItem('_kasTransaksi', JSON.stringify(kasTransaksi));
     localStorage.setItem('_activityLogs', JSON.stringify(_activityLogs));
   } catch(e){ /* localStorage penuh */ }
@@ -158,11 +204,13 @@ function restoreData(){
   var m = localStorage.getItem('_members');
   var s = localStorage.getItem('_sesiData');
   var k = localStorage.getItem('_sesiKet');
+  var r = localStorage.getItem('_sesiRoster');
   var t = localStorage.getItem('_kasTransaksi');
   var l = localStorage.getItem('_activityLogs');
   if(m) try { members = JSON.parse(m); } catch(e){}
   if(s) try { sesiData = JSON.parse(s); } catch(e){}
   if(k) try { sesiKet  = JSON.parse(k); } catch(e){}
+  if(r) try { var _sr = JSON.parse(r); if(_sr && typeof _sr==='object' && !Array.isArray(_sr)) sesiRoster = _sr; } catch(e){}
   if(t) try { kasTransaksi = JSON.parse(t); } catch(e){}
   if(l) try { _activityLogs = JSON.parse(l); } catch(e){}
 }
@@ -181,13 +229,13 @@ function setPendingCount(n){
     if(!el) return;
     if(navigator.onLine && n === 0){
       el.className = 'sync-badge sync-ok';
-      el.textContent = '🟢 Online';
+      el.textContent = 'Online';
     } else if(!navigator.onLine){
       el.className = 'sync-badge sync-off';
-      el.textContent = '🔴 Offline' + (n > 0 ? ' ('+n+' pending)' : '');
+      el.textContent = 'Offline' + (n > 0 ? ' ('+n+' pending)' : '');
     } else if(n > 0){
       el.className = 'sync-badge sync-save';
-      el.textContent = '🟡 ' + n + ' pending';
+      el.textContent = n + ' pending';
     }
   });
 }

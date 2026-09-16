@@ -59,7 +59,7 @@ function dbHtml(suffix){
     }
 
     html+='<div class="swipe-row" data-key="'+t+'">'+
-      '<div class="swipe-reveal"><span>🗑 Hapus</span></div>'+
+      '<div class="swipe-reveal"><span>Hapus</span></div>'+
       '<div class="swipe-content db-item" onclick="editSesi(\''+t+'\')" style="cursor:pointer">'+
         '<div class="db-info">'+
           '<div class="db-name">'+label+'</div>'+

@@ -16,14 +16,14 @@ function setSyncStatus(state){
   if(state === 'ok'){
     document.querySelectorAll('.sync-badge').forEach(function(el){
       el.className = 'sync-badge sync-ok';
-      el.textContent = '🟢 Online';
+      el.textContent = 'Online';
     });
   } else if(state === 'off'){
     setPendingCount(getPendingCount());
   } else if(state === 'save'){
     document.querySelectorAll('.sync-badge').forEach(function(el){
       el.className = 'sync-badge sync-save';
-      el.textContent = '🔄 Syncing...';
+      el.textContent = 'Menyinkronkan…';
     });
   }
 }
@@ -46,16 +46,16 @@ function updateSyncFromOnline(){
     if(navigator.onLine && getPendingCount() === 0){
       document.querySelectorAll('.sync-badge').forEach(function(el){
         el.className = 'sync-badge sync-ok';
-        el.textContent = '🟢 Online';
+        el.textContent = 'Online';
       });
     }
   }, 4000);
 }
 
-// Simpan satu sesi ke Firestore
+// Simpan satu sesi ke Firestore (termasuk roster snapshot)
 function fbSaveSesi(key){
   if(!_fbReady) return;
-  var data = { kegiatan: sesiKet[key]||'', absensi: sesiData[key]||{} };
+  var data = { kegiatan: sesiKet[key]||'', absensi: sesiData[key]||{}, roster: sesiRoster[key]||[] };
   _syncWrite(window._fsSet(window._fsDoc(fsDb(),'sesi',key), data));
 }
 
@@ -100,11 +100,14 @@ function fbStartListeners(){
   _fbUnsubSesi = window._fsSnap(window._fsCol(fsDb(),'sesi'), function(snap){
     sesiData = {};
     sesiKet  = {};
+    sesiRoster = {};
     snap.forEach(function(d){
       var dat = d.data();
       sesiData[d.id] = dat.absensi || {};
       sesiKet[d.id]  = dat.kegiatan || '';
+      sesiRoster[d.id] = dat.roster || null;
     });
+    migrateLegacySnapshots();
     backupData();
     try { renderRekap('pc'); } catch(e){}
     try { renderRekap('mob'); } catch(e){}
@@ -137,6 +140,7 @@ function fbStartListeners(){
       var dat = snap.data();
       if(dat.members && dat.members.length){ members = dat.members; }
     }
+    migrateLegacySnapshots();
     backupData();
     try { renderAnggota(); } catch(e){}
     try { renderAnggotaMob(); } catch(e){}
@@ -184,12 +188,14 @@ function fbInit(){
     });
     return window._fsGetDocs(window._fsCol(fsDb(),'sesi'));
   }).then(function(sSnap){
-    sesiData = {}; sesiKet = {};
+    sesiData = {}; sesiKet = {}; sesiRoster = {};
     sSnap.forEach(function(d){
       var dat = d.data();
       sesiData[d.id] = dat.absensi || {};
       sesiKet[d.id]  = dat.kegiatan || '';
+      sesiRoster[d.id] = dat.roster || null;
     });
+    migrateLegacySnapshots();
     backupData();
     fbStartListeners();
     setSyncStatus('ok');
@@ -197,6 +203,7 @@ function fbInit(){
     console.error('fbInit load error', e);
     // Coba restore dari localStorage
     restoreData();
+    migrateLegacySnapshots();
     fbStartListeners();
     setPendingCount(0);
   });

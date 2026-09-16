@@ -117,15 +117,15 @@ function initApp(){
     var el = document.getElementById(id);
     if(el) el.value = yy+'-'+mm+'-'+dd;
   });
-  ['rBulan','rBulanM','exRekapBulan','exRekapBulanM'].forEach(function(id){
+  ['rBulan','rBulanM'].forEach(function(id){
     var el = document.getElementById(id);
     if(el) el.value = today.getMonth()+1;
   });
-  ['rTahun','rTahunM','exRekapTahun','exRekapTahunM','exKasTahun','exKasTahunM'].forEach(function(id){
+  ['rTahun','rTahunM'].forEach(function(id){
     var el = document.getElementById(id);
     if(el){ if(el.querySelector('option[value="'+yy+'"]')) el.value = yy; }
   });
-  ['kasBulan','kasBulanM','exKasBulan','exKasBulanM'].forEach(function(id){
+  ['kasBulan','kasBulanM'].forEach(function(id){
     var el = document.getElementById(id);
     if(el) el.value = String(today.getMonth()+1).padStart(2,'0');
   });

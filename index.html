@@ -45,18 +45,33 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="manifest" href="manifest.webmanifest"/>
+  <meta name="theme-color" content="#1f5c3d"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+  <meta name="apple-mobile-web-app-title" content="MM Margosari"/>
+  <link rel="apple-touch-icon" href="icons/icon-180.png"/>
   <link rel="stylesheet" href="css/base.css"/>
   <link rel="stylesheet" href="css/layout.css"/>
   <link rel="stylesheet" href="css/components.css"/>
   <link rel="stylesheet" href="css/modules.css"/>
   
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🕌</text></svg>">
+  <link rel="icon" href="logo.png" type="image/png"/>
+  <meta property="og:title" content="Database Muda-Mudi Margosari"/>
+  <meta property="og:description" content="Absensi, kas, dan rekap Muda-Mudi Margosari."/>
+  <meta property="og:image" content="logo.png"/>
 </head>
 <body style="overscroll-behavior: none; touch-action: pan-y;">
 
 <!-- LOADING SCREEN -->
 <div id="loading-screen">
-  <div class="ls-mosq">🕌</div>
+  <div class="ls-logo" role="img" aria-label="Logo Muda-Mudi Margosari">
+    <div class="ls-logo-layer ls-l1"></div>
+    <div class="ls-logo-layer ls-l2"></div>
+    <div class="ls-logo-layer ls-l3"></div>
+    <div class="ls-logo-layer ls-l4"></div>
+  </div>
   <div class="ls-title">Database Muda-Mudi<br>Margosari</div>
   <div class="ls-bar"><div class="ls-bar-fill"></div></div>
   <div class="ls-sub">Memuat aplikasi...</div>
@@ -107,7 +122,7 @@
   <div class="login-center">
     <div class="login-card">
       <div class="login-card-hero">
-        <div class="login-mosq">🕌</div>
+        <div class="login-mosq"><img src="logo.png" alt="Logo Muda-Mudi Margosari"/></div>
         <div class="login-card-title">Database Muda-Mudi<br>Margosari</div>
         <div class="login-card-sub">Masuk untuk melanjutkan</div>
       </div>
@@ -135,8 +150,11 @@
 
     <div class="sidebar">
       <div class="sidebar-hd">
-        <div class="sidebar-title">Database Muda-Mudi<br>Margosari</div>
-        <div class="sidebar-date js-date"></div>
+        <img src="logo.png" class="sidebar-logo" alt="Logo Muda-Mudi Margosari"/>
+        <div class="sidebar-hd-text">
+          <div class="sidebar-title">Database Muda-Mudi<br>Margosari</div>
+          <div class="sidebar-date js-date"></div>
+        </div>
       </div>
       <nav class="sidebar-nav">
         <div class="sidebar-label">Menu</div>
@@ -156,7 +174,7 @@
           <svg class="ico si-icon"><use href="#ico-menu"/></svg> Lainnya
         </button>
       </nav>
-      <div id="pc-sync-badge" class="sync-badge sync-ok">🟢 Online</div>
+      <div id="pc-sync-badge" class="sync-badge sync-ok">Online</div>
       <div class="user-info">
         <div class="u-av js-uinit"></div>
         <div style="flex:1;min-width:0">
@@ -184,11 +202,11 @@
             </div>
             <div class="welcome-card welcome-card-home">
               <div class="welcome-inner">
-                <div class="welcome-greet"><span id="dash-welcome-emoji">☀️</span> <span id="dash-welcome-greet">Selamat Pagi</span>, MinKel</div>
+                <div class="welcome-greet"><span id="dash-welcome-greet">Selamat Pagi</span>, MinKel</div>
                 <div class="welcome-title">Database Muda-Mudi Margosari</div>
-                <div class="welcome-date">📅 <span class="js-date"></span></div>
+                <div class="welcome-date"><span class="js-date"></span></div>
               </div>
-              <div class="welcome-home-badge" aria-hidden="true">🕌</div>
+              <div class="welcome-home-badge" aria-hidden="true"><img src="logo.png" alt=""/></div>
             </div>
 
             <!-- Stat Cards -->
@@ -284,9 +302,9 @@
           <div id="pc-stage-hero">
             <div class="welcome-card welcome-card-absen-hero">
               <div class="welcome-inner">
-                <div class="welcome-greet">Mulai Absensi <span class="w-greet-emoji">✍️</span></div>
+                <div class="welcome-greet">Mulai Absensi</div>
                 <div class="welcome-title">Pilih tanggal &amp; nama kegiatan</div>
-                <div class="welcome-date">📅 <span class="js-date"></span></div>
+                <div class="welcome-date"><span class="js-date"></span></div>
                 <div class="welcome-actions">
                   <button class="w-btn w-btn-solid" onclick="showAbsenMain()">Mulai Absensi →</button>
                 </div>
@@ -301,7 +319,7 @@
             </div>
             <div id="sesiFilterRowPc" class="sesi-filter-row" style="display:none">
               <div class="toolbar" style="flex-wrap:wrap;gap:8px;margin:10px 20px 0">
-                <input id="dbSearch" placeholder="🔍 Cari kegiatan atau tanggal..." style="flex:1;min-width:140px" oninput="renderDb()"/>
+                <input id="dbSearch" placeholder="Cari kegiatan atau tanggal..." style="flex:1;min-width:140px" oninput="renderDb()"/>
                 <select id="dbFilterBulan" onchange="renderDb()" style="min-width:110px">
                   <option value="">Semua Bulan</option>
                   <option value="01">Januari</option><option value="02">Februari</option>
@@ -418,14 +436,14 @@
           <div style="padding:12px 20px 0">
             <div class="welcome-card welcome-card-kas">
               <div class="welcome-inner">
-                <div class="welcome-greet">Kelola Kas <span class="w-greet-emoji">🪙</span></div>
+                <div class="welcome-greet">Kelola Kas</div>
                 <div class="welcome-title">Catat pemasukan &amp; pengeluaran</div>
-                <div class="welcome-date">📅 <span class="js-date"></span></div>
+                <div class="welcome-date"><span class="js-date"></span></div>
                 <div class="welcome-actions">
                   <button class="w-btn w-btn-solid" onclick="openKasTambah()">+ Tambah Transaksi</button>
                 </div>
               </div>
-              <div class="welcome-home-badge" aria-hidden="true">💰</div>
+              <div class="welcome-home-badge" aria-hidden="true"><img src="logo.png" alt=""/></div>
             </div>
           </div>
 
@@ -719,7 +737,7 @@
                 <ol class="tentang-guide-list">
                   <li>Buka menu <b>Ekspor</b>.</li>
                   <li>Pilih data yang mau diambil: <b>Rekap Absensi Bulanan</b>, <b>Laporan Kas</b>, atau <b>Data Anggota</b>.</li>
-                  <li>Atur <b>bulan / tahun</b> (dan jenis kelamin bila perlu), lalu pilih format: <b>Excel</b>, <b>CSV</b>, atau <b>Print</b>.</li>
+                  <li>Pilih <b>periode</b> (Bulan / Tahun / Custom) dan jenis kelamin bila perlu, lalu pilih format: <b>Excel</b>, <b>CSV</b>, atau <b>Print</b>.</li>
                   <li>Hasil <b>Print</b> dibuka sebagai dokumen A4 landscape yang siap dicetak.</li>
                 </ol>
               </div>
@@ -740,58 +758,106 @@
             <div class="nd-card exp-card">
               <div class="exp-card-hd"><span class="exp-card-ic" style="background:var(--green-lt);color:var(--green)"><svg class="ico"><use href="#ico-chart"/></svg></span><span>Rekap Absensi Bulanan</span></div>
               <div class="exp-card-body">
+                <div class="exp-date-range">
+                  <label class="exp-date-lbl">Periode</label>
+                  <select id="exRekapPeriode" class="exp-date-input" onchange="exPeriodeChanged('rekap')">
+                    <option value="bulan" selected>Bulan tertentu</option>
+                    <option value="tahun">Tahun tertentu</option>
+                    <option value="custom">Custom...</option>
+                    <option value="semua">Semua data</option>
+                  </select>
+                  <div class="exp-date-row" id="exRekapBulanRow" style="margin-top:6px">
+                    <span id="exRekapBulanWrap" style="flex:1;display:flex;min-width:0">
+                      <select id="exRekapBulan" class="exp-date-input">
+                        <option value="01">Januari</option><option value="02">Februari</option>
+                        <option value="03">Maret</option><option value="04">April</option>
+                        <option value="05">Mei</option><option value="06">Juni</option>
+                        <option value="07">Juli</option><option value="08">Agustus</option>
+                        <option value="09">September</option><option value="10">Oktober</option>
+                        <option value="11">November</option><option value="12">Desember</option>
+                      </select>
+                    </span>
+                    <span id="exRekapTahunWrap" style="flex:1;display:flex;min-width:0">
+                      <select id="exRekapTahun" class="exp-date-input">
+                        <option value="2025">2025</option><option value="2026">2026</option>
+                        <option value="2027">2027</option><option value="2028">2028</option>
+                        <option value="2029">2029</option><option value="2030">2030</option>
+                      </select>
+                    </span>
+                  </div>
+                  <div class="exp-date-row" id="exRekapCustom" style="display:none;margin-top:6px">
+                    <input type="date" id="exRekapDari" class="exp-date-input" placeholder="Dari Tanggal">
+                    <span class="exp-date-sep">—</span>
+                    <input type="date" id="exRekapSampai" class="exp-date-input" placeholder="Sampai Tanggal">
+                  </div>
+                </div>
                 <div class="exp-filters">
-                  <select id="exRekapBulan">
-                    <option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option>
-                    <option value="4">April</option><option value="5">Mei</option><option value="6">Juni</option>
-                    <option value="7">Juli</option><option value="8">Agustus</option><option value="9">September</option>
-                    <option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
-                  </select>
-                  <select id="exRekapTahun">
-                    <option value="2026" selected>2026</option><option value="2027">2027</option>
-                    <option value="2028">2028</option><option value="2029">2029</option><option value="2030">2030</option>
-                  </select>
                   <select id="exRekapGender" style="max-width:120px">
                     <option value="S">Semua</option><option value="P">Perempuan</option><option value="L">Laki-laki</option>
                   </select>
                 </div>
                 <div class="exp-actions">
-                  <button onclick="eksporRekap('excel')"><span>📊</span> Excel</button>
-                  <button onclick="eksporRekap('csv')"><span>📄</span> CSV</button>
-                  <button onclick="eksporRekap('print')"><span>🖨</span> Print</button>
+                  <button onclick="eksporRekap('excel')">Excel</button>
+                  <button onclick="eksporRekap('csv')">CSV</button>
+                  <button onclick="eksporRekap('print')">Print</button>
                 </div>
               </div>
             </div>
             <div class="nd-card exp-card">
               <div class="exp-card-hd"><span class="exp-card-ic" style="background:var(--gold-lt);color:var(--gold-dk)"><svg class="ico"><use href="#ico-money"/></svg></span><span>Laporan Kas</span></div>
               <div class="exp-card-body">
-                <div class="exp-filters">
-                  <select id="exKasBulan">
-                    <option value="01">Januari</option><option value="02">Februari</option>
-                    <option value="03">Maret</option><option value="04">April</option>
-                    <option value="05">Mei</option><option value="06">Juni</option>
-                    <option value="07">Juli</option><option value="08">Agustus</option>
-                    <option value="09">September</option><option value="10">Oktober</option>
-                    <option value="11">November</option><option value="12">Desember</option>
+                <div class="exp-date-range">
+                  <label class="exp-date-lbl">Periode</label>
+                  <select id="exKasPeriode" class="exp-date-input" onchange="exPeriodeChanged('kas')">
+                    <option value="bulan" selected>Bulan tertentu</option>
+                    <option value="tahun">Tahun tertentu</option>
+                    <option value="custom">Custom...</option>
+                    <option value="semua">Semua data</option>
                   </select>
-                  <select id="exKasTahun">
-                    <option value="2025">2025</option><option value="2026" selected>2026</option>
-                    <option value="2027">2027</option><option value="2028">2028</option>
-                    <option value="2029">2029</option><option value="2030">2030</option>
-                  </select>
+                  <div class="exp-date-row" id="exKasBulanRow" style="margin-top:6px">
+                    <span id="exKasBulanWrap" style="flex:1;display:flex;min-width:0">
+                      <select id="exKasBulan" class="exp-date-input">
+                        <option value="01">Januari</option><option value="02">Februari</option>
+                        <option value="03">Maret</option><option value="04">April</option>
+                        <option value="05">Mei</option><option value="06">Juni</option>
+                        <option value="07">Juli</option><option value="08">Agustus</option>
+                        <option value="09">September</option><option value="10">Oktober</option>
+                        <option value="11">November</option><option value="12">Desember</option>
+                      </select>
+                    </span>
+                    <span id="exKasTahunWrap" style="flex:1;display:flex;min-width:0">
+                      <select id="exKasTahun" class="exp-date-input">
+                        <option value="2025">2025</option><option value="2026">2026</option>
+                        <option value="2027">2027</option><option value="2028">2028</option>
+                        <option value="2029">2029</option><option value="2030">2030</option>
+                      </select>
+                    </span>
+                  </div>
+                  <div class="exp-date-row" id="exKasCustom" style="display:none;margin-top:6px">
+                    <input type="date" id="exKasDari" class="exp-date-input" placeholder="Dari Tanggal">
+                    <span class="exp-date-sep">—</span>
+                    <input type="date" id="exKasSampai" class="exp-date-input" placeholder="Sampai Tanggal">
+                  </div>
                 </div>
                 <div class="exp-actions">
-                  <button onclick="eksporKas('excel')"><span>📊</span> Excel</button>
-                  <button onclick="eksporKas('csv')"><span>📄</span> CSV</button>
-                  <button onclick="eksporKas('print')"><span>🖨</span> Print</button>
+                  <button onclick="eksporKas('excel')">Excel</button>
+                  <button onclick="eksporKas('csv')">CSV</button>
+                  <button onclick="eksporKas('print')">Print</button>
                 </div>
+              </div>
+            </div>
+            <div class="nd-card exp-card">
+              <div class="exp-card-hd"><span class="exp-card-ic" style="background:var(--amber-lt);color:var(--amber)"><svg class="ico"><use href="#ico-download"/></svg></span><span>Rekap Gabungan (Absensi + Kas)</span></div>
+              <div class="exp-card-body">
+                <p class="exp-note">Export rekap absensi beserta rekap kas dalam satu file (Excel / CSV / Print).</p>
+                <button class="btn-p" onclick="openExGab()" style="align-self:flex-start">Pilih Periode &amp; Export</button>
               </div>
             </div>
             <div class="nd-card exp-card">
               <div class="exp-card-hd"><span class="exp-card-ic" style="background:var(--amber-lt);color:var(--amber)"><svg class="ico"><use href="#ico-users"/></svg></span><span>Data Anggota</span></div>
               <div class="exp-card-body">
                 <p class="exp-note">Pilih anggota yang ingin diekspor (Excel / CSV / Print ZIP-PDF). Ekspor satu anggota tersedia di halaman detail anggota.</p>
-                <button class="btn-p" onclick="openExpAng()" style="align-self:flex-start"><span>👥</span> Pilih Anggota &amp; Ekspor</button>
+                <button class="btn-p" onclick="openExpAng()" style="align-self:flex-start">Pilih Anggota &amp; Ekspor</button>
               </div>
             </div>
           </div>
@@ -814,11 +880,11 @@
         <!-- Welcome -->
         <div class="welcome-card welcome-card-mob welcome-card-home">
           <div class="welcome-inner">
-            <div class="welcome-greet"><span id="dash-welcome-emoji-mob">☀️</span> <span id="dash-welcome-greet-mob">Selamat Pagi</span>, MinKel</div>
+            <div class="welcome-greet"><span id="dash-welcome-greet-mob">Selamat Pagi</span>, MinKel</div>
             <div class="welcome-title">Database Muda-Mudi Margosari</div>
-            <div class="welcome-date">📅 <span class="js-date"></span></div>
+            <div class="welcome-date"><span class="js-date"></span></div>
           </div>
-          <div class="welcome-home-badge" aria-hidden="true">🕌</div>
+          <div class="welcome-home-badge" aria-hidden="true"><img src="logo.png" alt=""/></div>
         </div>
 
         <!-- Stat Cards 2x2 -->
@@ -909,9 +975,9 @@
         <div id="mob-stage-hero">
           <div class="welcome-card welcome-card-mob welcome-card-absen-hero" style="margin:12px">
             <div class="welcome-inner">
-              <div class="welcome-greet">Mulai Absensi <span class="w-greet-emoji">✍️</span></div>
+              <div class="welcome-greet">Mulai Absensi</div>
               <div class="welcome-title">Pilih tanggal &amp; nama kegiatan</div>
-              <div class="welcome-date">📅 <span class="js-date"></span></div>
+              <div class="welcome-date"><span class="js-date"></span></div>
               <div class="welcome-actions">
                 <button class="w-btn w-btn-solid" onclick="showMobAbsenMain()">Mulai Absensi →</button>
               </div>
@@ -926,7 +992,7 @@
           </div>
           <div id="sesiFilterRowM" class="sesi-filter-row" style="display:none">
             <div class="toolbar" style="flex-wrap:wrap;gap:8px;margin:10px 12px 0">
-              <input id="dbSearchM" placeholder="🔍 Cari kegiatan..." style="flex:1;min-width:120px" oninput="renderDbMob()"/>
+              <input id="dbSearchM" placeholder="Cari kegiatan..." style="flex:1;min-width:120px" oninput="renderDbMob()"/>
               <select id="dbFilterBulanM" onchange="renderDbMob()" style="min-width:100px">
                 <option value="">Semua Bulan</option>
                 <option value="01">Januari</option><option value="02">Februari</option>
@@ -1052,7 +1118,7 @@
                 <div class="menu-profile-name js-uname">Administrator</div>
                 <div class="menu-profile-role js-urole"></div>
               </div>
-              <span id="mob-sync-badge" class="sync-badge sync-ok">🟢 Online</span>
+              <span id="mob-sync-badge" class="sync-badge sync-ok">Online</span>
             </div>
           </div>
 
@@ -1196,7 +1262,7 @@
               <ol class="tentang-guide-list">
                 <li>Buka menu <b>Ekspor</b>.</li>
                 <li>Pilih data yang mau diambil: <b>Rekap Absensi Bulanan</b>, <b>Laporan Kas</b>, atau <b>Data Anggota</b>.</li>
-                <li>Atur <b>bulan / tahun</b> (dan jenis kelamin bila perlu), lalu pilih format: <b>Excel</b>, <b>CSV</b>, atau <b>Print</b>.</li>
+                <li>Pilih <b>periode</b> (Bulan / Tahun / Custom) dan jenis kelamin bila perlu, lalu pilih format: <b>Excel</b>, <b>CSV</b>, atau <b>Print</b>.</li>
                 <li>Hasil <b>Print</b> dibuka sebagai dokumen A4 landscape yang siap dicetak.</li>
               </ol>
             </div>
@@ -1220,58 +1286,106 @@
           <div class="nd-card exp-card">
             <div class="exp-card-hd"><span class="exp-card-ic" style="background:var(--green-lt);color:var(--green)"><svg class="ico"><use href="#ico-chart"/></svg></span><span>Rekap Absensi Bulanan</span></div>
             <div class="exp-card-body">
+              <div class="exp-date-range">
+                <label class="exp-date-lbl">Periode</label>
+                <select id="exRekapPeriodeM" class="exp-date-input" onchange="exPeriodeChanged('rekap')">
+                  <option value="bulan" selected>Bulan tertentu</option>
+                  <option value="tahun">Tahun tertentu</option>
+                  <option value="custom">Custom...</option>
+                  <option value="semua">Semua data</option>
+                </select>
+                <div class="exp-date-row" id="exRekapBulanRowM" style="margin-top:6px">
+                  <span id="exRekapBulanWrapM" style="flex:1;display:flex;min-width:0">
+                    <select id="exRekapBulanM" class="exp-date-input">
+                      <option value="01">Januari</option><option value="02">Februari</option>
+                      <option value="03">Maret</option><option value="04">April</option>
+                      <option value="05">Mei</option><option value="06">Juni</option>
+                      <option value="07">Juli</option><option value="08">Agustus</option>
+                      <option value="09">September</option><option value="10">Oktober</option>
+                      <option value="11">November</option><option value="12">Desember</option>
+                    </select>
+                  </span>
+                  <span id="exRekapTahunWrapM" style="flex:1;display:flex;min-width:0">
+                    <select id="exRekapTahunM" class="exp-date-input">
+                      <option value="2025">2025</option><option value="2026">2026</option>
+                      <option value="2027">2027</option><option value="2028">2028</option>
+                      <option value="2029">2029</option><option value="2030">2030</option>
+                    </select>
+                  </span>
+                </div>
+                <div class="exp-date-row" id="exRekapCustomM" style="display:none;margin-top:6px">
+                  <input type="date" id="exRekapDariM" class="exp-date-input" placeholder="Dari Tanggal">
+                  <span class="exp-date-sep">—</span>
+                  <input type="date" id="exRekapSampaiM" class="exp-date-input" placeholder="Sampai Tanggal">
+                </div>
+              </div>
               <div class="exp-filters">
-                <select id="exRekapBulanM">
-                  <option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option>
-                  <option value="4">April</option><option value="5">Mei</option><option value="6">Juni</option>
-                  <option value="7">Juli</option><option value="8">Agustus</option><option value="9">September</option>
-                  <option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
-                </select>
-                <select id="exRekapTahunM">
-                  <option value="2026" selected>2026</option><option value="2027">2027</option>
-                  <option value="2028">2028</option><option value="2029">2029</option><option value="2030">2030</option>
-                </select>
                 <select id="exRekapGenderM" style="max-width:110px">
                   <option value="S">Semua</option><option value="P">Perempuan</option><option value="L">Laki-laki</option>
                 </select>
               </div>
               <div class="exp-actions">
-                <button onclick="eksporRekap('excel')"><span>📊</span> Excel</button>
-                <button onclick="eksporRekap('csv')"><span>📄</span> CSV</button>
-                <button onclick="eksporRekap('print')"><span>🖨</span> Print</button>
+                <button onclick="eksporRekap('excel')">Excel</button>
+                <button onclick="eksporRekap('csv')">CSV</button>
+                <button onclick="eksporRekap('print')">Print</button>
               </div>
             </div>
           </div>
           <div class="nd-card exp-card">
             <div class="exp-card-hd"><span class="exp-card-ic" style="background:var(--gold-lt);color:var(--gold-dk)"><svg class="ico"><use href="#ico-money"/></svg></span><span>Laporan Kas</span></div>
             <div class="exp-card-body">
-              <div class="exp-filters">
-                <select id="exKasBulanM">
-                  <option value="01">Januari</option><option value="02">Februari</option>
-                  <option value="03">Maret</option><option value="04">April</option>
-                  <option value="05">Mei</option><option value="06">Juni</option>
-                  <option value="07">Juli</option><option value="08">Agustus</option>
-                  <option value="09">September</option><option value="10">Oktober</option>
-                  <option value="11">November</option><option value="12">Desember</option>
+              <div class="exp-date-range">
+                <label class="exp-date-lbl">Periode</label>
+                <select id="exKasPeriodeM" class="exp-date-input" onchange="exPeriodeChanged('kas')">
+                  <option value="bulan" selected>Bulan tertentu</option>
+                  <option value="tahun">Tahun tertentu</option>
+                  <option value="custom">Custom...</option>
+                  <option value="semua">Semua data</option>
                 </select>
-                <select id="exKasTahunM">
-                  <option value="2025">2025</option><option value="2026" selected>2026</option>
-                  <option value="2027">2027</option><option value="2028">2028</option>
-                  <option value="2029">2029</option><option value="2030">2030</option>
-                </select>
+                <div class="exp-date-row" id="exKasBulanRowM" style="margin-top:6px">
+                  <span id="exKasBulanWrapM" style="flex:1;display:flex;min-width:0">
+                    <select id="exKasBulanM" class="exp-date-input">
+                      <option value="01">Januari</option><option value="02">Februari</option>
+                      <option value="03">Maret</option><option value="04">April</option>
+                      <option value="05">Mei</option><option value="06">Juni</option>
+                      <option value="07">Juli</option><option value="08">Agustus</option>
+                      <option value="09">September</option><option value="10">Oktober</option>
+                      <option value="11">November</option><option value="12">Desember</option>
+                    </select>
+                  </span>
+                  <span id="exKasTahunWrapM" style="flex:1;display:flex;min-width:0">
+                    <select id="exKasTahunM" class="exp-date-input">
+                      <option value="2025">2025</option><option value="2026">2026</option>
+                      <option value="2027">2027</option><option value="2028">2028</option>
+                      <option value="2029">2029</option><option value="2030">2030</option>
+                    </select>
+                  </span>
+                </div>
+                <div class="exp-date-row" id="exKasCustomM" style="display:none;margin-top:6px">
+                  <input type="date" id="exKasDariM" class="exp-date-input" placeholder="Dari Tanggal">
+                  <span class="exp-date-sep">—</span>
+                  <input type="date" id="exKasSampaiM" class="exp-date-input" placeholder="Sampai Tanggal">
+                </div>
               </div>
               <div class="exp-actions">
-                <button onclick="eksporKas('excel')"><span>📊</span> Excel</button>
-                <button onclick="eksporKas('csv')"><span>📄</span> CSV</button>
-                <button onclick="eksporKas('print')"><span>🖨</span> Print</button>
+                <button onclick="eksporKas('excel')">Excel</button>
+                <button onclick="eksporKas('csv')">CSV</button>
+                <button onclick="eksporKas('print')">Print</button>
               </div>
+            </div>
+          </div>
+          <div class="nd-card exp-card">
+            <div class="exp-card-hd"><span class="exp-card-ic" style="background:var(--amber-lt);color:var(--amber)"><svg class="ico"><use href="#ico-download"/></svg></span><span>Rekap Gabungan (Absensi + Kas)</span></div>
+            <div class="exp-card-body">
+              <p class="exp-note">Export rekap absensi beserta rekap kas dalam satu file (Excel / CSV / Print).</p>
+              <button class="btn-p" onclick="openExGab()" style="align-self:flex-start">Pilih Periode &amp; Export</button>
             </div>
           </div>
           <div class="nd-card exp-card">
             <div class="exp-card-hd"><span class="exp-card-ic" style="background:var(--amber-lt);color:var(--amber)"><svg class="ico"><use href="#ico-users"/></svg></span><span>Data Anggota</span></div>
             <div class="exp-card-body">
               <p class="exp-note">Pilih anggota yang ingin diekspor (Excel / CSV / Print ZIP-PDF).</p>
-              <button class="btn-p" onclick="openExpAng()" style="align-self:flex-start"><span>👥</span> Pilih Anggota &amp; Ekspor</button>
+              <button class="btn-p" onclick="openExpAng()" style="align-self:flex-start">Pilih Anggota &amp; Ekspor</button>
             </div>
           </div>
         </div>
@@ -1306,14 +1420,14 @@
       <!-- Welcome -->
       <div class="welcome-card welcome-card-mob welcome-card-kas" style="margin:12px 14px 0">
         <div class="welcome-inner">
-          <div class="welcome-greet">Kelola Kas <span class="w-greet-emoji">🪙</span></div>
+          <div class="welcome-greet">Kelola Kas</div>
           <div class="welcome-title">Catat pemasukan &amp; pengeluaran</div>
-          <div class="welcome-date">📅 <span class="js-date"></span></div>
+          <div class="welcome-date"><span class="js-date"></span></div>
           <div class="welcome-actions">
             <button class="w-btn w-btn-solid" onclick="openKasTambah()">+ Tambah Transaksi</button>
           </div>
         </div>
-        <div class="welcome-home-badge" aria-hidden="true">💰</div>
+        <div class="welcome-home-badge" aria-hidden="true"><img src="logo.png" alt=""/></div>
       </div>
       <!-- Cash Flow card -->
       <div class="kas-mob-cf" style="margin:12px 14px 0">
@@ -1482,12 +1596,12 @@
     </table>
   </div>
   <div class="mdet-footer">
-    <button onclick="exportMemberExcel()">📊 Excel</button>
-    <button onclick="exportMemberCSV()">📄 CSV</button>
-    <button onclick="exportMemberPrint()">🖨 Print</button>
-    <button onclick="editNamaAnggota()">✏️ Edit Nama</button>
-    <button id="mdet-arsip-btn" onclick="arsipToggleAnggota()" style="color:var(--gold-dk);border-color:var(--gold);background:var(--gold-xlt)">🗂 Arsipkan</button>
-    <button class="btn-danger" onclick="hapusAnggotaFromDetail()" style="margin-left:auto">🗑 Hapus</button>
+    <button onclick="exportMemberExcel()">Excel</button>
+    <button onclick="exportMemberCSV()">CSV</button>
+    <button onclick="exportMemberPrint()">Print</button>
+    <button onclick="editNamaAnggota()">Edit Nama</button>
+    <button id="mdet-arsip-btn" onclick="arsipToggleAnggota()" style="color:var(--gold-dk);border-color:var(--gold);background:var(--gold-xlt)">Arsipkan</button>
+    <button class="btn-danger" onclick="hapusAnggotaFromDetail()" style="margin-left:auto">Hapus</button>
     <button class="mdet-close-btn" onclick="closeMemberDetail()">Tutup</button>
   </div>
 </div>
@@ -1631,8 +1745,8 @@
     <div class="fr">
       <label>Jenis Transaksi</label>
       <div class="seg" style="margin-top:2px">
-        <button class="seg-btn on" id="kasJenisP" onclick="setKasJenis('pemasukan')">⬆️ Pemasukan</button>
-        <button class="seg-btn" id="kasJenisK" onclick="setKasJenis('pengeluaran')">⬇️ Pengeluaran</button>
+        <button class="seg-btn on" id="kasJenisP" onclick="setKasJenis('pemasukan')">Pemasukan</button>
+        <button class="seg-btn" id="kasJenisK" onclick="setKasJenis('pengeluaran')">Pengeluaran</button>
       </div>
       <input type="hidden" id="kasJenis" value="pemasukan"/>
     </div>
@@ -1651,7 +1765,7 @@
   </div>
   <div class="izin-popup-footer">
     <button onclick="closeKasTambah()">Batal</button>
-    <button class="btn-p" style="background:var(--brown);border-color:var(--brown)" onclick="submitKasTambah()">💾 Simpan</button>
+    <button class="btn-p" style="background:var(--brown);border-color:var(--brown)" onclick="submitKasTambah()">Simpan</button>
   </div>
 </div>
 
@@ -1659,7 +1773,7 @@
 <div id="expang-overlay" class="izin-overlay" onclick="closeExpAng()"></div>
 <div id="expang-popup" class="izin-popup" style="width:min(420px,95vw)">
   <div class="izin-popup-header">
-    <div class="izin-popup-icon" style="background:var(--green-lt);color:var(--green)">👥</div>
+    <div class="izin-popup-icon" style="background:var(--green-lt);color:var(--green)"><svg class="ico" style="width:17px;height:17px"><use href="#ico-users"/></svg></div>
     <div>
       <div class="izin-popup-title" style="color:var(--green)">Export Data Anggota</div>
       <div class="izin-popup-name">Pilih anggota dan periode</div>
@@ -1667,22 +1781,13 @@
     <button onclick="closeExpAng()" style="margin-left:auto;background:none;border:none;font-size:16px;cursor:pointer;color:var(--text3)">✕</button>
   </div>
   <div class="izin-popup-body" style="max-height:55vh;overflow-y:auto">
-    <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
-      <select id="expang-bulan" style="flex:1;min-width:100px">
-        <option value="">Semua Bulan</option>
-        <option value="01">Januari</option><option value="02">Februari</option>
-        <option value="03">Maret</option><option value="04">April</option>
-        <option value="05">Mei</option><option value="06">Juni</option>
-        <option value="07">Juli</option><option value="08">Agustus</option>
-        <option value="09">September</option><option value="10">Oktober</option>
-        <option value="11">November</option><option value="12">Desember</option>
-      </select>
-      <select id="expang-tahun" style="flex:1;min-width:80px">
-        <option value="">Semua Tahun</option>
-        <option value="2026">2026</option><option value="2027">2027</option>
-        <option value="2028">2028</option><option value="2029">2029</option>
-        <option value="2030">2030</option>
-      </select>
+    <div class="exp-date-range" style="margin-bottom:10px">
+      <label class="exp-date-lbl">Pilih Rentang Tanggal</label>
+      <div class="exp-date-row">
+        <input type="date" id="expangDari" class="exp-date-input" placeholder="Dari Tanggal">
+        <span class="exp-date-sep">—</span>
+        <input type="date" id="expangSampai" class="exp-date-input" placeholder="Sampai Tanggal">
+      </div>
     </div>
     <div style="display:flex;justify-content:space-between;margin-bottom:8px">
       <button class="exp-sel-btn" onclick="expangSelAll(true)">Pilih Semua</button>
@@ -1692,9 +1797,67 @@
   </div>
   <div class="izin-popup-footer" style="flex-wrap:wrap;gap:6px">
     <button class="btn-sec" onclick="closeExpAng()">Batal</button>
-    <button class="exp-act-btn" style="background:var(--green)" onclick="doExpAng('excel')">📊 Excel</button>
-    <button class="exp-act-btn" style="background:var(--green)" onclick="doExpAng('csv')">📄 CSV</button>
-    <button class="exp-act-btn" style="background:var(--green)" onclick="doExpAng('print')">🖨 Print</button>
+    <button class="exp-act-btn" style="background:var(--green)" onclick="doExpAng('excel')">Excel</button>
+    <button class="exp-act-btn" style="background:var(--green)" onclick="doExpAng('csv')">CSV</button>
+    <button class="exp-act-btn" style="background:var(--green)" onclick="doExpAng('print')">Print</button>
+  </div>
+</div>
+
+<!-- EXPORT GABUNGAN (REKAP + KAS) POPUP -->
+<div id="exgab-overlay" class="izin-overlay" onclick="closeExGab()"></div>
+<div id="exgab-popup" class="izin-popup" style="width:min(380px,94vw)">
+  <div class="izin-popup-header">
+    <div class="izin-popup-icon" style="background:var(--green-lt);color:var(--green)"><svg class="ico" style="width:17px;height:17px"><use href="#ico-download"/></svg></div>
+    <div>
+      <div class="izin-popup-title" style="color:var(--green)">Export Rekap + Kas</div>
+      <div class="izin-popup-name">Pilih periode dan jenis kelamin</div>
+    </div>
+    <button onclick="closeExGab()" style="margin-left:auto;background:none;border:none;font-size:16px;cursor:pointer;color:var(--text3)">✕</button>
+  </div>
+  <div class="izin-popup-body">
+    <label class="exp-date-lbl">Periode</label>
+    <select id="exGabPeriode" class="exp-date-input" style="width:100%;box-sizing:border-box" onchange="exGabPeriodeChanged()">
+      <option value="bulan" selected>Bulan tertentu</option>
+      <option value="tahun">Tahun tertentu</option>
+      <option value="custom">Custom...</option>
+      <option value="semua">Semua data</option>
+    </select>
+    <div class="exp-date-row" id="exGabBulanRow" style="margin-top:8px">
+      <span id="exGabBulanWrap" style="flex:1;display:flex;min-width:0">
+        <select id="exGabBulan" class="exp-date-input">
+          <option value="01">Januari</option><option value="02">Februari</option>
+          <option value="03">Maret</option><option value="04">April</option>
+          <option value="05">Mei</option><option value="06">Juni</option>
+          <option value="07">Juli</option><option value="08">Agustus</option>
+          <option value="09">September</option><option value="10">Oktober</option>
+          <option value="11">November</option><option value="12">Desember</option>
+        </select>
+      </span>
+      <span style="flex:1;display:flex;min-width:0">
+        <select id="exGabTahun" class="exp-date-input">
+          <option value="2025">2025</option><option value="2026">2026</option>
+          <option value="2027">2027</option><option value="2028">2028</option>
+          <option value="2029">2029</option><option value="2030">2030</option>
+        </select>
+      </span>
+    </div>
+    <div class="exp-date-row" id="exGabCustom" style="display:none;margin-top:8px">
+      <input type="date" id="exGabDari" class="exp-date-input" placeholder="Dari Tanggal">
+      <span class="exp-date-sep">—</span>
+      <input type="date" id="exGabSampai" class="exp-date-input" placeholder="Sampai Tanggal">
+    </div>
+    <label class="exp-date-lbl" style="margin-top:10px">Jenis Kelamin</label>
+    <select id="exGabGender" class="exp-date-input" style="width:100%;box-sizing:border-box">
+      <option value="S">Semua</option><option value="P">Perempuan</option><option value="L">Laki-laki</option>
+    </select>
+    <label class="exp-date-lbl" style="margin-top:10px">Catatan / Hasil Musyawarah <span style="font-weight:400;text-transform:none;letter-spacing:0">(opsional)</span></label>
+    <textarea id="exGabCatatan" class="exp-date-input" rows="3" placeholder="cth: Hasil musyawarah ditetapkan iuran..." style="width:100%;box-sizing:border-box;resize:vertical;min-height:64px;font-family:inherit"></textarea>
+  </div>
+  <div class="izin-popup-footer" style="flex-wrap:wrap;gap:6px">
+    <button class="btn-sec" onclick="closeExGab()">Batal</button>
+    <button class="exp-act-btn" style="background:var(--green)" onclick="eksporGabungan('excel')">Excel</button>
+    <button class="exp-act-btn" style="background:var(--green)" onclick="eksporGabungan('csv')">CSV</button>
+    <button class="exp-act-btn" style="background:var(--green)" onclick="eksporGabungan('print')">Print</button>
   </div>
 </div>
 <script src="js/firebase.js"></script>
@@ -1715,7 +1878,7 @@
 <div id="log-overlay" class="izin-overlay" onclick="closeActivityLog()"></div>
 <div id="log-popup" class="izin-popup" style="width:min(680px,96vw);max-height:88vh;overflow:hidden;display:none;flex-direction:column">
   <div class="izin-popup-header" style="flex-shrink:0">
-    <div class="izin-popup-icon" style="background:var(--amber-lt);color:var(--amber)">🕐</div>
+    <div class="izin-popup-icon" style="background:var(--amber-lt);color:var(--amber)"><svg class="ico" style="width:17px;height:17px"><use href="#ico-clock"/></svg></div>
     <div style="flex:1">
       <div class="izin-popup-title" style="color:var(--amber)">Activity Log</div>
       <div class="izin-popup-name">Riwayat aktivitas pengguna</div>
@@ -1723,7 +1886,7 @@
     <button onclick="closeActivityLog()" style="background:none;border:none;font-size:16px;cursor:pointer;color:var(--text3);padding:4px 6px;margin-left:auto">✕</button>
   </div>
   <div style="padding:8px 14px;border-bottom:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;flex-shrink:0;align-items:center">
-    <input type="text" id="logSearch" placeholder="🔍 Cari aktivitas..." style="flex:1;min-width:120px;font-size:12px;padding:7px 10px" oninput="renderActivityLogFor('')"/>
+    <input type="text" id="logSearch" placeholder="Cari aktivitas..." style="flex:1;min-width:120px;font-size:12px;padding:7px 10px" oninput="renderActivityLogFor('')"/>
     <select id="logFilter" onchange="renderActivityLogFor('')" style="font-size:12px;padding:6px 8px;width:auto;min-width:100px">
       <option value="">Semua</option>
       <option value="absen">Absensi</option>
@@ -1752,7 +1915,7 @@
   </div>
   <div class="izin-popup-footer">
     <button onclick="closeActivityLog()">Tutup</button>
-    <button class="btn-p" style="background:var(--brown);border-color:var(--brown)" onclick="logExport()">📊 Export</button>
+    <button class="btn-p" style="background:var(--brown);border-color:var(--brown)" onclick="logExport()">Export</button>
   </div>
 </div>
 

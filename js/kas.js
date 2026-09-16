@@ -49,7 +49,7 @@ function seedKasData(){
   });
   logActivity('kas', 'Seed data awal Apr-Jun 2026');
   renderKas();
-  showToast('✅ Data kas April–Juni 2026 dimuat');
+  showToast('Data kas April–Juni 2026 dimuat.');
 }
 
 // ── Sort & Running Saldo ──
@@ -172,8 +172,8 @@ function renderKas(){
         html+='<td class="r">'+keluarStr+'</td>';
         html+='<td class="r" style="font-weight:600">'+fmtRp(item.saldo)+'</td>';
         html+='<td style="text-align:center;white-space:nowrap">'+
-          '<button onclick="kasEditTrx(\''+trx.id+'\')" title="Edit" style="font-size:11px;padding:3px 7px;margin-right:2px">✏️</button>'+
-          '<button onclick="kasDelTrx(\''+trx.id+'\')" title="Hapus" style="font-size:11px;padding:3px 7px" class="btn-danger">🗑</button>'+
+          '<button onclick="kasEditTrx(\''+trx.id+'\')" title="Edit" style="font-size:11px;padding:3px 7px;margin-right:2px"><svg class="ico" style="width:11px;height:11px"><use href="#ico-edit"/></svg></button>'+
+          '<button onclick="kasDelTrx(\''+trx.id+'\')" title="Hapus" style="font-size:11px;padding:3px 7px" class="btn-danger"><svg class="ico" style="width:11px;height:11px"><use href="#ico-trash"/></svg></button>'+
         '</td>';
         html+='</tr>';
       });
@@ -220,7 +220,7 @@ function renderKas(){
         var nominalStr=(isPemasukan?'+':'-')+fmtRp(trx.nominal);
         var nominalColor=isPemasukan?'var(--green)':'var(--red)';
         mHtml+='<div class="swipe-row" data-key="'+trx.id+'">';
-        mHtml+='<div class="swipe-reveal"><span>🗑 Hapus</span></div>';
+        mHtml+='<div class="swipe-reveal"><span>Hapus</span></div>';
         mHtml+='<div class="swipe-content kas-mob-trx-item" onclick="kasEditTrx(\''+trx.id+'\')" style="cursor:pointer">';
         mHtml+='<div class="kas-mob-trx-dot" style="background:'+dotColor+'"></div>';
         mHtml+='<div class="kas-mob-trx-info"><div class="kas-mob-trx-date">'+fmtTglShort(trx.tanggal)+'</div><div class="kas-mob-trx-ket">'+escHtml(trx.keterangan||'')+'</div></div>';
@@ -478,55 +478,97 @@ function kasDelTrx(id){
 
 // ── Saldo Awal (starting point April 2026: terkunci, read-only) ──
 
+// ── Fragment cetak Kas (dipakai ulang) ──
+// Bagian tengah laporan kas: kartu Cash Flow + Donut Komposisi + tabel
+// Detail Transaksi. Dipakai oleh kasExport('print') dan oleh export gabungan
+// Rekap+Kas di rekap.js supaya desainnya sama persis.
+// Parameter ke-7 (opsional, hanya dipakai export gabungan): teks catatan
+// musyawarah. Bila diisi, tabel Detail Transaksi + kartu catatan tampil
+// berdampingan (kiri-kanan); bila kosong, tabel tampil full seperti biasa.
+function kasPrintSectionHtml(periodItems, saldoAwal, totalMasuk, totalKeluar, selisih, saldoAkhir, catatan){
+  var donutR=54,donutCx=70,donutCy=70,donutW=14;
+  var donutTotal=totalMasuk+totalKeluar;
+  var donutSvg='';
+  if(donutTotal>0){
+    var pctMasuk=totalMasuk/donutTotal,pctKeluar=totalKeluar/donutTotal;
+    var circ=2*Math.PI*donutR;
+    var dashM=pctMasuk*circ,gapM=circ-dashM,dashK=pctKeluar*circ,gapK=circ-dashK,rotateK=-90+pctMasuk*360;
+    donutSvg='<svg width="140" height="140" viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">'+
+      '<circle cx="'+donutCx+'" cy="'+donutCy+'" r="'+donutR+'" fill="none" stroke="#e8e0d0" stroke-width="'+donutW+'"/>'+
+      '<circle cx="'+donutCx+'" cy="'+donutCy+'" r="'+donutR+'" fill="none" stroke="#2e7d55" stroke-width="'+donutW+'" stroke-dasharray="'+dashM+' '+gapM+'" transform="rotate(-90 '+donutCx+' '+donutCy+')" stroke-linecap="round"/>'+
+      (totalKeluar>0?'<circle cx="'+donutCx+'" cy="'+donutCy+'" r="'+donutR+'" fill="none" stroke="#a83a33" stroke-width="'+donutW+'" stroke-dasharray="'+dashK+' '+gapK+'" transform="rotate('+rotateK+' '+donutCx+' '+donutCy+')" stroke-linecap="round"/>':'')+
+      '<text x="'+donutCx+'" y="'+(donutCy-5)+'" text-anchor="middle" font-size="13" font-weight="700" fill="#28322a">'+Math.round(pctMasuk*100)+'%</text>'+
+      '<text x="'+donutCx+'" y="'+(donutCy+10)+'" text-anchor="middle" font-size="9" fill="#888">Masuk</text>'+
+      '</svg>';
+  } else {
+    donutSvg='<svg width="140" height="140" viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg"><circle cx="70" cy="70" r="54" fill="none" stroke="#e8e0d0" stroke-width="14"/><text x="70" y="75" text-anchor="middle" font-size="11" fill="#aaa">Kosong</text></svg>';
+  }
+  var rows='',rowNo=1;
+  rows+='<tr class="saldo-awal-row"><td colspan="2" style="font-style:italic;color:#7c8a6c;font-size:10.5px">Saldo Awal Periode</td><td></td><td></td><td class="num bold" style="color:#b07b1f">'+fmtRp(saldoAwal)+'</td></tr>';
+  periodItems.forEach(function(item){
+    var trx=item.trx;
+    var masuk =trx.jenis==='pemasukan'   ?fmtRp(trx.nominal):'-';
+    var keluar=trx.jenis==='pengeluaran' ?fmtRp(trx.nominal):'-';
+    var shade=rowNo%2===0?'background:#f7f4ea':'';
+    rows+='<tr style="'+shade+'"><td style="white-space:nowrap;font-size:10.5px">'+fmtTglShort(trx.tanggal)+'</td><td style="font-size:10.5px">'+escHtml(trx.keterangan||'')+'</td><td class="num green" style="font-size:10.5px">'+masuk+'</td><td class="num red" style="font-size:10.5px">'+keluar+'</td><td class="num bold" style="font-size:10.5px">'+fmtRp(item.saldo)+'</td></tr>';
+    rowNo++;
+  });
+  return '<div class="cf-donut-row"><div class="cf-box"><div class="cf-box-title">Cash Flow Periode</div>'+
+    '<div class="cf-row"><div class="cf-icon" style="background:#e2f0e7">Sal</div><span class="cf-lbl">Saldo Awal</span><span class="cf-val" style="color:#b07b1f">'+fmtRp(saldoAwal)+'</span></div>'+
+    '<div class="cf-row"><div class="cf-icon" style="background:#e2f0e7">↑</div><span class="cf-lbl">Total Pemasukan</span><span class="cf-val" style="color:#2e7d55">'+fmtRp(totalMasuk)+'</span></div>'+
+    '<div class="cf-row"><div class="cf-icon" style="background:#f6e2df">↓</div><span class="cf-lbl">Total Pengeluaran</span><span class="cf-val" style="color:#a83a33">'+fmtRp(totalKeluar)+'</span></div>'+
+    '<div class="cf-row"><div class="cf-icon" style="background:#f5ead0">~</div><span class="cf-lbl">Selisih</span><span class="cf-val" style="color:'+(selisih>=0?'#2e7d55':'#a83a33')+'">'+fmtRp(selisih)+'</span></div>'+
+    '<div class="cf-saldo-akhir"><span class="cf-sa-lbl">Saldo Akhir</span><span class="cf-sa-val">'+fmtRp(saldoAkhir)+'</span></div></div>'+
+    '<div class="donut-box"><div class="donut-box-title">Komposisi</div>'+donutSvg+
+    '<div class="donut-legend">'+
+    (totalMasuk>0?'<div class="donut-leg-row"><div class="donut-dot" style="background:#2e7d55"></div><span class="donut-leg-lbl">Pemasukan</span><span class="donut-leg-val" style="color:#2e7d55">'+fmtRp(totalMasuk)+'</span></div>':'')+
+    (totalKeluar>0?'<div class="donut-leg-row"><div class="donut-dot" style="background:#a83a33"></div><span class="donut-leg-lbl">Pengeluaran</span><span class="donut-leg-val" style="color:#a83a33">'+fmtRp(totalKeluar)+'</span></div>':'')+
+    '</div></div></div>'+
+    kasDetailTableHtml(rows, totalMasuk, totalKeluar, saldoAkhir, catatan||'');
+}
+
+function kasDetailTableHtml(rows, totalMasuk, totalKeluar, saldoAkhir, catatan){
+  var tableHtml='<div class="section-title">Detail Transaksi</div>'+
+    '<table><thead><tr><th>Tanggal</th><th>Keterangan</th><th style="text-align:right">Masuk (Rp)</th><th style="text-align:right">Keluar (Rp)</th><th style="text-align:right">Saldo (Rp)</th></tr></thead>'+
+    '<tbody>'+rows+
+    '<tr class="total-row"><td colspan="2">TOTAL PERIODE</td><td class="num green">'+fmtRp(totalMasuk)+'</td><td class="num red">'+fmtRp(totalKeluar)+'</td><td class="num bold">'+fmtRp(saldoAkhir)+'</td></tr>'+
+    '</tbody></table>';
+  if(!catatan) return tableHtml;
+  var _ct=escHtml(catatan).replace(/\r\n/g,'\n').replace(/\n/g,'<br>');
+  return '<div class="kas-detail-row">'+
+    '<div class="kas-detail-main">'+tableHtml+'</div>'+
+    '<div class="kas-detail-side"><div class="section-title">Catatan / Hasil Musyawarah</div>'+
+    '<div class="tbl-card catatan-card-side"><div class="catatan-text">'+_ct+'</div></div></div>'+
+  '</div>';
+}
+
 // ── Export ──
 function kasExport(type){
-  var bulan   = kasGetBulan();
-  var tahun   = kasGetTahun();
-  var bulanNum= parseInt(bulan,10);
-  var prefix  = tahun+'-'+bulan;
+  var _rg=(typeof resolveExRange==='function')?resolveExRange('kas')
+    :{dari:_exVal('exKasDari','exKasDariM'),sampai:_exVal('exKasSampai','exKasSampaiM')};
+  var cDari=_rg.dari||'', cSampai=_rg.sampai||'';
+  var dariDate=cDari?cDari:'0000-01-01';
+  var sampaiDate=cSampai?cSampai:'9999-12-31';
+  if(dariDate>sampaiDate){ var tmp=dariDate;dariDate=sampaiDate;sampaiDate=tmp; }
   var allRun  = kasCalcRunning();
   var saldoAwal=0;
   for(var i=0;i<allRun.length;i++){
-    var tp=allRun[i].trx.tanggal.split('-');
-    if(tp[0]<tahun||(tp[0]===tahun&&parseInt(tp[1])<bulanNum)) saldoAwal=allRun[i].saldo;
+    if(allRun[i].trx.tanggal<dariDate) saldoAwal=allRun[i].saldo;
   }
-  var periodItems=allRun.filter(function(item){return item.trx.tanggal.startsWith(prefix);});
+  var periodItems=allRun.filter(function(item){
+    var tg=item.trx.tanggal;
+    return tg>=dariDate && tg<=sampaiDate;
+  });
   var totalMasuk=0,totalKeluar=0;
   periodItems.forEach(function(item){
     if(item.trx.jenis==='pemasukan') totalMasuk+=item.trx.nominal; else totalKeluar+=item.trx.nominal;
   });
   var selisih=totalMasuk-totalKeluar;
   var saldoAkhir=saldoAwal+selisih;
-  var periodeLabel=BULAN_ID[bulanNum]+' '+tahun;
+  var periodeLabel=(cDari||'Awal')+' s/d '+(cSampai||'Akhir');
 
   if(type==='print'){
-    var donutR=54,donutCx=70,donutCy=70,donutW=14;
-    var donutTotal=totalMasuk+totalKeluar;
-    var donutSvg='';
-    if(donutTotal>0){
-      var pctMasuk=totalMasuk/donutTotal,pctKeluar=totalKeluar/donutTotal;
-      var circ=2*Math.PI*donutR;
-      var dashM=pctMasuk*circ,gapM=circ-dashM,dashK=pctKeluar*circ,gapK=circ-dashK,rotateK=-90+pctMasuk*360;
-      donutSvg='<svg width="140" height="140" viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">'+
-        '<circle cx="'+donutCx+'" cy="'+donutCy+'" r="'+donutR+'" fill="none" stroke="#e8e0d0" stroke-width="'+donutW+'"/>'+
-        '<circle cx="'+donutCx+'" cy="'+donutCy+'" r="'+donutR+'" fill="none" stroke="#2e7d55" stroke-width="'+donutW+'" stroke-dasharray="'+dashM+' '+gapM+'" transform="rotate(-90 '+donutCx+' '+donutCy+')" stroke-linecap="round"/>'+
-        (totalKeluar>0?'<circle cx="'+donutCx+'" cy="'+donutCy+'" r="'+donutR+'" fill="none" stroke="#a83a33" stroke-width="'+donutW+'" stroke-dasharray="'+dashK+' '+gapK+'" transform="rotate('+rotateK+' '+donutCx+' '+donutCy+')" stroke-linecap="round"/>':'')+
-        '<text x="'+donutCx+'" y="'+(donutCy-5)+'" text-anchor="middle" font-size="13" font-weight="700" fill="#28322a">'+Math.round(pctMasuk*100)+'%</text>'+
-        '<text x="'+donutCx+'" y="'+(donutCy+10)+'" text-anchor="middle" font-size="9" fill="#888">Masuk</text>'+
-        '</svg>';
-    } else {
-      donutSvg='<svg width="140" height="140" viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg"><circle cx="70" cy="70" r="54" fill="none" stroke="#e8e0d0" stroke-width="14"/><text x="70" y="75" text-anchor="middle" font-size="11" fill="#aaa">Kosong</text></svg>';
-    }
-    var rows='',rowNo=1;
-    rows+='<tr class="saldo-awal-row"><td colspan="2" style="font-style:italic;color:#7c8a6c;font-size:10.5px">Saldo Awal Periode</td><td></td><td></td><td class="num bold" style="color:#b07b1f">'+fmtRp(saldoAwal)+'</td></tr>';
-    periodItems.forEach(function(item){
-      var trx=item.trx;
-      var masuk =trx.jenis==='pemasukan'   ?fmtRp(trx.nominal):'-';
-      var keluar=trx.jenis==='pengeluaran' ?fmtRp(trx.nominal):'-';
-      var shade=rowNo%2===0?'background:#f7f4ea':'';
-      rows+='<tr style="'+shade+'"><td style="white-space:nowrap;font-size:10.5px">'+fmtTglShort(trx.tanggal)+'</td><td style="font-size:10.5px">'+escHtml(trx.keterangan||'')+'</td><td class="num green" style="font-size:10.5px">'+masuk+'</td><td class="num red" style="font-size:10.5px">'+keluar+'</td><td class="num bold" style="font-size:10.5px">'+fmtRp(item.saldo)+'</td></tr>';
-      rowNo++;
-    });
+    var kasSection=kasPrintSectionHtml(periodItems,saldoAwal,totalMasuk,totalKeluar,selisih,saldoAkhir);
     var printedAt=new Date().toLocaleString('id-ID',{dateStyle:'long',timeStyle:'short'});
 var html='<!DOCTYPE html><html><head><meta charset="UTF-8">'+
       '<title>Laporan Keuangan Muda-Mudi Margosari — '+periodeLabel+'</title>'+
@@ -560,22 +602,7 @@ var html='<!DOCTYPE html><html><head><meta charset="UTF-8">'+
       '<div class="print-header"><div class="ph-left"><div class="ph-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3f8a53" stroke-width="1.8"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg></div>'+
       '<div><div class="ph-sub">Laporan Keuangan</div><div class="ph-title">Muda-Mudi Margosari</div></div></div>'+
       '<div class="ph-right"><div class="ph-period-lbl">Periode Aktif</div><div class="ph-period-val">'+periodeLabel+'</div><div class="ph-badge">Kas &amp; Keuangan</div></div></div>'+
-      '<div class="cf-donut-row"><div class="cf-box"><div class="cf-box-title">Cash Flow Periode</div>'+
-      '<div class="cf-row"><div class="cf-icon" style="background:#e2f0e7">Sal</div><span class="cf-lbl">Saldo Awal</span><span class="cf-val" style="color:#b07b1f">'+fmtRp(saldoAwal)+'</span></div>'+
-      '<div class="cf-row"><div class="cf-icon" style="background:#e2f0e7">↑</div><span class="cf-lbl">Total Pemasukan</span><span class="cf-val" style="color:#2e7d55">'+fmtRp(totalMasuk)+'</span></div>'+
-      '<div class="cf-row"><div class="cf-icon" style="background:#f6e2df">↓</div><span class="cf-lbl">Total Pengeluaran</span><span class="cf-val" style="color:#a83a33">'+fmtRp(totalKeluar)+'</span></div>'+
-      '<div class="cf-row"><div class="cf-icon" style="background:#f5ead0">~</div><span class="cf-lbl">Selisih</span><span class="cf-val" style="color:'+(selisih>=0?'#2e7d55':'#a83a33')+'">'+fmtRp(selisih)+'</span></div>'+
-      '<div class="cf-saldo-akhir"><span class="cf-sa-lbl">Saldo Akhir</span><span class="cf-sa-val">'+fmtRp(saldoAkhir)+'</span></div></div>'+
-      '<div class="donut-box"><div class="donut-box-title">Komposisi</div>'+donutSvg+
-      '<div class="donut-legend">'+
-      (totalMasuk>0?'<div class="donut-leg-row"><div class="donut-dot" style="background:#2e7d55"></div><span class="donut-leg-lbl">Pemasukan</span><span class="donut-leg-val" style="color:#2e7d55">'+fmtRp(totalMasuk)+'</span></div>':'')+
-      (totalKeluar>0?'<div class="donut-leg-row"><div class="donut-dot" style="background:#a83a33"></div><span class="donut-leg-lbl">Pengeluaran</span><span class="donut-leg-val" style="color:#a83a33">'+fmtRp(totalKeluar)+'</span></div>':'')+
-      '</div></div></div>'+
-      '<div class="section-title">Detail Transaksi</div>'+
-      '<table><thead><tr><th>Tanggal</th><th>Keterangan</th><th style="text-align:right">Masuk (Rp)</th><th style="text-align:right">Keluar (Rp)</th><th style="text-align:right">Saldo (Rp)</th></tr></thead>'+
-      '<tbody>'+rows+
-      '<tr class="total-row"><td colspan="2">TOTAL PERIODE</td><td class="num green">'+fmtRp(totalMasuk)+'</td><td class="num red">'+fmtRp(totalKeluar)+'</td><td class="num bold">'+fmtRp(saldoAkhir)+'</td></tr>'+
-      '</tbody></table>'+
+      kasSection+
       '<div class="footer"><div class="footer-left">Dicetak: '+printedAt+'<br>Sistem Rekap Absensi Muda-Mudi Margosari</div>'+
       '<div class="sign-box"><div class="sign-line"></div>Bendahara / Penanggung Jawab</div></div>'+
       '</body></html>';

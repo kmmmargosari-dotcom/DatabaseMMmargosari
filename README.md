@@ -1,33 +1,28 @@
-# 📋 Sistem Rekap Keterangan Izin
+# Sistem Rekap Absensi Muda-Mudi Margosari
 
-> Aplikasi absensi & rekap kehadiran **Muda-Mudi Margosari** — menampilkan daftar keterangan izin anggota dalam **Masonry Grid bergaya Pinterest** dengan tinggi kartu menyesuaikan isi, plus tampilan **print-ready** (A4 landscape) yang sudah dioptimasi.
+> Aplikasi absensi & rekap kehadiran **Muda-Mudi Margosari** — rekap bulanan per anggota, ringkasan kas, insight kehadiran, serta tampilan **print-ready** (A4 landscape).
 
 ![Status](https://img.shields.io/badge/status-Private-red) ![Maintained](https://img.shields.io/badge/maintained-yes-brightgreen) ![Platform](https://img.shields.io/badge/platform-Web-blue) ![Language](https://img.shields.io/badge/language-JavaScript-yellow)
 
 ---
 
-## ✨ Tentang Project
+## Tentang Project
 
-Web ini dibuat untuk mempermudah **pengelolaan data internal** muda-mudi: mencatat kehadiran, memantau keterangan izin per anggota, mengelola kas, hingga melihat rekap bulanan — dalam satu aplikasi yang rapi, ringan, dan mudah dipakai di HP maupun laptop.
-
-Bagian **Keterangan Izin** dirancang khusus agar daftar nama + tanggal izin tampil padat dan enak dibaca: setiap anggota satu kartu, kolom menyesuaikan ruang, dan hasil cetaknya dioptimasi hemat tinta namun tetap jelas.
+Web ini dibuat untuk mempermudah **pengelolaan data internal** muda-mudi: mencatat kehadiran, memantau kehadiran per anggota, mengelola kas, melihat rekap bulanan, hingga mengekspor laporan — dalam satu aplikasi yang rapi, ringan, dan mudah dipakai di HP maupun laptop.
 
 ---
 
-## 🚀 Fitur Utama
+## Fitur Utama
 
-- 🔲 **Masonry Grid Layout** — daftar izin tersusun seperti Pinterest (`column-count`), kartu tidak terpotong antar-kolom.
-- 📏 **Auto-fit Content Height** — tinggi kartu otomatis mengikuti jumlah baris izin tiap anggota; tidak ada ruang kosong yang canggung.
-- 🖨️ **Print-Optimized View** — dokumen cetak A4 *landscape* (margin 10mm), `print-color-adjust: exact`, identik dengan preview layar.
-- 🗂️ **Rekap Bulanan** — tabel kehadiran, grafik per pertemuan, distribusi Hadir/Izin/Alfa.
-- 💰 **Manajemen Kas** — pencatatan masuk/keluar lengkap dengan saldo & laporan.
-- 👥 **Data Anggota** — CRUD anggota aktif & arsip, detail riwayat per orang.
-- 📤 **Ekspor Data** — Excel, CSV, dan Print untuk rekap absensi, kas, dan anggota.
-- 🧭 **Responsive** — layout terpisah untuk PC & mobile, navigasi bawah ala iOS.
+- **Rekap Bulanan** — tabel kehadiran per anggota, grafik per pertemuan, distribusi Hadir/Izin/Alfa, insight (tren vs bulan lalu).
+- **Manajemen Kas** — pencatatan masuk/keluar lengkap dengan saldo, cash flow, dan laporan.
+- **Data Anggota** — kelola anggota aktif & arsip, detail riwayat per orang.
+- **Ekspor Data** — Excel, CSV, dan Print untuk rekap absensi, kas, gabungan, dan anggota.
+- **Responsive** — layout terpisah untuk PC & mobile, navigasi bawah ala iOS.
 
 ---
 
-## 📸 Tampilan Layar
+## Tampilan Layar
 
 > Tambahkan tangkapan layar di folder `docs/screenshots/`, lalu ganti jalurnya di bawah ini.
 
@@ -37,7 +32,7 @@ Bagian **Keterangan Izin** dirancang khusus agar daftar nama + tanggal izin tamp
 
 ---
 
-## 🛠️ Teknologi yang Digunakan
+## Teknologi yang Digunakan
 
 | Bagian | Teknologi |
 | --- | --- |
@@ -51,7 +46,7 @@ Bagian **Keterangan Izin** dirancang khusus agar daftar nama + tanggal izin tamp
 
 ---
 
-## 💻 Cara Instalasi & Menjalankan
+## Cara Instalasi & Menjalankan
 
 Project ini murni **file statis** (tanpa build). Ikuti langkah berikut:
 
@@ -71,11 +66,11 @@ npx serve .
 3. **Buat akun** — tambahkan pengguna di Firebase Auth, lalu sesuaikan pemetaan `USERNAME_MAP` di `js/auth.js`.
 4. **Buka** `http://localhost:8080` (atau buka `index.html` langsung di browser).
 
-> 💡 **Catatan:** atur *Firestore Security Rules* agar hanya pengguna yang sudah login yang bisa mengakses data sebelum dipakai produksi.
+> Catatan: atur *Firestore Security Rules* agar hanya pengguna yang sudah login yang bisa mengakses data sebelum dipakai produksi.
 
 ---
 
-## 📂 Struktur Direktori
+## Struktur Direktori
 
 ```
 .
@@ -95,7 +90,7 @@ npx serve .
 │   ├── dashboard.js        # Halaman Dashboard
 │   ├── absen.js            # Halaman Absensi (isi kehadiran per sesi)
 │   ├── sesi.js             # Halaman Sesi (daftar seluruh sesi absensi)
-│   ├── rekap.js            # Halaman Rekap Bulanan & Keterangan Izin + export
+│   ├── rekap.js            # Halaman Rekap Bulanan, insight & grafik
 │   ├── kas.js              # Halaman Kas/Keuangan + export
 │   ├── anggota.js          # Halaman Data Anggota (CRUD) + export
 │   └── ekspor.js           # Halaman Ekspor terpusat

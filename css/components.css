@@ -1,7 +1,6 @@
 /* ══════════════════════════════════
    SKELETON LOADING
 ══════════════════════════════════ */
-.sk-wrap{padding:0}
 .sk-item{display:flex;align-items:center;gap:10px;padding:13px 14px;border-bottom:1px solid var(--border);background:var(--bg)}
 .sk-av{width:34px;height:34px;border-radius:50%;flex-shrink:0;background:var(--bg3);animation:skShimmer 1.3s infinite}
 .sk-lines{flex:1;display:flex;flex-direction:column;gap:6px}
@@ -27,6 +26,7 @@
 .izin-popup-header{display:flex;align-items:center;gap:12px;padding:16px 16px 12px;border-bottom:1px solid var(--border)}
 .izin-popup-icon{width:34px;height:34px;border-radius:50%;background:var(--amber-lt);color:var(--amber);
   display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0}
+.izin-popup-icon .ico{width:17px;height:17px}
 .izin-popup-title{font-weight:600;font-size:14px;color:var(--amber)}
 .izin-popup-name{font-size:11px;color:var(--text2);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px}
 .izin-popup-body{padding:14px 16px}
@@ -114,12 +114,10 @@
 .sf-x.on{border-color:var(--border);background:var(--bg3);color:var(--text2)}
 .mdet-sf-reset{font-size:10px;padding:3px 8px;border-radius:99px;border:none;background:none;color:var(--text3);cursor:pointer;font-family:inherit;text-decoration:underline;margin-left:2px}
 .mdet-sf-reset:hover{color:var(--text)}
-.mem-detail-btn{font-size:11px;padding:4px 9px;color:var(--gold-dk);border-color:var(--gold);background:var(--gold-xlt)}
-.mem-detail-btn:hover{background:var(--gold-lt)}
 
 /* ══════════════════════════════════
    EXPORT MULTI POPUP
-══════════════════════════════════ */
+   ══════════════════════════════════ */
 .exp-check-row{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:6px;cursor:pointer;font-size:13px;transition:background .12s}
 .exp-check-row:hover{background:var(--bg2)}
 .exp-check-row input[type=checkbox]{width:15px;height:15px;cursor:pointer;accent-color:var(--gold-dk);flex-shrink:0}

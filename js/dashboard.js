@@ -40,13 +40,10 @@ function renderDashboard(){
   // Sapaan welcome card berdasar jam (pagi/siang/sore/malam)
   var jam = new Date().getHours();
   var sapaan = jam<4 ? 'Selamat Malam' : jam<11 ? 'Selamat Pagi' : jam<15 ? 'Selamat Siang' : jam<18 ? 'Selamat Sore' : 'Selamat Malam';
-  var emoji = jam<4 ? '🌙' : jam<11 ? '☀️' : jam<15 ? '🌤️' : jam<18 ? '🌇' : '🌙';
 
   function setTxt(id,v){ var el=document.getElementById(id); if(el) el.textContent=v; }
   setTxt('dash-welcome-greet', sapaan);
   setTxt('dash-welcome-greet-mob', sapaan);
-  setTxt('dash-welcome-emoji', emoji);
-  setTxt('dash-welcome-emoji-mob', emoji);
   setTxt('dash-generus-pc',  totalGenerus);
   setTxt('dash-kegiatan-pc', kegiatanBulanIni);
   setTxt('dash-persen-pc',   persen+'%');

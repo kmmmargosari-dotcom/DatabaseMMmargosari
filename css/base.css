@@ -1,8 +1,7 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 *{-webkit-tap-highlight-color:transparent}
 :root{
-  /* Buku Induk — tema "civic ledger": tinta hijau-pinus di atas kertas daftar
-     hadir lawas, dengan aksen merah-cap (stempel resmi) sebagai sorotan. */
+  /* Tema: tinta hijau-pinus di atas kertas cream, aksen merah-cap. */
   --gold:#1f5c3d;           /* accent: tinta hijau-pinus (primary CTA)   */
   --gold-dk:#153f2a;        /* accent-press: tinta pekat saat ditekan    */
   --gold-lt:#dbe7d7;        /* tint: pita hijau lembut                   */
@@ -40,7 +39,7 @@ input:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(63,1
 input::placeholder{color:var(--text3)}
 
 /* ── TYPE: ledger display + label fonts ── */
-.pc-topbar-title,.mob-pg-hd h3,.ndash-header-title,.setup-title,.login-card-title,.sidebar-title,.mdet-name,.kas-dash-hd-title,.dash-title{font-family:var(--font-display);font-weight:600;letter-spacing:0}
+.pc-topbar-title,.mob-pg-hd h3,.login-card-title,.sidebar-title,.mdet-name{font-family:var(--font-display);font-weight:600;letter-spacing:0}
 
 /* ── SVG ICONS ── */
 .ico{display:inline-block;vertical-align:middle;width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
@@ -93,19 +92,12 @@ tr.gender-sep-p td{background:#f3e2d8;color:var(--brown)}
 .sync-ok  {background:var(--green-lt);color:var(--green);border-color:#c7ddc9}
 .sync-off {background:var(--red-lt);color:var(--red);border-color:#e6bfb4}
 .sync-save{background:var(--amber-lt);color:var(--amber);border-color:#e6cf9e}
-.sync-pending{background:var(--amber-lt);color:var(--amber);border-color:#e6cf9e}
-.pc-sync-wrap{padding:6px 12px 2px}
+.sync-badge::before{content:'';width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0}
 #pc-sync-badge{margin:6px 12px;border-radius:20px}
 .user-info{display:flex;align-items:center;gap:8px;padding:12px 14px;border-top:1px solid var(--border);background:var(--bg)}
 .u-av{width:30px;height:30px;border-radius:50%;background:var(--gold-lt);color:var(--brown);font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--gold)}
 .u-nama{font-size:12px;font-weight:500}
 .u-role{font-size:10px;color:var(--text3);text-transform:capitalize;letter-spacing:.2px}
-
-/* ── STAT GRID (rekap) ── */
-.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px}
-.stat{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:14px;text-align:center}
-.stat-lbl{font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;font-weight:500}
-.stat-val{font-size:22px;font-weight:300;color:var(--text)}
 
 /* ── DB ITEM ── */
 .db-section-hd{font-size:10px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--text3);padding:14px 16px 6px;background:var(--bg2);border-top:2px solid var(--bg3);border-bottom:1px solid var(--border);margin-top:4px}
@@ -117,18 +109,12 @@ tr.gender-sep-p td{background:#f3e2d8;color:var(--brown)}
 .db-ket{font-size:11px;color:var(--gold-dk);margin-top:1px;font-style:italic}
 .db-sub{font-size:11px;color:var(--text2);margin-top:3px}
 .db-badges{display:flex;gap:4px;flex-wrap:wrap}
-.db-actions{display:flex;gap:6px}
 
 /* ── MEMBER ITEM ── */
 .mem-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--bg)}
 .mem-info{flex:1}
 .mem-name{font-size:13px;font-weight:500}
 .mem-gender{font-size:11px;color:var(--text3);margin-top:1px}
-
-/* ── ADD FORM ── */
-.add-form{display:none;padding:12px;border-bottom:1px solid var(--border);background:var(--bg2);gap:8px;flex-wrap:wrap;align-items:flex-end}
-.add-form.open{display:flex}
-.add-form input{flex:1;min-width:140px}
 
 /* ── EMPTY STATE ── */
 .empty{padding:40px;text-align:center;color:var(--text3);font-size:12px;letter-spacing:.2px}
@@ -158,10 +144,6 @@ tr.gender-sep-p td{background:#f3e2d8;color:var(--brown)}
 .more-btn{background:none;border:none;color:var(--text3);font-size:15px;cursor:pointer;padding:4px 3px;line-height:1;letter-spacing:2px;font-family:inherit}
 .more-btn:hover{color:var(--text);background:none}
 
-/* ── INLINE PANEL (kept for compat) ── */
-.ip{display:none}
-.ip.open{display:none}
-.ip-icon{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .ig{background:var(--green-lt);color:var(--green)}
 .iamb{background:var(--amber-lt);color:var(--amber)}
 .ir{background:var(--red-lt);color:var(--red)}
@@ -187,47 +169,6 @@ tr.gender-sep-p td{background:#f3e2d8;color:var(--brown)}
 .izin-tpl:hover{background:var(--amber);color:#fff}
 .izin-tpl:active{transform:scale(0.93)}
 
-/* ── DASHBOARD CARD (mobile) ── */
-.dash-card{background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:32px;width:100%;max-width:440px;box-shadow:var(--shadow-md)}
-.dash-hero{text-align:center;padding-bottom:24px;border-bottom:1px solid var(--border);margin-bottom:20px}
-.dash-org{font-size:10px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--gold-dk);margin-bottom:8px}
-.dash-title{font-size:22px;font-weight:300;color:var(--text);line-height:1.35;letter-spacing:-.4px}
-.dash-date{font-size:11px;color:var(--text3);margin-top:6px}
-.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.dash-item{display:flex;align-items:center;gap:12px;padding:14px 12px;border-radius:var(--rl);border:1px solid var(--border);background:var(--bg);cursor:pointer;transition:all .15s}
-.dash-item:hover{background:var(--bg2);box-shadow:var(--shadow);transform:translateY(-1px)}
-.dash-item:active{transform:scale(0.97)}
-.dash-ico-wrap{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.dash-item-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;font-weight:500;margin-bottom:2px}
-.dash-item-title{font-size:13px;font-weight:500;color:var(--text);letter-spacing:-.1px}
-.mob-dash-wrap{display:flex;align-items:flex-start;justify-content:center;padding:20px 16px;min-height:100%}
-.mob-dash-card{background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:24px;width:100%;box-shadow:var(--shadow-md)}
-.mob-user-inner{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--border);margin-bottom:16px}
-.mob-dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-
-/* ── EXPORT DROPDOWN ── */
-.exp-wrap{position:relative;display:inline-block}
-.exp-menu{display:none;position:absolute;right:0;top:calc(100% + 6px);background:var(--bg);border:1px solid var(--border);border-radius:var(--rxl);box-shadow:0 12px 32px rgba(0,0,0,.14);z-index:200;min-width:200px;padding:6px;white-space:nowrap;overflow:hidden}
-.exp-menu.open{display:block;animation:fadeUp .15s ease both}
-.exp-menu button{display:flex;align-items:center;gap:9px;width:100%;text-align:left;padding:10px 13px;font-size:12.5px;background:none;border:none;border-radius:var(--r);cursor:pointer;color:var(--text);font-family:inherit;font-weight:400;letter-spacing:0;transition:background .12s}
-.exp-menu button:hover{background:var(--bg2)}
-.exp-menu .exp-divider{height:1px;background:var(--border);margin:4px 8px}
-.exp-menu .exp-section-label{font-size:10px;color:var(--text3);font-weight:600;letter-spacing:.6px;text-transform:uppercase;padding:6px 14px 2px;pointer-events:none}
-
-/* ── IZIN SHEET v3 (per-member cards) ── */
-.iz3-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 8px;margin-top:16px;border-bottom:1px solid var(--border)}
-.iz3-title{font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--gold-dk)}
-.iz3-total{font-size:10px;color:var(--text3);background:var(--gold-xlt);border:1px solid var(--gold-lt);padding:2px 9px;border-radius:99px;font-weight:600}
-.iz3-grid{column-count:6;column-gap:12px;padding:14px 16px 8px}
-.iz3-card{break-inside:avoid;page-break-inside:avoid;display:inline-block;width:100%;margin-bottom:12px;border:1px solid rgba(0,0,0,.12);border-radius:8px;padding:10px 12px;height:auto;background:var(--bg)}
-.iz3-nama{font-size:11px;font-weight:700;color:var(--text);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.2px;padding-bottom:5px;border-bottom:1px solid var(--border);margin-bottom:2px}
-.iz3-line{display:flex;align-items:baseline;gap:7px;min-width:0}
-.iz3-tgl{font-size:10px;color:var(--gold-dk);font-weight:600;font-family:var(--font-label);font-variant-numeric:tabular-nums;white-space:nowrap;flex-shrink:0}
-.iz3-kg{font-size:10.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-.iz3-note{font-size:9.5px;color:var(--amber);white-space:nowrap;flex-shrink:0;font-style:italic}
-.iz-empty{padding:12px 14px;text-align:center;color:var(--text3);font-size:11px}
-.izin-sheet-hd{font-size:13px;font-weight:600;color:var(--amber);margin:28px 0 10px;padding:12px 16px;background:var(--amber-lt);border-left:3px solid var(--amber);border-radius:0 var(--r) var(--r) 0;letter-spacing:.1px}
-
 /* ── REKAP SUMMARY PANEL ── */
 .rs-panel{display:flex;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border);background:var(--bg);gap:0;min-height:0}
 .rs-donut-area{display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0;padding-right:4px}
@@ -239,23 +180,18 @@ tr.gender-sep-p td{background:#f3e2d8;color:var(--brown)}
 .rs-val{font-size:26px;font-weight:300;line-height:1;letter-spacing:-.5px}
 .rs-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);font-weight:500;margin-top:3px}
 
-/* ══════════════════════════════════════════════════
-   BUKU INDUK — sentuhan khas "register ledger":
-   label kecil & angka memakai huruf mono seperti mesin
-   ketik formulir, terpisah jelas dari nama orang (serif/
-   sans) supaya kolom angka terasa rapi & mudah dipindai.
-   ══════════════════════════════════════════════════ */
-.sec-title,.db-section-hd,.stat-lbl,.fr label,.iz3-title,.iz3-total,
-.rs-donut-lbl,.rs-lbl,.kas-stat-lbl,.kas-cf-title,.kas-cf-hd-sub,
-.kas-cf-hd-period-lbl,.kas-tbl-title,.kas-dash-hd-sub,.kas-donut-ttl,
-.kas-line-title,.rekap-chart-title,.exp-menu .exp-section-label,
-.dash-item-label,.dash-org,.u-role,.izin-popup-label,.mdet-stat-lbl,
+/* Label kecil & angka: font mono agar rapi dipindai. */
+.sec-title,.db-section-hd,.fr label,
+.rs-donut-lbl,.rs-lbl,.kas-cf-title,
+.kas-donut-ttl,
+.kas-line-title,.rekap-chart-title,
+.u-role,.izin-popup-label,.mdet-stat-lbl,
 .mdet-section-title,.mdet-table th,.mdet-status-lbl,.sidebar-label,
-.col-hd,.nstat-sub,.kas-riwayat-table th,.kas-mob-stat-lbl,tr.gender-sep td{
+.col-hd,.nstat-sub,.kas-riwayat-table th,tr.gender-sep td{
   font-family:var(--font-label);
 }
 
-.stat-val,.rs-val,.kas-stat-val,.kas-cf-hd-period-val,.kas-mob-stat-val,
+.rs-val,
 .kas-cf-saldo-akhir-val,.kas-cf-row-val,.kas-mob-total-val,.mdet-stat-val,
 .nstat-val,.kas-donut-leg-val{
   font-family:var(--font-label);font-weight:600;font-variant-numeric:tabular-nums;
@@ -267,8 +203,6 @@ table td:not(.tl){font-family:var(--font-label);font-variant-numeric:tabular-num
    MICRO-INTERACTIONS & POLISH
    ══════════════════════════════════════════════════ */
 button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
-/* Klik pakai mouse/jari: tidak muncul outline default browser (biru) — focus
-   ring hijau tetap muncul hanya saat navigasi keyboard (a11y). */
 button:focus:not(:focus-visible),select:focus:not(:focus-visible){outline:none}
 .btn-p:hover{box-shadow:0 4px 14px rgba(31,92,61,.22);transform:translateY(-1px)}
 .btn-p:active{transform:translateY(0) scale(.96)}
@@ -287,28 +221,18 @@ button:focus:not(:focus-visible),select:focus:not(:focus-visible){outline:none}
 .nstat-card:active,.exp-card:active,.mem-item:active{transform:scale(.98)}
 .db-item:active{background:var(--bg3)}
 
-/* ══════════════════════════════════════════════════
-   SMOOTH MOTION — transisi halus di seluruh app
-   Durasi pendek & konsisten (150–250ms). Elemen muncul
-   pakai ease-out, elemen yang hilang pakai ease-in.
-   ══════════════════════════════════════════════════ */
-
-/* Item list / konten baru: muncul fade + slide kecil ke atas */
-.list-in{animation:listIn .18s ease-out both}
+/* Motion: durasi pendek & konsisten (150–250ms). */
 @keyframes listIn{from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)}}
 
 /* Baris tabel: fade halus saat list dirender ulang */
 @keyframes rowIn{from{opacity:0} to{opacity:1}}
 
-/* Hapus item: ciutkan tinggi + fade sebelum list diganti, biar tidak "loncat" */
+/* Hapus item: ciutkan tinggi + fade sebelum list diganti */
 .collapsing{overflow:hidden!important;opacity:0!important;transform:scale(.94)!important;
   transition:height .22s ease,margin .22s ease,padding .22s ease,opacity .18s ease,transform .18s ease!important}
 
 /* Feedback tap pada kartu/konten yang bisa diklik */
 .swipe-content.db-item:active{transform:scale(.985);background:var(--bg3)}
-
-/* Form tambah inline yang dibuka-tutup */
-.add-form.open{animation:listIn .18s ease-out both}
 
 /* Panel ringkasan (rekap) ikut fade saat dirender ulang */
 .rs-panel{animation:listIn .2s ease-out both}

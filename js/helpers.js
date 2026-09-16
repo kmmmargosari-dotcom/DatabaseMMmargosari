@@ -48,18 +48,43 @@ function showToast(msg, duration){
   }, duration||2200);
 }
 
+// Putuskan apakah section kas harus lompat ke halaman baru: hanya bila
+// konten sebelumnya sudah melebihi satu halaman cetak. Murni fungsi data
+// (mudah di-unit-test); pengukuran offsetTop dilakukan pemanggil.
+function kasBreakDecision(preKasTop, pageH){
+  return preKasTop > pageH;
+}
+
 function _printWithIframe(html){
   var old = document.getElementById('_print_frame');
   if(old) old.remove();
   var f = document.createElement('iframe');
   f.id = '_print_frame';
-  f.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:794px;height:1123px;border:none';
+  // Lebar disamakan dengan lebar konten cetak A4 landscape (297-20mm)
+  // supaya pengukuran tinggi mendekati hasil cetak sebenarnya.
+  f.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1047px;height:1123px;border:none';
   document.body.appendChild(f);
   f.contentDocument.open();
   f.contentDocument.write(html);
   f.contentDocument.close();
   f.contentWindow.focus();
-  setTimeout(function(){ f.contentWindow.print(); }, 900);
+  setTimeout(function(){
+    try{
+      // Ukur tinggi AKTUAL hasil render: bila semua konten sebelum kas
+      // masih muat satu halaman, batalkan lompatan halaman paksa supaya
+      // tidak ada setengah halaman kosong. Dokumen panjang tetap
+      // menaruh kas di halaman baru seperti semula.
+      var doc=f.contentDocument;
+      var kasEl=doc.querySelector('.kas-print-page');
+      if(kasEl){
+        var pageH=(210-20)/25.4*96; // area cetak A4 landscape (px)
+        var top=0, el=kasEl;
+        while(el){ top+=el.offsetTop||0; el=el.offsetParent; }
+        if(!kasBreakDecision(top, pageH)) kasEl.classList.add('no-break');
+      }
+    }catch(e){}
+    f.contentWindow.print();
+  }, 900);
 }
 
 function fmtRp(n){
@@ -240,15 +265,6 @@ function refreshNow(){
   location.reload();
 }
 
-// Titik sambung untuk mekanisme pengecekan update.
-// Implementasikan pemanggilan showUpdateNotification() di sini ketika update
-// terdeteksi, mis. setelah membandingkan nomor build/versi.
-function appCheckForUpdate(){
-  if(typeof window._appUpdateCheck === 'function'){
-    window._appUpdateCheck(showUpdateNotification);
-  }
-}
-
 function skeletonHtml(count){
   var h='';
   for(var i=0;i<(count||5);i++){
@@ -262,11 +278,6 @@ function skeletonHtml(count){
     '</div>';
   }
   return h;
-}
-
-function showSkeleton(elId, count){
-  var el = document.getElementById(elId);
-  if(el) el.innerHTML = skeletonHtml(count||5);
 }
 
 // Buat path SVG garis halus (Catmull-Rom -> Bezier) dari array titik [x,y]
@@ -289,7 +300,7 @@ function smoothLinePath(pts){
 // ══════════════════════════════════════════════════
 // SWIPE TO DELETE
 // Struktur item: <div class="swipe-row" data-key="...">
-//   <div class="swipe-reveal">🗑 Hapus</div>
+//   <div class="swipe-reveal">Hapus</div>
 //   <div class="swipe-content" onclick="...">...</div>
 // </div>
 // Geser kiri sampai penuh → panggil onConfirm() (biasanya membuka konfirmasi

@@ -94,7 +94,17 @@ function selesaiSummary(){
 }
 
 function _selesaiSave(){
-  if(absenTgl){ sesiKet[absenTgl] = absenKet; fbSaveSesi(absenTgl); }
+  if(absenTgl){
+    sesiKet[absenTgl] = absenKet;
+    if(!sesiRoster[absenTgl]){
+      var _ss = sesiData[absenTgl]||{};
+      sesiRoster[absenTgl] = Object.keys(_ss).map(function(nm){
+        var _e = _ss[nm]||{};
+        return {nama:nm, gender:_e.gender || memberGenderNow(nm) || '?'};
+      });
+    }
+    fbSaveSesi(absenTgl);
+  }
   _absenDirty = false;
   syncRekapFilter();
   resetAbsenForm();
@@ -139,14 +149,14 @@ function sesiLabel(key){
 function mulaiAbsensi(isMob){
   var suf = isMob ? 'M' : '';
   var tgl = document.getElementById('sTgl'+suf).value;
-  if(!tgl){ appAlert('Pilih tanggal dulu!'); return; }
+  if(!tgl){ appAlert('Pilih tanggal dahulu.'); return; }
   var parts  = tgl.split('-');
   var tahun  = parseInt(parts[0]);
   var bulan  = parseInt(parts[1]);
   var ket    = document.getElementById('sKet'+suf).value.trim();
   if(sesiData[tgl]){
     var existingKet = sesiKet[tgl]||'(tanpa nama)';
-    appConfirm('Tanggal ini sudah ada sesi:\n"'+existingKet+'"\n\nBuat sesi BARU untuk hari yang sama?', function(){
+    appConfirm('Tanggal ini sudah memiliki sesi:\n"'+existingKet+'"\n\nBuat sesi baru untuk hari yang sama?', function(){
       var n=2;
       while(sesiData[tgl+'_'+n]) n++;
       _mulaiAbsensiFinish(tgl+'_'+n, bulan, tahun, ket);
@@ -160,6 +170,9 @@ function _mulaiAbsensiFinish(sessionKey, bulan, tahun, ket){
   absenTgl=sessionKey; absenBulan=bulan; absenTahun=tahun; absenKet=ket;
   _absenDirty=false;
   if(!sesiData[sessionKey]) sesiData[sessionKey]={};
+  if(!sesiRoster[sessionKey]){
+    sesiRoster[sessionKey] = activeMembers().map(function(m){ return {nama:m.nama, gender:m.gender}; });
+  }
   sesiKet[sessionKey] = ket;
   fbSaveSesi(sessionKey);
   absenGender='S'; openPanel=null;
@@ -323,6 +336,7 @@ function saveIzinPopup(){
   if(!sesiData[absenTgl][_izinNama]) sesiData[absenTgl][_izinNama]={};
   sesiData[absenTgl][_izinNama].status  = 'I';
   sesiData[absenTgl][_izinNama].catatan = val;
+  stampEntryGender(absenTgl, _izinNama);
   _absenDirty = true;
   logActivity('absen', 'Izin '+_izinNama+(val?' ('+val+')':'')+(absenKet?' ['+absenKet+']':''));
   fbSaveSesi(absenTgl);
@@ -331,21 +345,12 @@ function saveIzinPopup(){
   redraw(ctx);
 }
 
-function ipBtn(ic, svgId, label, action){
-  return '<button class="ip-btn" onclick="'+action+'">'+
-    '<span class="ip-icon '+ic+'"><svg class="ico" style="width:13px;height:13px"><use href="#ico-'+svgId+'"></use></svg></span>'+label+'</button>';
-}
-
-// ── Panel Control ──
-function togglePanel(key, ctx){ openPanel = (openPanel===key) ? null : key; redraw(ctx); }
-function openNote(nama, ctx){ openPanel = eid(nama)+'|note'; redraw(ctx); }
-function closePanel(ctx){ openPanel=null; redraw(ctx); }
-
 // ── Status Mutation ──
 function setStatus(nama, s, ctx){
   if(!sesiData[absenTgl]) sesiData[absenTgl]={};
   if(!sesiData[absenTgl][nama]) sesiData[absenTgl][nama]={};
   sesiData[absenTgl][nama].status = s;
+  stampEntryGender(absenTgl, nama);
   if(s!=='I') delete sesiData[absenTgl][nama].catatan;
   _absenDirty = true;
   var sl = s==='H'?'Hadir':s==='I'?'Izin':'Alfa';
@@ -362,16 +367,6 @@ function setStatus(nama, s, ctx){
   }, 30);
 }
 
-function setStatusIzin(nama, ctx){
-  if(!sesiData[absenTgl]) sesiData[absenTgl]={};
-  if(!sesiData[absenTgl][nama]) sesiData[absenTgl][nama]={};
-  sesiData[absenTgl][nama].status = 'I';
-  _absenDirty = true;
-  fbSaveSesi(absenTgl);
-  openPanel = eid(nama)+'|note';
-  redraw(ctx);
-}
-
 function clearStatus(nama, ctx){
   if(sesiData[absenTgl]&&sesiData[absenTgl][nama]){
     delete sesiData[absenTgl][nama].status;
@@ -381,22 +376,6 @@ function clearStatus(nama, ctx){
   logActivity('absen', 'Hapus status '+nama+(absenKet?' ('+absenKet+')':''));
   fbSaveSesi(absenTgl);
   openPanel=null; redraw(ctx);
-}
-
-function saveNote(nama, ctx){
-  var key = eid(nama);
-  var val = document.getElementById('fNote-'+ctx+'-'+key).value.trim();
-  if(!sesiData[absenTgl]) sesiData[absenTgl]={};
-  if(!sesiData[absenTgl][nama]) sesiData[absenTgl][nama]={};
-  sesiData[absenTgl][nama].catatan = val;
-  _absenDirty = true;
-  fbSaveSesi(absenTgl);
-  openPanel=null; redraw(ctx);
-}
-
-function fillNote(ctx, key, val){
-  var el = document.getElementById('fNote-'+ctx+'-'+key);
-  if(el){ el.value = val; el.focus(); }
 }
 
 function redraw(ctx){
@@ -449,6 +428,7 @@ function _doApplyBulk(status, names, ket){
   names.forEach(function(nama){
     if(!sesiData[absenTgl][nama]) sesiData[absenTgl][nama]={};
     sesiData[absenTgl][nama].status = status;
+    stampEntryGender(absenTgl, nama);
     if(status==='I') sesiData[absenTgl][nama].catatan = ket;
     else delete sesiData[absenTgl][nama].catatan;
   });
